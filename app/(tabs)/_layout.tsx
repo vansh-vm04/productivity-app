@@ -18,6 +18,10 @@ export default function TabLayout() {
           paddingTop: 2,
           paddingHorizontal: 24,
         },
+        tabBarLabelStyle: {
+          fontFamily: "Poppins-SemiBold",
+          fontSize: 8.5,
+        }
       }}
     >
       <Tabs.Screen

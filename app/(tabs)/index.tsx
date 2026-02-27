@@ -80,17 +80,16 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
   headerGreeting: {
-    fontSize: 28,
-    fontWeight: "300",
+    fontSize: 26,
+    fontFamily: "Poppins-Light",
   },
   headerName: {
-    fontSize: 28,
-    fontWeight: "400",
+    fontSize: 26,
+    fontFamily: "Poppins-Medium",
   },
   headerTextSmall: {
-    lineHeight: 18,
-    fontSize: 14,
-    fontWeight: "300",
+    fontSize: 12,
+    fontFamily: "Poppins-Light",
   },
   headerLeft: {
     justifyContent: "center",
@@ -105,7 +104,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   addButtonText: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "200",
     color: "#ffffff",
     textAlign: "center",
@@ -148,13 +147,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   cardTextGray: {
-    fontSize: 12,
-    fontWeight: "400",
+    fontSize: 10,
+    fontFamily: "Poppins-Regular",
     color: "#6B6B6B",
   },
   cardTextBlack: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 14,
+    fontFamily: "Poppins-SemiBold",
     color: "#2B2B2B",
   },
   noteBox: {
@@ -163,11 +162,11 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   noteContainer: {
-    paddingVertical: 8,
+    paddingVertical: 4,
   },
   noteText: {
-    fontSize: 12,
-    fontWeight: "400",
+    fontSize: 10,
+    fontFamily: "Poppins-Regular",
     color: "#6B6B6B",
     textOverflow: "ellipsis",
   },

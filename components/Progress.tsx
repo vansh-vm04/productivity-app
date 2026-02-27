@@ -80,12 +80,13 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 16,
+    fontFamily: "Poppins-Bold", 
     color: "#3b3660",
     borderBottomColor: "rgba(155, 123, 247, 0.15)",
     borderBottomWidth: 1,
-    paddingVertical: 10,
+    paddingTop: 6,
+    paddingBottom: 4,
     width: "100%",
   },
   centerContent: {
@@ -99,19 +100,22 @@ const styles = StyleSheet.create({
   },
   subText: {
     fontSize: 14,
+    fontFamily: "Poppins-Regular",
     color: "#6b6894",
     marginTop: 4,
   },
   message: {
-    fontSize: 15,
+    fontSize: 13,
     color: "#6b6894",
     textAlign: "center",
-    marginTop: -26,
+    marginTop: -36,
+    fontFamily: "Poppins-Medium",
   },
   progressContainer: {
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingTop: 14,
+    paddingBottom: 8,
   },
 });
