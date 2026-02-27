@@ -1,17 +1,18 @@
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import TodayProgress from "@/components/Progress";
 
 export default function Index() {
   return (
-    <View
-      style={styles.screen}
-    >
+    <View style={styles.screen}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.headerTextSmall}>Good Morning,</Text>
-          <Text style={styles.headerTextLarge}>Vansh!</Text>
+          <Text style={styles.headerGreeting}>Hey <Text style={styles.headerName}>Vansh!</Text></Text>
+          <Text style={styles.headerTextSmall}>
+            Let’s make today productive.
+          </Text>
         </View>
 
         <TouchableOpacity style={styles.addButton}>
@@ -20,13 +21,17 @@ export default function Index() {
       </View>
 
       {/* Content */}
+      <TodayProgress completed={12} total={20}></TodayProgress>
+
       <View style={styles.cardView}>
         {/* Notes Card */}
         <View style={styles.noteCard}>
           <Text style={styles.cardTextBlack}>Notes</Text>
           <View style={styles.noteContainer}>
             <View style={styles.noteBox}>
-              <Text numberOfLines={2} style={styles.noteText}>Meeting at 3 PM</Text>
+              <Text numberOfLines={2} style={styles.noteText}>
+                Meeting at 3 PM
+              </Text>
             </View>
           </View>
         </View>
@@ -34,7 +39,7 @@ export default function Index() {
         <View style={styles.otherCards}>
           {/* Task Card */}
           <View style={styles.taskCard}>
-            <FontAwesome5 name="tasks" size={24} color="#2B2B2B" />
+            <FontAwesome5 name="tasks" size={22} color="#2B2B2B" />
 
             <View>
               <Text style={styles.cardTextGray}>20 Tasks</Text>
@@ -43,7 +48,7 @@ export default function Index() {
           </View>
           {/* Streak Card */}
           <View style={styles.streakCard}>
-            <AntDesign name="fire" size={24} color="#2B2B2B" />
+            <AntDesign name="fire" size={22} color="#2B2B2B" />
 
             <View>
               <Text style={styles.cardTextGray}>7 days</Text>
@@ -57,7 +62,7 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  screen:{
+  screen: {
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
@@ -65,7 +70,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     paddingHorizontal: 24,
   },
-  header:{
+  header: {
     width: "100%",
     backgroundColor: "#ffffff",
     justifyContent: "space-between",
@@ -74,19 +79,24 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingTop: 50,
   },
-  headerTextLarge:{
-    fontSize: 32,
+  headerGreeting: {
+    fontSize: 28,
+    fontWeight: "300",
+  },
+  headerName: {
+    fontSize: 28,
     fontWeight: "400",
   },
-  headerTextSmall:{
-    fontSize: 12,
-    fontWeight: "400",
+  headerTextSmall: {
+    lineHeight: 18,
+    fontSize: 14,
+    fontWeight: "300",
   },
-  headerLeft:{
+  headerLeft: {
     justifyContent: "center",
     alignItems: "flex-start",
   },
-  addButton:{
+  addButton: {
     width: 56,
     height: 56,
     borderRadius: 28,
@@ -94,71 +104,71 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  addButtonText:{
+  addButtonText: {
     fontSize: 28,
     fontWeight: "200",
     color: "#ffffff",
     textAlign: "center",
     lineHeight: 40,
   },
-  cardView:{
+  cardView: {
     width: "100%",
-    height: "40%",
+    height: "36%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 16,
+    paddingVertical: 10,
   },
-  noteCard:{
+  noteCard: {
     width: "49%",
     height: "100%",
-    backgroundColor: "#f8e9c8",
+    backgroundColor: "#f8efc8",
     borderRadius: 34,
-    padding: 24
+    padding: 24,
   },
-  otherCards:{
+  otherCards: {
     width: "49%",
     height: "100%",
     justifyContent: "space-between",
   },
-  taskCard:{
+  taskCard: {
     width: "100%",
     height: "49%",
-    backgroundColor: "#deecec",
+    backgroundColor: "#f8e0c8",
     borderRadius: 34,
     padding: 24,
     justifyContent: "space-between",
   },
-  streakCard:{
+  streakCard: {
     width: "100%",
     height: "49%",
-    backgroundColor: "#ded3fd",
+    backgroundColor: "#c8f8dc",
     borderRadius: 34,
     padding: 24,
     justifyContent: "space-between",
   },
-  cardTextGray:{
-    fontSize: 14,
+  cardTextGray: {
+    fontSize: 12,
     fontWeight: "400",
     color: "#6B6B6B",
   },
-  cardTextBlack:{
-    fontSize: 18,
+  cardTextBlack: {
+    fontSize: 16,
     fontWeight: "600",
     color: "#2B2B2B",
   },
-  noteBox:{
+  noteBox: {
     borderTopColor: "#A3A3A3",
     borderTopWidth: 0.5,
     paddingVertical: 6,
   },
-  noteContainer:{
+  noteContainer: {
     paddingVertical: 8,
   },
-  noteText:{
-    fontSize: 14,
+  noteText: {
+    fontSize: 12,
     fontWeight: "400",
     color: "#6B6B6B",
     textOverflow: "ellipsis",
-  }
-})
+  },
+});
