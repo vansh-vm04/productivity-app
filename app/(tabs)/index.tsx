@@ -67,12 +67,12 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     position: "relative",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#111111",
     paddingHorizontal: 24,
   },
   header: {
     width: "100%",
-    backgroundColor: "#ffffff",
+    backgroundColor: "transparent",
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
@@ -82,14 +82,17 @@ const styles = StyleSheet.create({
   headerGreeting: {
     fontSize: 26,
     fontFamily: "Poppins-Light",
+    color: "#ffffff",
   },
   headerName: {
     fontSize: 26,
     fontFamily: "Poppins-Medium",
+    color: "#ffffff",
   },
   headerTextSmall: {
     fontSize: 12,
     fontFamily: "Poppins-Light",
+    color: "#ffffff",
   },
   headerLeft: {
     justifyContent: "center",
@@ -99,7 +102,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#434343",
+    backgroundColor: "#E10600",
     alignItems: "center",
     justifyContent: "center",
   },

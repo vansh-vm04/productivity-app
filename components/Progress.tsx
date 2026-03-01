@@ -29,10 +29,7 @@ export default function TodayProgress({ completed, total }: Props) {
   };
 
   return (
-    <LinearGradient
-      colors={["#f3e8ff", "#e8eaff", "#dbeafe"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+    <View
       style={styles.card}
     >
       <Text style={styles.cardTitle}>{"Today's Progress"}</Text>
@@ -41,8 +38,8 @@ export default function TodayProgress({ completed, total }: Props) {
           size={180}
           width={12}
           fill={progress}
-          tintColor="#9b7bf7"
-          backgroundColor="#d7d0e774"
+          tintColor="#E10600"
+          backgroundColor="#e7a0a030"
           arcSweepAngle={180}
           rotation={270}
           lineCap="round"
@@ -59,7 +56,7 @@ export default function TodayProgress({ completed, total }: Props) {
 
         <Text style={styles.message}>{getMessage()}</Text>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -70,20 +67,17 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     alignItems: "flex-start",
     width: "100%",
-    borderColor: "rgba(180, 160, 240, 0.25)",
-    borderWidth: 1,
-    shadowColor: "#c38cc1e1",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 2,
-    marginTop: 12,
+    borderColor: "#E10600",
+    borderWidth: 0.5,
+    marginVertical: 12,
+    backgroundColor: "#000000",
+
   },
   cardTitle: {
     fontSize: 16,
     fontFamily: "Poppins-Bold", 
-    color: "#3b3660",
-    borderBottomColor: "rgba(155, 123, 247, 0.15)",
+    color: "#ffffff",
+    borderBottomColor: "rgba(103, 103, 103, 0.29)",
     borderBottomWidth: 1,
     paddingTop: 6,
     paddingBottom: 4,
@@ -95,18 +89,18 @@ const styles = StyleSheet.create({
   percentText: {
     fontSize: 36,
     fontWeight: "900",
-    color: "#2d275a",
+    color: "#ffffff",
     marginTop: -10,
   },
   subText: {
     fontSize: 14,
     fontFamily: "Poppins-Regular",
-    color: "#6b6894",
+    color: "#ffffff",
     marginTop: 4,
   },
   message: {
     fontSize: 13,
-    color: "#6b6894",
+    color: "#ffffff",
     textAlign: "center",
     marginTop: -36,
     fontFamily: "Poppins-Medium",
