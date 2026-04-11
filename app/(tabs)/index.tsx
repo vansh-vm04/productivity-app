@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function Index() {
   return (
@@ -23,10 +24,14 @@ export default function Index() {
             Let’s make today productive.
           </Text>
         </View>
-
+        <View style={{ flexDirection: "row", gap: moderateScale(8) }}>
+        <TouchableOpacity style={styles.bellButton}>
+          <MaterialCommunityIcons name="bell-outline" size={24} color="#ffffff" />
+        </TouchableOpacity>
         <TouchableOpacity style={styles.addButton}>
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
+        </View>
       </View>
 
       {/* Today's Progress Card */}
@@ -74,6 +79,14 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   addButton: {
+    width: moderateScale(56),
+    height: moderateScale(56),
+    borderRadius: moderateScale(28),
+    backgroundColor: PRIMARY.main,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bellButton: {
     width: moderateScale(56),
     height: moderateScale(56),
     borderRadius: moderateScale(28),

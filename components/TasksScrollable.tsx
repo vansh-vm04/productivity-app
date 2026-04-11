@@ -5,12 +5,12 @@ import {
     PriorityType,
 } from "@/constants/tags";
 import {
-  BORDER,
-  CARD_PALETTES,
-  PRIMARY,
-  SURFACE,
-  TAG,
-  TEXT,
+    BORDER,
+    CARD_PALETTES,
+    PRIMARY,
+    SURFACE,
+    TAG,
+    TEXT,
 } from "@/theme/colors";
 import { fonts } from "@/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/utils/responsive";
@@ -18,11 +18,11 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useState } from "react";
 import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 // Mock data - replace with actual data source
@@ -149,8 +149,9 @@ export default function TasksScrollable() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>All Tasks</Text>
+      <Text style={styles.sectionTitle}>{"Today's Tasks"}</Text>
       <ScrollView
+        nestedScrollEnabled={true}
         alwaysBounceVertical
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -263,13 +264,14 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     width: "100%",
+    maxHeight: moderateScale(650),
   },
   scrollContent: {
     paddingBottom: moderateScale(16),
   },
   taskCard: {
     width: "100%",
-    height: moderateScale(110),
+    height: moderateScale(100),
     borderRadius: moderateScale(16),
     overflow: "hidden",
     borderWidth: 0.5,
@@ -337,7 +339,7 @@ const styles = StyleSheet.create({
   },
   tag: {
     paddingHorizontal: moderateScale(10),
-    paddingVertical: moderateScale(5),
+    paddingVertical: moderateScale(3),
     borderRadius: moderateScale(12),
     alignItems: "center",
     justifyContent: "center",
