@@ -226,7 +226,7 @@ export default function Tasks() {
           }}
         >
           <Text style={styles.addButtonIcon}>+</Text>
-          <Text style={styles.addButtonText}>Add Task</Text>
+          <Text style={styles.addButtonText}>New Task</Text>
         </TouchableOpacity>
       </View>
 
