@@ -1,6 +1,7 @@
 import TodayProgress from "@/components/Progress";
 import TasksScrollable from "@/components/TasksScrollable";
 import { BACKGROUND, PRIMARY, TEXT } from "@/theme/colors";
+import { moderateScale, responsiveFontSize } from "@/utils/responsive";
 import {
   ScrollView,
   StyleSheet,
@@ -41,8 +42,8 @@ const styles = StyleSheet.create({
   screen: {
     flexGrow: 1,
     backgroundColor: BACKGROUND.secondary,
-    paddingHorizontal: 16,
-    paddingBottom: 40,
+    paddingHorizontal: moderateScale(16),
+    paddingBottom: moderateScale(40),
   },
   header: {
     width: "100%",
@@ -50,21 +51,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    paddingVertical: 8,
-    paddingTop: 50,
+    paddingVertical: moderateScale(8),
+    paddingTop: moderateScale(50),
   },
   headerGreeting: {
-    fontSize: 26,
+    fontSize: responsiveFontSize(26),
     fontFamily: "Poppins-Light",
     color: TEXT.primary,
   },
   headerName: {
-    fontSize: 26,
+    fontSize: responsiveFontSize(26),
     fontFamily: "Poppins-Medium",
     color: TEXT.primary,
   },
   headerTextSmall: {
-    fontSize: 12,
+    fontSize: responsiveFontSize(12),
     fontFamily: "Poppins-Light",
     color: TEXT.primary,
   },
@@ -73,18 +74,18 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   addButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: moderateScale(56),
+    height: moderateScale(56),
+    borderRadius: moderateScale(28),
     backgroundColor: PRIMARY.main,
     alignItems: "center",
     justifyContent: "center",
   },
   addButtonText: {
-    fontSize: 26,
+    fontSize: responsiveFontSize(26),
     fontWeight: "200",
     color: TEXT.primary,
     textAlign: "center",
-    lineHeight: 40,
+    lineHeight: moderateScale(40),
   },
 });

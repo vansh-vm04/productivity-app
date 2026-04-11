@@ -1,4 +1,5 @@
 import { BORDER, PRIMARY, SURFACE, TEXT, UTILITY } from "@/theme/colors";
+import { moderateScale, responsiveFontSize } from "@/utils/responsive";
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
@@ -34,8 +35,8 @@ export default function TodayProgress({ completed, total }: Props) {
       <Text style={styles.cardTitle}>{"Today's Progress"}</Text>
       <View style={styles.progressContainer}>
         <AnimatedCircularProgress
-          size={180}
-          width={12}
+          size={moderateScale(180)}
+          width={moderateScale(12)}
           fill={progress}
           tintColor={PRIMARY.main}
           backgroundColor={UTILITY.transparentBlack30}
@@ -61,53 +62,53 @@ export default function TodayProgress({ completed, total }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 24,
-    paddingHorizontal: 20,
-    paddingVertical: 6,
+    borderRadius: moderateScale(24),
+    paddingHorizontal: moderateScale(20),
+    paddingVertical: moderateScale(6),
     alignItems: "flex-start",
     width: "100%",
-    marginVertical: 12,
+    marginVertical: moderateScale(12),
     backgroundColor: SURFACE.primary,
     borderWidth: 0.5,
     borderColor: BORDER.primary,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     fontFamily: "Poppins-Bold",
     color: TEXT.primary,
     borderBottomColor: BORDER.primary,
     borderBottomWidth: 0.5,
-    paddingTop: 6,
-    paddingBottom: 4,
+    paddingTop: moderateScale(6),
+    paddingBottom: moderateScale(4),
     width: "100%",
   },
   centerContent: {
     alignItems: "center",
   },
   percentText: {
-    fontSize: 36,
+    fontSize: responsiveFontSize(36),
     fontWeight: "900",
     color: TEXT.primary,
-    marginTop: -10,
+    marginTop: moderateScale(-10),
   },
   subText: {
-    fontSize: 14,
+    fontSize: responsiveFontSize(14),
     fontFamily: "Poppins-Regular",
     color: TEXT.primary,
-    marginTop: 4,
+    marginTop: moderateScale(4),
   },
   message: {
-    fontSize: 13,
+    fontSize: responsiveFontSize(13),
     color: TEXT.primary,
     textAlign: "center",
-    marginTop: -36,
+    marginTop: moderateScale(-36),
     fontFamily: "Poppins-Medium",
   },
   progressContainer: {
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 14,
-    paddingBottom: 8,
+    paddingTop: moderateScale(14),
+    paddingBottom: moderateScale(8),
   },
 });

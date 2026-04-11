@@ -13,6 +13,7 @@ import {
   TEXT,
 } from "@/theme/colors";
 import { fonts } from "@/theme/fonts";
+import { moderateScale, responsiveFontSize } from "@/utils/responsive";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useState } from "react";
@@ -76,12 +77,13 @@ const getCardColors = (index: number) => {
 };
 
 const getCategoryIcon = (category: CategoryType) => {
+  const iconSize = moderateScale(18);
   switch (category) {
     case "work":
       return (
         <FontAwesome5
           name="briefcase"
-          size={18}
+          size={iconSize}
           color="#ffffff"
           style={styles.icon}
         />
@@ -90,7 +92,7 @@ const getCategoryIcon = (category: CategoryType) => {
       return (
         <MaterialCommunityIcons
           name="dumbbell"
-          size={18}
+          size={iconSize}
           color="#ffffff"
           style={styles.icon}
         />
@@ -99,7 +101,7 @@ const getCategoryIcon = (category: CategoryType) => {
       return (
         <MaterialCommunityIcons
           name="home"
-          size={18}
+          size={iconSize}
           color="#ffffff"
           style={styles.icon}
         />
@@ -108,7 +110,7 @@ const getCategoryIcon = (category: CategoryType) => {
       return (
         <MaterialCommunityIcons
           name="sprout"
-          size={18}
+          size={iconSize}
           color="#ffffff"
           style={styles.icon}
         />
@@ -117,7 +119,7 @@ const getCategoryIcon = (category: CategoryType) => {
       return (
         <MaterialCommunityIcons
           name="brain"
-          size={18}
+          size={iconSize}
           color="#ffffff"
           style={styles.icon}
         />
@@ -126,7 +128,7 @@ const getCategoryIcon = (category: CategoryType) => {
       return (
         <FontAwesome5
           name="tasks"
-          size={18}
+          size={iconSize}
           color="#ffffff"
           style={styles.icon}
         />
@@ -240,42 +242,42 @@ export default function TasksScrollable() {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    marginVertical: 14,
+    marginVertical: moderateScale(14),
     backgroundColor: SURFACE.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    borderRadius: 24,
+    paddingHorizontal: moderateScale(20),
+    paddingVertical: moderateScale(6),
+    borderRadius: moderateScale(24),
     borderWidth: 0.5,
     borderColor: BORDER.primary,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     fontFamily: fonts.bold,
     color: TEXT.primary,
     borderBottomColor: BORDER.primary,
     borderBottomWidth: 0.5,
-    paddingTop: 6,
-    paddingBottom: 4,
+    paddingTop: moderateScale(6),
+    paddingBottom: moderateScale(4),
     width: "100%",
-    marginBottom: 8,
+    marginBottom: moderateScale(8),
   },
   scrollView: {
     width: "100%",
   },
   scrollContent: {
-    paddingBottom: 16,
+    paddingBottom: moderateScale(16),
   },
   taskCard: {
     width: "100%",
-    height: 110,
-    borderRadius: 16,
+    height: moderateScale(110),
+    borderRadius: moderateScale(16),
     overflow: "hidden",
     borderWidth: 0.5,
-    padding: 16,
+    padding: moderateScale(16),
     justifyContent: "space-between",
     alignItems: "flex-start",
     flexDirection: "column",
-    marginVertical: 6,
+    marginVertical: moderateScale(6),
   },
   cardContent: {
     width: "100%",
@@ -288,7 +290,7 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 10,
+    gap: moderateScale(10),
     flex: 1,
     width: "100%",
   },
@@ -296,21 +298,21 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   taskName: {
-    fontSize: 13,
+    fontSize: responsiveFontSize(13),
     fontFamily: fonts.semibold,
     color: TEXT.primary,
     flex: 1,
-    lineHeight: 16,
-    paddingTop: 2,
+    lineHeight: moderateScale(16),
+    paddingTop: moderateScale(2),
   },
   taskNameCompleted: {
     color: TEXT.tertiary,
     textDecorationLine: "line-through",
   },
   checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
+    width: moderateScale(24),
+    height: moderateScale(24),
+    borderRadius: moderateScale(6),
     borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
@@ -325,18 +327,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 8,
+    gap: moderateScale(8),
   },
   tagsContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: moderateScale(6),
     flex: 1,
   },
   tag: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
+    paddingHorizontal: moderateScale(10),
+    paddingVertical: moderateScale(5),
+    borderRadius: moderateScale(12),
     alignItems: "center",
     justifyContent: "center",
   },
@@ -347,7 +349,7 @@ const styles = StyleSheet.create({
     backgroundColor: TAG.background,
   },
   tagText: {
-    fontSize: 11,
+    fontSize: responsiveFontSize(11),
     fontFamily: fonts.medium,
     color: TAG.text,
   },
