@@ -4,15 +4,24 @@ import {
     PRIORITY_TAGS,
     PriorityType,
 } from "@/constants/tags";
+import {
+  BORDER,
+  CARD_PALETTES,
+  PRIMARY,
+  SURFACE,
+  TAG,
+  TEXT,
+} from "@/theme/colors";
+import { fonts } from "@/theme/fonts";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 // Mock data - replace with actual data source
@@ -62,47 +71,8 @@ interface Task {
   completed: boolean;
 }
 
-interface CardColors {
-  base: string;
-  glow: string;
-  accent: string;
-}
-
-const COLOR_PALETTES: CardColors[] = [
-  {
-    base: "#0F172A",
-    glow: "#60A5FA",
-    accent: "#3B82F6",
-  },
-  {
-    base: "#1A132F",
-    glow: "#A78BFA",
-    accent: "#7C3AED",
-  },
-  {
-    base: "#052E2B",
-    glow: "#34D399",
-    accent: "#10B981",
-  },
-  {
-    base: "#083344",
-    glow: "#22D3EE",
-    accent: "#06B6D4",
-  },
-  {
-    base: "#2A0E1E",
-    glow: "#F472B6",
-    accent: "#EC4899",
-  },
-  {
-    base: "#2C1A0E",
-    glow: "#FDBA74",
-    accent: "#FB923C",
-  },
-];
-
-const getCardColors = (index: number): CardColors => {
-  return COLOR_PALETTES[index % COLOR_PALETTES.length];
+const getCardColors = (index: number) => {
+  return CARD_PALETTES[index % CARD_PALETTES.length];
 };
 
 const getCategoryIcon = (category: CategoryType) => {
@@ -200,7 +170,6 @@ export default function TasksScrollable() {
               ]}
               activeOpacity={0.8}
             >
-
               {/* Card content */}
               <View style={styles.cardContent}>
                 {/* Top row: Icon and Title */}
@@ -272,18 +241,18 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     marginVertical: 14,
-    backgroundColor: "#202020",
+    backgroundColor: SURFACE.primary,
     paddingHorizontal: 20,
     paddingVertical: 6,
     borderRadius: 24,
     borderWidth: 0.5,
-    borderColor: "#3d3d3d",
+    borderColor: BORDER.primary,
   },
   sectionTitle: {
     fontSize: 16,
-    fontFamily: "Poppins-Bold", 
-    color: "#ffffff",
-    borderBottomColor: "#3d3d3d",
+    fontFamily: fonts.bold,
+    color: TEXT.primary,
+    borderBottomColor: BORDER.primary,
     borderBottomWidth: 0.5,
     paddingTop: 6,
     paddingBottom: 4,
@@ -306,7 +275,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start",
     flexDirection: "column",
-    marginVertical: 8,
+    marginVertical: 6,
   },
   cardContent: {
     width: "100%",
@@ -328,14 +297,14 @@ const styles = StyleSheet.create({
   },
   taskName: {
     fontSize: 13,
-    fontFamily: "Poppins-SemiBold",
-    color: "#ffffff",
+    fontFamily: fonts.semibold,
+    color: TEXT.primary,
     flex: 1,
     lineHeight: 16,
     paddingTop: 2,
   },
   taskNameCompleted: {
-    color: "rgba(255, 255, 255, 0.6)",
+    color: TEXT.tertiary,
     textDecorationLine: "line-through",
   },
   checkbox: {
@@ -348,8 +317,8 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   checkboxCompleted: {
-    backgroundColor: "#E10600",
-    borderColor: "#E10600",
+    backgroundColor: PRIMARY.main,
+    borderColor: PRIMARY.main,
   },
   cardFooter: {
     width: "100%",
@@ -372,14 +341,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   priorityTag: {
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    backgroundColor: TAG.background,
   },
   categoryTag: {
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    backgroundColor: TAG.background,
   },
   tagText: {
     fontSize: 11,
-    fontFamily: "Poppins-Medium",
-    color: "#ffffff",
+    fontFamily: fonts.medium,
+    color: TAG.text,
   },
 });

@@ -1,13 +1,14 @@
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { PRIMARY, TAB } from "@/theme/colors";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarInactiveTintColor: "#616161",
-        tabBarActiveTintColor: "#E10600",
+        tabBarInactiveTintColor: TAB.inActive,
+        tabBarActiveTintColor: PRIMARY.main,
         headerStyle: {
           backgroundColor: "#ffffff",
         },
@@ -15,13 +16,13 @@ export default function TabLayout() {
         headerTintColor: "#000000",
         tabBarStyle: {
           backgroundColor: "#000000",
-          paddingTop: 2,
+          paddingVertical: 2,
           paddingHorizontal: 24,
           borderTopColor: "#000000",
         },
         tabBarLabelStyle: {
           fontFamily: "Poppins-SemiBold",
-          fontSize: 8.5,
+          fontSize: 10,
         }
       }}
     >

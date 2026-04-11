@@ -1,5 +1,6 @@
 import TodayProgress from "@/components/Progress";
 import TasksScrollable from "@/components/TasksScrollable";
+import { BACKGROUND, PRIMARY, TEXT } from "@/theme/colors";
 import {
   ScrollView,
   StyleSheet,
@@ -39,7 +40,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   screen: {
     flexGrow: 1,
-    backgroundColor: "#121212",
+    backgroundColor: BACKGROUND.secondary,
     paddingHorizontal: 16,
     paddingBottom: 40,
   },
@@ -55,17 +56,17 @@ const styles = StyleSheet.create({
   headerGreeting: {
     fontSize: 26,
     fontFamily: "Poppins-Light",
-    color: "#ffffff",
+    color: TEXT.primary,
   },
   headerName: {
     fontSize: 26,
     fontFamily: "Poppins-Medium",
-    color: "#ffffff",
+    color: TEXT.primary,
   },
   headerTextSmall: {
     fontSize: 12,
     fontFamily: "Poppins-Light",
-    color: "#ffffff",
+    color: TEXT.primary,
   },
   headerLeft: {
     justifyContent: "center",
@@ -75,14 +76,14 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#E10600",
+    backgroundColor: PRIMARY.main,
     alignItems: "center",
     justifyContent: "center",
   },
   addButtonText: {
     fontSize: 26,
     fontWeight: "200",
-    color: "#ffffff",
+    color: TEXT.primary,
     textAlign: "center",
     lineHeight: 40,
   },

@@ -1,3 +1,4 @@
+import { BORDER, PRIMARY, SURFACE, TEXT, UTILITY } from "@/theme/colors";
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
@@ -23,22 +24,21 @@ export default function TodayProgress({ completed, total }: Props) {
   const getMessage = () => {
     if (progress === 0) return "Let’s start your day 🚀";
     if (progress < 50) return "Nice start. Keep going 🔥";
-    if (progress < 100) return `🔥 You’re ${progress}% there. Keep the momentum!`;
+    if (progress < 100)
+      return `🔥 You’re ${progress}% there. Keep the momentum!`;
     return "You crushed today 👏";
   };
 
   return (
-    <View
-      style={styles.card}
-    >
+    <View style={styles.card}>
       <Text style={styles.cardTitle}>{"Today's Progress"}</Text>
       <View style={styles.progressContainer}>
         <AnimatedCircularProgress
           size={180}
           width={12}
           fill={progress}
-          tintColor="#E10600"
-          backgroundColor="#e7a0a030"
+          tintColor={PRIMARY.main}
+          backgroundColor={UTILITY.transparentBlack30}
           arcSweepAngle={180}
           rotation={270}
           lineCap="round"
@@ -67,15 +67,15 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     width: "100%",
     marginVertical: 12,
-    backgroundColor: "#202020",
+    backgroundColor: SURFACE.primary,
     borderWidth: 0.5,
-    borderColor: "#3d3d3d",
+    borderColor: BORDER.primary,
   },
   cardTitle: {
     fontSize: 16,
-    fontFamily: "Poppins-Bold", 
-    color: "#ffffff",
-    borderBottomColor: "#3d3d3d",
+    fontFamily: "Poppins-Bold",
+    color: TEXT.primary,
+    borderBottomColor: BORDER.primary,
     borderBottomWidth: 0.5,
     paddingTop: 6,
     paddingBottom: 4,
@@ -87,18 +87,18 @@ const styles = StyleSheet.create({
   percentText: {
     fontSize: 36,
     fontWeight: "900",
-    color: "#ffffff",
+    color: TEXT.primary,
     marginTop: -10,
   },
   subText: {
     fontSize: 14,
     fontFamily: "Poppins-Regular",
-    color: "#ffffff",
+    color: TEXT.primary,
     marginTop: 4,
   },
   message: {
     fontSize: 13,
-    color: "#ffffff",
+    color: TEXT.primary,
     textAlign: "center",
     marginTop: -36,
     fontFamily: "Poppins-Medium",
