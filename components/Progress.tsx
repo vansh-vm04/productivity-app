@@ -1,4 +1,3 @@
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
@@ -62,23 +61,22 @@ export default function TodayProgress({ completed, total }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 34,
+    borderRadius: 24,
     paddingHorizontal: 20,
     paddingVertical: 6,
     alignItems: "flex-start",
     width: "100%",
-    borderColor: "#E10600",
-    borderWidth: 0.5,
     marginVertical: 12,
-    backgroundColor: "#000000",
-
+    backgroundColor: "#202020",
+    borderWidth: 0.5,
+    borderColor: "#3d3d3d",
   },
   cardTitle: {
     fontSize: 16,
     fontFamily: "Poppins-Bold", 
     color: "#ffffff",
-    borderBottomColor: "rgba(103, 103, 103, 0.29)",
-    borderBottomWidth: 1,
+    borderBottomColor: "#3d3d3d",
+    borderBottomWidth: 0.5,
     paddingTop: 6,
     paddingBottom: 4,
     width: "100%",
