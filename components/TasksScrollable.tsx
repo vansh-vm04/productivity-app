@@ -33,6 +33,7 @@ const MOCK_TASKS = [
     category: "work" as CategoryType,
     priority: "urgent" as PriorityType,
     completed: false,
+    dueDate: new Date(2026, 3, 14, 18, 0),
   },
   {
     id: "2",
@@ -40,6 +41,7 @@ const MOCK_TASKS = [
     category: "health" as CategoryType,
     priority: "important" as PriorityType,
     completed: true,
+    dueDate: new Date(2026, 3, 12, 7, 0),
   },
   {
     id: "3",
@@ -47,6 +49,7 @@ const MOCK_TASKS = [
     category: "personal" as CategoryType,
     priority: "normal" as PriorityType,
     completed: false,
+    dueDate: new Date(2026, 3, 13, 14, 30),
   },
   {
     id: "4",
@@ -54,6 +57,7 @@ const MOCK_TASKS = [
     category: "work" as CategoryType,
     priority: "urgent" as PriorityType,
     completed: false,
+    dueDate: new Date(2026, 3, 12, 10, 0),
   },
   {
     id: "5",
@@ -61,6 +65,7 @@ const MOCK_TASKS = [
     category: "growth" as CategoryType,
     priority: "low" as PriorityType,
     completed: true,
+    dueDate: new Date(2026, 3, 15, 20, 0),
   },
 ];
 
@@ -70,6 +75,7 @@ interface Task {
   category: CategoryType;
   priority: PriorityType;
   completed: boolean;
+  dueDate: Date;
 }
 
 const getCardColors = (index: number) => {
@@ -136,6 +142,28 @@ const getCategoryIcon = (category: CategoryType) => {
   }
 };
 
+const formatDueDate = (date: Date) => {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const time = `${hours}:${minutes}`;
+
+  if (date.toDateString() === today.toDateString()) {
+    return `Today ${time}`;
+  } else if (date.toDateString() === tomorrow.toDateString()) {
+    return `Tomorrow ${time}`;
+  } else {
+    const monthDay = date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+    return `${monthDay} ${time}`;
+  }
+};
+
 export default function TasksScrollable() {
   const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
 
@@ -164,6 +192,10 @@ export default function TasksScrollable() {
             <TouchableOpacity
               key={task.id}
               onPress={() => toggleTask(task.id)}
+              onLongPress={() => {
+                // TODO: Handle long press if needed
+              }}
+              delayLongPress={300}
               style={[
                 styles.taskCard,
                 {
@@ -175,7 +207,7 @@ export default function TasksScrollable() {
             >
               {/* Card content */}
               <View style={styles.cardContent}>
-                {/* Top row: Icon and Title */}
+                {/* Top row: Icon, Title, and Checkbox */}
                 <View style={styles.cardHeader}>
                   {getCategoryIcon(task.category)}
                   <Text
@@ -187,27 +219,6 @@ export default function TasksScrollable() {
                   >
                     {task.name}
                   </Text>
-                </View>
-
-                {/* Bottom row: Tags and Checkbox */}
-                <View style={styles.cardFooter}>
-                  {/* Tags Container */}
-                  <View style={styles.tagsContainer}>
-                    {/* Priority Tag */}
-                    <View style={[styles.tag, styles.priorityTag]}>
-                      <Text style={styles.tagText}>
-                        {PRIORITY_TAGS[task.priority].label}
-                      </Text>
-                    </View>
-
-                    {/* Category Tag */}
-                    <View style={[styles.tag, styles.categoryTag]}>
-                      <Text style={styles.tagText}>
-                        {CATEGORY_TAGS[task.category].label}
-                      </Text>
-                    </View>
-                  </View>
-
                   {/* Checkbox */}
                   <View
                     style={[
@@ -231,6 +242,38 @@ export default function TasksScrollable() {
                     )}
                   </View>
                 </View>
+
+                {/* Bottom row: Tags and Due Date */}
+                <View style={styles.cardFooter}>
+                  {/* Tags Container */}
+                  <View style={styles.tagsContainer}>
+                    {/* Priority Tag */}
+                    <View style={[styles.tag, styles.priorityTag]}>
+                      <Text style={styles.tagText}>
+                        {PRIORITY_TAGS[task.priority].label}
+                      </Text>
+                    </View>
+
+                    {/* Category Tag */}
+                    <View style={[styles.tag, styles.categoryTag]}>
+                      <Text style={styles.tagText}>
+                        {CATEGORY_TAGS[task.category].label}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Due Date */}
+                  <View style={styles.dueDateInline}>
+                    <MaterialCommunityIcons
+                      name="clock-outline"
+                      size={moderateScale(12)}
+                      color={TEXT.secondary}
+                    />
+                    <Text style={styles.dueDateText}>
+                      {formatDueDate(task.dueDate)}
+                    </Text>
+                  </View>
+                </View>
               </View>
             </TouchableOpacity>
           );
@@ -245,7 +288,7 @@ const styles = StyleSheet.create({
     width: "100%",
     marginVertical: moderateScale(14),
     backgroundColor: SURFACE.primary,
-    paddingHorizontal: moderateScale(20),
+    paddingHorizontal: moderateScale(12),
     paddingVertical: moderateScale(6),
     borderRadius: moderateScale(24),
     borderWidth: 0.5,
@@ -261,6 +304,7 @@ const styles = StyleSheet.create({
     paddingBottom: moderateScale(4),
     width: "100%",
     marginBottom: moderateScale(8),
+    paddingHorizontal: moderateScale(8),
   },
   scrollView: {
     width: "100%",
@@ -271,7 +315,7 @@ const styles = StyleSheet.create({
   },
   taskCard: {
     width: "100%",
-    height: moderateScale(100),
+    height: moderateScale(110),
     borderRadius: moderateScale(16),
     overflow: "hidden",
     borderWidth: 0.5,
@@ -283,18 +327,18 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     width: "100%",
-    height: "100%",
     justifyContent: "space-between",
     alignItems: "flex-start",
     zIndex: 1,
     flexDirection: "column",
+    gap: moderateScale(30),
   },
   cardHeader: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: moderateScale(10),
-    flex: 1,
     width: "100%",
+    justifyContent: "space-between",
   },
   icon: {
     flexShrink: 0,
@@ -310,6 +354,16 @@ const styles = StyleSheet.create({
   taskNameCompleted: {
     color: TEXT.tertiary,
     textDecorationLine: "line-through",
+  },
+  dueDateInline: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: moderateScale(4),
+  },
+  dueDateText: {
+    fontSize: responsiveFontSize(10),
+    fontFamily: fonts.medium,
+    color: TEXT.secondary,
   },
   checkbox: {
     width: moderateScale(24),

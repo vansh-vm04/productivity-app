@@ -26,6 +26,7 @@ export default function Index() {
         </View>
         <View style={{ flexDirection: "row", gap: moderateScale(8) }}>
         <TouchableOpacity style={styles.bellButton}>
+          <Text style={styles.unreadMarker}>●</Text>
           <MaterialCommunityIcons name="bell-outline" size={24} color="#ffffff" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.addButton}>
@@ -100,5 +101,13 @@ const styles = StyleSheet.create({
     color: TEXT.primary,
     textAlign: "center",
     lineHeight: moderateScale(40),
+  },
+  unreadMarker: {
+    position: "absolute",
+    top: 11,
+    right: 17,
+    color: "#ffffff",
+    zIndex: 1,
+    fontSize: responsiveFontSize(18),
   },
 });

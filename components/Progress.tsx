@@ -63,7 +63,7 @@ export default function TodayProgress({ completed, total }: Props) {
 const styles = StyleSheet.create({
   card: {
     borderRadius: moderateScale(24),
-    paddingHorizontal: moderateScale(20),
+    paddingHorizontal: moderateScale(12),
     paddingVertical: moderateScale(6),
     alignItems: "flex-start",
     width: "100%",
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     paddingTop: moderateScale(6),
     paddingBottom: moderateScale(4),
     width: "100%",
+    paddingHorizontal: moderateScale(8),
   },
   centerContent: {
     alignItems: "center",
