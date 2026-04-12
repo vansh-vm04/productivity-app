@@ -49,6 +49,7 @@ export const SURFACE = {
 export const BORDER = {
   /** Primary border - for main UI elements */
   primary: "#3D3D3D",
+  seconday: "#696969",
 } as const;
 
 // ========================================
@@ -120,3 +121,8 @@ export const UTILITY = {
   /** Transparent black overlays */
   transparentBlack30: "rgba(0, 0, 0, 0.3)",
 } as const;
+
+export const MODAL = {
+  /** Modal background overlay */
+  overlay: "rgba(0, 0, 0, 0.5)",
+}

@@ -1,7 +1,10 @@
+import CreateModal from "@/components/CreateModal";
 import TodayProgress from "@/components/Progress";
 import TasksScrollable from "@/components/TasksScrollable";
 import { BACKGROUND, PRIMARY, TEXT } from "@/theme/colors";
 import { moderateScale, responsiveFontSize } from "@/utils/responsive";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -9,38 +12,60 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function Index() {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleCreateOption = (option: "task" | "note" | "habit") => {
+    // Handle each option - implement your logic here
+    console.log("Creating:", option);
+    // You can navigate to the creation screen or perform other actions
+  };
   return (
-    <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Text style={styles.headerGreeting}>
-            Hey <Text style={styles.headerName}>Vansh!</Text>
-          </Text>
-          <Text style={styles.headerTextSmall}>
-            Let’s make today productive.
-          </Text>
+    <>
+      <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <Text style={styles.headerGreeting}>
+              Hey <Text style={styles.headerName}>Vansh!</Text>
+            </Text>
+            <Text style={styles.headerTextSmall}>
+              Let’s make today productive.
+            </Text>
+          </View>
+          <View style={{ flexDirection: "row", gap: moderateScale(8) }}>
+            <TouchableOpacity style={styles.bellButton}>
+              <Text style={styles.unreadMarker}>●</Text>
+              <MaterialCommunityIcons
+                name="bell-outline"
+                size={24}
+                color="#ffffff"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => setModalVisible(true)}
+            >
+              <Text style={styles.addButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={{ flexDirection: "row", gap: moderateScale(8) }}>
-        <TouchableOpacity style={styles.bellButton}>
-          <Text style={styles.unreadMarker}>●</Text>
-          <MaterialCommunityIcons name="bell-outline" size={24} color="#ffffff" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.addButton}>
-          <Text style={styles.addButtonText}>+</Text>
-        </TouchableOpacity>
-        </View>
-      </View>
 
-      {/* Today's Progress Card */}
-      <TodayProgress completed={12} total={20} />
+        {/* Today's Progress Card */}
+        <TodayProgress completed={12} total={20} />
 
-      {/* All Tasks Scrollable */}
-      <TasksScrollable />
-    </ScrollView>
+        {/* All Tasks Scrollable */}
+        <TasksScrollable />
+      </ScrollView>
+
+      {/* Create Modal */}
+      <CreateModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSelectOption={handleCreateOption}
+      />
+    </>
   );
 }
 

@@ -361,9 +361,10 @@ const styles = StyleSheet.create({
     gap: moderateScale(4),
   },
   dueDateText: {
-    fontSize: responsiveFontSize(10),
+    fontSize: responsiveFontSize(11),
     fontFamily: fonts.medium,
     color: TEXT.secondary,
+    paddingTop: moderateScale(2),
   },
   checkbox: {
     width: moderateScale(24),
