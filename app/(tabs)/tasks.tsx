@@ -232,7 +232,7 @@ export default function Tasks() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>All Tasks</Text>
+        <Text style={styles.headerTitle}>Tasks</Text>
         <TouchableOpacity
           style={styles.addButton}
           activeOpacity={0.7}
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(16),
     paddingVertical: moderateScale(10),
     borderBottomWidth: 0.5,
-    borderBottomColor: BORDER.primary,
+    borderBottomColor: "#000000",
     paddingTop: moderateScale(50),
   },
   headerTitle: {
