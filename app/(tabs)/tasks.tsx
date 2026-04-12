@@ -18,6 +18,7 @@ import { fonts } from "@/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/utils/responsive";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Modal,
@@ -27,7 +28,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
 
 // Mock data with due dates
 const MOCK_TASKS = [
@@ -212,8 +212,20 @@ export default function Tasks() {
   };
 
   const handleEdit = () => {
+    if (!selectedTask) return;
+
     setModalVisible(false);
-    // TODO: Navigate to edit screen or open edit modal
+    router.push({
+      pathname: "/createTask",
+      params: {
+        mode: "edit",
+        taskId: selectedTask.id,
+        name: selectedTask.name,
+        category: selectedTask.category,
+        priority: selectedTask.priority,
+        dueDate: selectedTask.dueDate.toISOString(),
+      },
+    });
   };
 
   return (

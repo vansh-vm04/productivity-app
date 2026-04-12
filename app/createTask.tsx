@@ -9,7 +9,7 @@ import { fonts } from "@/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
     Platform,
@@ -22,6 +22,7 @@ import {
 } from "react-native";
 
 interface TaskData {
+  id?: string;
   name: string;
   priority: PriorityType;
   category: CategoryType | "custom";
@@ -31,12 +32,43 @@ interface TaskData {
 
 export default function CreateTask() {
   const router = useRouter();
+  const params = useLocalSearchParams<{
+    mode?: string;
+    taskId?: string;
+    name?: string;
+    category?: string;
+    priority?: string;
+    dueDate?: string;
+  }>();
+
+  const isEditMode = params.mode === "edit";
+  const isCategoryType = (value: string): value is CategoryType => {
+    return value in CATEGORY_TAGS;
+  };
+  const isPriorityType = (value: string): value is PriorityType => {
+    return value in PRIORITY_TAGS;
+  };
+
+  const initialCategory =
+    typeof params.category === "string" && isCategoryType(params.category)
+      ? params.category
+      : "personal";
+  const initialPriority =
+    typeof params.priority === "string" && isPriorityType(params.priority)
+      ? params.priority
+      : "normal";
+  const initialDueDate =
+    typeof params.dueDate === "string" && params.dueDate
+      ? new Date(params.dueDate)
+      : null;
+
   const [taskData, setTaskData] = useState<TaskData>({
-    name: "",
-    priority: "normal",
-    category: "personal",
+    id: typeof params.taskId === "string" ? params.taskId : undefined,
+    name: typeof params.name === "string" ? params.name : "",
+    priority: initialPriority,
+    category: initialCategory,
     customCategory: "",
-    dueDate: null,
+    dueDate: initialDueDate,
   });
 
   const [customCategoryInput, setCustomCategoryInput] = useState("");
@@ -86,7 +118,7 @@ export default function CreateTask() {
       return;
     }
 
-    console.log("Creating task:", {
+    console.log(isEditMode ? "Updating task:" : "Creating task:", {
       ...taskData,
       category:
         taskData.category === "custom"
@@ -109,7 +141,9 @@ export default function CreateTask() {
             color={TEXT.primary}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Create Task</Text>
+        <Text style={styles.headerTitle}>
+          {isEditMode ? "Edit Task" : "Create Task"}
+        </Text>
         <View style={{ width: 28 }} />
       </View>
 
@@ -307,7 +341,9 @@ export default function CreateTask() {
           style={styles.createButton}
           onPress={handleCreateTask}
         >
-          <Text style={styles.createButtonText}>Create Task</Text>
+          <Text style={styles.createButtonText}>
+            {isEditMode ? "Update Task" : "Create Task"}
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
