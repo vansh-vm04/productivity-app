@@ -16,11 +16,6 @@ import {
 export default function Index() {
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleCreateOption = (option: "task" | "note" | "habit") => {
-    // Handle each option - implement your logic here
-    console.log("Creating:", option);
-    // You can navigate to the creation screen or perform other actions
-  };
   return (
     <>
       <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}>
@@ -63,7 +58,6 @@ export default function Index() {
       <CreateModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        onSelectOption={handleCreateOption}
       />
     </>
   );

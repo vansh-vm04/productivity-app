@@ -8,8 +8,8 @@ export const PRIMARY = {
 } as const;
 
 export const TAB = {
-    inActive: "#616161",
-}
+  inActive: "#616161",
+};
 
 // ========================================
 // TEXT COLORS
@@ -50,6 +50,15 @@ export const BORDER = {
   /** Primary border - for main UI elements */
   primary: "#3D3D3D",
   seconday: "#696969",
+} as const;
+
+// ========================================
+// MODAL COLORS
+// ========================================
+
+export const MODAL = {
+  /** Overlay background for modals */
+  overlay: "#0000007e",
 } as const;
 
 // ========================================
@@ -122,7 +131,3 @@ export const UTILITY = {
   transparentBlack30: "rgba(0, 0, 0, 0.3)",
 } as const;
 
-export const MODAL = {
-  /** Modal background overlay */
-  overlay: "rgba(0, 0, 0, 0.5)",
-}

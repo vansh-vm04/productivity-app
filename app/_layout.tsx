@@ -1,5 +1,5 @@
-import { SplashScreen, Stack } from "expo-router";
 import { useFonts } from "expo-font";
+import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 
 SplashScreen.preventAutoHideAsync();
@@ -29,6 +29,10 @@ export default function RootLayout() {
       <Stack.Screen
         name="(tabs)"
         options={{ headerShown: false, statusBarHidden: false }}
+      />
+      <Stack.Screen
+        name="createTask"
+        options={{ headerShown: false, statusBarHidden: false, animation: "slide_from_right" }}
       />
     </Stack>
   );

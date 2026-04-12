@@ -2,30 +2,41 @@ import { BACKGROUND, MODAL, PRIMARY, SURFACE, TEXT } from "@/theme/colors";
 import { fonts } from "@/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
-    Modal,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
 
 type Props = {
   visible: boolean;
   onClose: () => void;
-  onSelectOption: (option: "task" | "note" | "habit") => void;
 };
 
-export default function CreateModal({
-  visible,
-  onClose,
-  onSelectOption,
-}: Props) {
+export default function CreateModal({ visible, onClose }: Props) {
+  const router = useRouter();
+
   const handleOptionPress = (option: "task" | "note" | "habit") => {
-    onSelectOption(option);
     onClose();
+
+    switch (option) {
+      case "task":
+        router.push("/createTask");
+        break;
+      case "note":
+        // TODO: Navigate to create note screen
+        console.log("Navigate to create note");
+        break;
+      case "habit":
+        // TODO: Navigate to create habit screen
+        console.log("Navigate to create habit");
+        break;
+    }
   };
 
   const options: {

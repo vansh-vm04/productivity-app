@@ -27,6 +27,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useRouter } from "expo-router";
 
 // Mock data with due dates
 const MOCK_TASKS = [
@@ -181,6 +182,7 @@ export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const router = useRouter();
 
   const toggleTask = (id: string) => {
     setTasks(
@@ -223,7 +225,7 @@ export default function Tasks() {
           style={styles.addButton}
           activeOpacity={0.7}
           onPress={() => {
-            // TODO: Navigate to add task screen
+            router.push("/createTask");
           }}
         >
           <Text style={styles.addButtonIcon}>+</Text>
