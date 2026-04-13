@@ -1,8 +1,10 @@
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
+import { enableScreens } from 'react-native-screens';
 
 SplashScreen.preventAutoHideAsync();
+enableScreens(true);
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -32,7 +34,21 @@ export default function RootLayout() {
       />
       <Stack.Screen
         name="createTask"
-        options={{ headerShown: false, statusBarHidden: false, animation: "slide_from_right" }}
+        options={{
+          headerShown: false,
+          statusBarHidden: false,
+          animation: "simple_push",
+          presentation: "card",
+        }}
+      />
+      <Stack.Screen
+        name="CreateNote"
+        options={{
+          headerShown: false,
+          statusBarHidden: false,
+          animation: "simple_push",
+          presentation: "card",
+        }}
       />
     </Stack>
   );

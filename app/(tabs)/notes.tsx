@@ -1,6 +1,7 @@
 import { BACKGROUND, PRIMARY, TEXT } from "@/theme/colors";
 import { fonts } from "@/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/utils/responsive";
+import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   ScrollView,
@@ -107,6 +108,7 @@ const MOCK_NOTES: Note[] = [
 ];
 
 export default function Notes() {
+  const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<NoteCategory>("all");
 
   const filteredNotes = useMemo(() => {
@@ -130,6 +132,18 @@ export default function Notes() {
         key={note.id}
         activeOpacity={0.85}
         style={[styles.noteCard, { backgroundColor: note.bgColor }]}
+        onPress={() =>
+          router.push({
+            pathname: "/CreateNote",
+            params: {
+              mode: "edit",
+              noteId: note.id,
+              title: note.title,
+              body: note.body,
+              category: note.category,
+            },
+          })
+        }
       >
         <View style={styles.noteCardHeader}>
           <Text
@@ -155,7 +169,11 @@ export default function Notes() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Notes</Text>
-        <TouchableOpacity style={styles.addButton} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.addButton}
+          activeOpacity={0.7}
+          onPress={() => router.push("/CreateNote")}
+        >
           <Text style={styles.addButtonIcon}>+</Text>
           <Text style={styles.addButtonText}>New Note</Text>
         </TouchableOpacity>
