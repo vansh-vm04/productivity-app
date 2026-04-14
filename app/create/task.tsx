@@ -11,6 +11,12 @@ import {
   SURFACE,
   TEXT,
 } from "@/shared/theme/colors";
+import {
+  formatTaskDate,
+  formatTaskTime,
+  isTaskCategoryType,
+  isTaskPriorityType,
+} from "@/features/tasks/ui/tasks.helper";
 import { fonts } from "@/shared/theme/fonts";
 import { TaskData } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
@@ -40,19 +46,13 @@ export default function CreateTask() {
   }>();
 
   const isEditMode = params.mode === "edit";
-  const isCategoryType = (value: string): value is CategoryType => {
-    return value in CATEGORY_TAGS;
-  };
-  const isPriorityType = (value: string): value is PriorityType => {
-    return value in PRIORITY_TAGS;
-  };
 
   const initialCategory =
-    typeof params.category === "string" && isCategoryType(params.category)
+    typeof params.category === "string" && isTaskCategoryType(params.category)
       ? params.category
       : "personal";
   const initialPriority =
-    typeof params.priority === "string" && isPriorityType(params.priority)
+    typeof params.priority === "string" && isTaskPriorityType(params.priority)
       ? params.priority
       : "normal";
   const initialDueDate =
@@ -91,23 +91,6 @@ export default function CreateTask() {
       newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
       setTaskData({ ...taskData, dueDate: newDate });
     }
-  };
-
-  const formatDate = (date: Date | null) => {
-    if (!date) return "Select date";
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const formatTime = (date: Date | null) => {
-    if (!date) return "Select time";
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
   };
 
   const handleCreateTask = () => {
@@ -266,7 +249,7 @@ export default function CreateTask() {
               color={PRIMARY.main}
             />
             <Text style={styles.dateTimeButtonText}>
-              {formatDate(taskData.dueDate)}
+              {formatTaskDate(taskData.dueDate)}
             </Text>
           </TouchableOpacity>
 
@@ -289,7 +272,7 @@ export default function CreateTask() {
                 !taskData.dueDate && styles.dateTimeButtonDisabledText,
               ]}
             >
-              {formatTime(taskData.dueDate)}
+              {formatTaskTime(taskData.dueDate)}
             </Text>
           </TouchableOpacity>
         </View>

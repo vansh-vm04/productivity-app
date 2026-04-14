@@ -1,12 +1,9 @@
 import {
     CATEGORY_TAGS,
-    CategoryType,
     PRIORITY_TAGS,
-    PriorityType,
 } from "@/shared/constants/tags";
 import {
     BORDER,
-    CARD_PALETTES,
     PRIMARY,
     SURFACE,
     TAG,
@@ -25,101 +22,12 @@ import {
     View,
 } from "react-native";
 import { TODAY_TASKS_MOCKS } from "@/features/tasks/mocks/tasks.mocks";
-
-interface Task {
-  id: string;
-  name: string;
-  category: CategoryType;
-  priority: PriorityType;
-  completed: boolean;
-  dueDate: Date;
-}
-
-const getCardColors = (index: number) => {
-  return CARD_PALETTES[index % CARD_PALETTES.length];
-};
-
-const getCategoryIcon = (category: CategoryType) => {
-  const iconSize = moderateScale(18);
-  switch (category) {
-    case "work":
-      return (
-        <FontAwesome5
-          name="briefcase"
-          size={iconSize}
-          color="#ffffff"
-          style={styles.icon}
-        />
-      );
-    case "health":
-      return (
-        <MaterialCommunityIcons
-          name="dumbbell"
-          size={iconSize}
-          color="#ffffff"
-          style={styles.icon}
-        />
-      );
-    case "personal":
-      return (
-        <MaterialCommunityIcons
-          name="home"
-          size={iconSize}
-          color="#ffffff"
-          style={styles.icon}
-        />
-      );
-    case "growth":
-      return (
-        <MaterialCommunityIcons
-          name="sprout"
-          size={iconSize}
-          color="#ffffff"
-          style={styles.icon}
-        />
-      );
-    case "deepwork":
-      return (
-        <MaterialCommunityIcons
-          name="brain"
-          size={iconSize}
-          color="#ffffff"
-          style={styles.icon}
-        />
-      );
-    default:
-      return (
-        <FontAwesome5
-          name="tasks"
-          size={iconSize}
-          color="#ffffff"
-          style={styles.icon}
-        />
-      );
-  }
-};
-
-const formatDueDate = (date: Date) => {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  const time = `${hours}:${minutes}`;
-
-  if (date.toDateString() === today.toDateString()) {
-    return `Today ${time}`;
-  } else if (date.toDateString() === tomorrow.toDateString()) {
-    return `Tomorrow ${time}`;
-  } else {
-    const monthDay = date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-    return `${monthDay} ${time}`;
-  }
-};
+import {
+  formatTaskDueDate,
+  getTaskCardColors,
+  getTaskCategoryIcon,
+} from "@/features/tasks/ui/tasks.helper";
+import { Task } from "@/shared/types/task";
 
 export default function TasksScrollable() {
   const [tasks, setTasks] = useState<Task[]>(TODAY_TASKS_MOCKS);
@@ -144,7 +52,7 @@ export default function TasksScrollable() {
         scrollEventThrottle={16}
       >
         {tasks.map((task, index) => {
-          const colors = getCardColors(index);
+          const colors = getTaskCardColors(index);
           return (
             <TouchableOpacity
               key={task.id}
@@ -166,7 +74,7 @@ export default function TasksScrollable() {
               <View style={styles.cardContent}>
                 {/* Top row: Icon, Title, and Checkbox */}
                 <View style={styles.cardHeader}>
-                  {getCategoryIcon(task.category)}
+                  {getTaskCategoryIcon(task.category, { style: styles.icon })}
                   <Text
                     style={[
                       styles.taskName,
@@ -227,7 +135,7 @@ export default function TasksScrollable() {
                       color={TEXT.secondary}
                     />
                     <Text style={styles.dueDateText}>
-                      {formatDueDate(task.dueDate)}
+                      {formatTaskDueDate(task.dueDate)}
                     </Text>
                   </View>
                 </View>

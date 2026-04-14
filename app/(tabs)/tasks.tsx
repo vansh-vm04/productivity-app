@@ -1,12 +1,10 @@
 import {
   CATEGORY_TAGS,
-  CategoryType,
   PRIORITY_TAGS,
 } from "@/shared/constants/tags";
 import {
   BACKGROUND,
   BORDER,
-  CARD_PALETTES,
   MODAL,
   PRIMARY,
   SURFACE,
@@ -29,62 +27,11 @@ import {
 } from "react-native";
 import { Task } from "@/shared/types/task";
 import { TASKS_MOCKS } from "@/features/tasks/mocks/tasks.mocks";
-
-const getCardColors = (index: number) => {
-  return CARD_PALETTES[index % CARD_PALETTES.length];
-};
-
-const getCategoryIcon = (category: CategoryType) => {
-  const iconSize = moderateScale(18);
-  switch (category) {
-    case "work":
-      return <FontAwesome5 name="briefcase" size={iconSize} color="#ffffff" />;
-    case "health":
-      return (
-        <MaterialCommunityIcons
-          name="dumbbell"
-          size={iconSize}
-          color="#ffffff"
-        />
-      );
-    case "personal":
-      return (
-        <MaterialCommunityIcons name="home" size={iconSize} color="#ffffff" />
-      );
-    case "growth":
-      return (
-        <MaterialCommunityIcons name="sprout" size={iconSize} color="#ffffff" />
-      );
-    case "deepwork":
-      return (
-        <MaterialCommunityIcons name="brain" size={iconSize} color="#ffffff" />
-      );
-    default:
-      return <FontAwesome5 name="tasks" size={iconSize} color="#ffffff" />;
-  }
-};
-
-const formatDueDate = (date: Date) => {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  const time = `${hours}:${minutes}`;
-
-  if (date.toDateString() === today.toDateString()) {
-    return `Today ${time}`;
-  } else if (date.toDateString() === tomorrow.toDateString()) {
-    return `Tomorrow ${time}`;
-  } else {
-    const monthDay = date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-    return `${monthDay} ${time}`;
-  }
-};
+import {
+  formatTaskDueDate,
+  getTaskCardColors,
+  getTaskCategoryIcon,
+} from "@/features/tasks/ui/tasks.helper";
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>(TASKS_MOCKS);
@@ -161,7 +108,7 @@ export default function Tasks() {
       >
         <Text style={styles.tipText}>Long press a task for more options</Text>
         {tasks.map((task, index) => {
-          const colors = getCardColors(index);
+          const colors = getTaskCardColors(index);
           return (
             <TouchableOpacity
               key={task.id}
@@ -181,7 +128,7 @@ export default function Tasks() {
               <View style={styles.cardContent}>
                 {/* Top row: Icon, Title, and Checkbox */}
                 <View style={styles.cardHeader}>
-                  {getCategoryIcon(task.category)}
+                  {getTaskCategoryIcon(task.category)}
                   <Text
                     style={[
                       styles.taskName,
@@ -242,7 +189,7 @@ export default function Tasks() {
                       color={TEXT.secondary}
                     />
                     <Text style={styles.dueDateText}>
-                      {formatDueDate(task.dueDate)}
+                      {formatTaskDueDate(task.dueDate)}
                     </Text>
                   </View>
                 </View>
