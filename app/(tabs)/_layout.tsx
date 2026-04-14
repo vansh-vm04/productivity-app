@@ -1,7 +1,7 @@
-import { Tabs } from "expo-router";
+import { PRIMARY, TAB } from "@/shared/theme/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { PRIMARY, TAB } from "@/theme/colors";
+import { Tabs } from "expo-router";
 
 export default function TabLayout() {
   return (
@@ -23,7 +23,7 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontFamily: "Poppins-SemiBold",
           fontSize: 10,
-        }
+        },
       }}
     >
       <Tabs.Screen
@@ -67,9 +67,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="streaks"
+        name="habits"
         options={{
-          title: "Streaks",
+          title: "Habits",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "flame-sharp" : "flame-outline"}

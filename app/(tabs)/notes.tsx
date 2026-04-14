@@ -1,6 +1,6 @@
-import { BACKGROUND, PRIMARY, TEXT } from "@/theme/colors";
-import { fonts } from "@/theme/fonts";
-import { moderateScale, responsiveFontSize } from "@/utils/responsive";
+import { BACKGROUND, PRIMARY, TEXT } from "@/shared/theme/colors";
+import { fonts } from "@/shared/theme/fonts";
+import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
@@ -134,7 +134,7 @@ export default function Notes() {
         style={[styles.noteCard, { backgroundColor: note.bgColor }]}
         onPress={() =>
           router.push({
-            pathname: "/CreateNote",
+            pathname: "/create/note",
             params: {
               mode: "edit",
               noteId: note.id,
@@ -172,7 +172,7 @@ export default function Notes() {
         <TouchableOpacity
           style={styles.addButton}
           activeOpacity={0.7}
-          onPress={() => router.push("/CreateNote")}
+          onPress={() => router.push("/create/note")}
         >
           <Text style={styles.addButtonIcon}>+</Text>
           <Text style={styles.addButtonText}>New Note</Text>

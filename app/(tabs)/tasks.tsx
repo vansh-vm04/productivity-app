@@ -3,7 +3,7 @@ import {
   CategoryType,
   PRIORITY_TAGS,
   PriorityType,
-} from "@/constants/tags";
+} from "@/shared/constants/tags";
 import {
   BACKGROUND,
   BORDER,
@@ -13,9 +13,9 @@ import {
   SURFACE,
   TAG,
   TEXT,
-} from "@/theme/colors";
-import { fonts } from "@/theme/fonts";
-import { moderateScale, responsiveFontSize } from "@/utils/responsive";
+} from "@/shared/theme/colors";
+import { fonts } from "@/shared/theme/fonts";
+import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
@@ -216,7 +216,7 @@ export default function Tasks() {
 
     setModalVisible(false);
     router.push({
-      pathname: "/createTask",
+      pathname: "/create/task",
       params: {
         mode: "edit",
         taskId: selectedTask.id,
@@ -237,7 +237,7 @@ export default function Tasks() {
           style={styles.addButton}
           activeOpacity={0.7}
           onPress={() => {
-            router.push("/createTask");
+            router.push("/create/task");
           }}
         >
           <Text style={styles.addButtonIcon}>+</Text>

@@ -1,6 +1,12 @@
-import { BACKGROUND, MODAL, PRIMARY, SURFACE, TEXT } from "@/theme/colors";
-import { fonts } from "@/theme/fonts";
-import { moderateScale, responsiveFontSize } from "@/utils/responsive";
+import {
+  BACKGROUND,
+  MODAL,
+  PRIMARY,
+  SURFACE,
+  TEXT,
+} from "@/shared/theme/colors";
+import { fonts } from "@/shared/theme/fonts";
+import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -26,14 +32,15 @@ export default function CreateModal({ visible, onClose }: Props) {
 
     switch (option) {
       case "task":
-        router.push("/createTask");
+        router.push("/create/task");
         break;
       case "note":
-        // TODO: Navigate to create note screen
+        router.push("/create/note");
         console.log("Navigate to create note");
         break;
       case "habit":
         // TODO: Navigate to create habit screen
+        router.push("/create/habit");
         console.log("Navigate to create habit");
         break;
     }

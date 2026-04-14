@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-export default function Streaks() {
+export default function Habits() {
   return (
     <View
       style={{
@@ -9,7 +9,7 @@ export default function Streaks() {
         alignItems: "center",
       }}
     >
-      <Text>Streaks.</Text>
+      <Text>Habits.</Text>
     </View>
   );
 }

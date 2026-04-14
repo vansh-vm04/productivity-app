@@ -1,6 +1,6 @@
-import { BACKGROUND, PRIMARY, SURFACE, TEXT } from "@/theme/colors";
-import { fonts } from "@/theme/fonts";
-import { moderateScale, responsiveFontSize } from "@/utils/responsive";
+import { BACKGROUND, PRIMARY, SURFACE, TEXT } from "@/shared/theme/colors";
+import { fonts } from "@/shared/theme/fonts";
+import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {

@@ -1,5 +1,5 @@
-import { BORDER, PRIMARY, SURFACE, TEXT, UTILITY } from "@/theme/colors";
-import { moderateScale, responsiveFontSize } from "@/utils/responsive";
+import { BORDER, PRIMARY, SURFACE, TEXT, UTILITY } from "@/shared/theme/colors";
+import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";

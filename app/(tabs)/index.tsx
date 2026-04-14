@@ -1,8 +1,8 @@
-import CreateModal from "@/components/CreateModal";
-import TodayProgress from "@/components/Progress";
-import TasksScrollable from "@/components/TasksScrollable";
-import { BACKGROUND, PRIMARY, TEXT } from "@/theme/colors";
-import { moderateScale, responsiveFontSize } from "@/utils/responsive";
+import CreateModal from "@/shared/components/CreateModal";
+import TodayProgress from "@/shared/components/ProgressCard";
+import TasksScrollable from "@/features/tasks/components/TasksScrollable";
+import { BACKGROUND, PRIMARY, TEXT } from "@/shared/theme/colors";
+import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
 import {
@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 
-export default function Index() {
+export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (

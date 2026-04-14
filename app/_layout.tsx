@@ -33,7 +33,7 @@ export default function RootLayout() {
         options={{ headerShown: false, statusBarHidden: false }}
       />
       <Stack.Screen
-        name="createTask"
+        name="create/task"
         options={{
           headerShown: false,
           statusBarHidden: false,
@@ -42,7 +42,16 @@ export default function RootLayout() {
         }}
       />
       <Stack.Screen
-        name="CreateNote"
+        name="create/note"
+        options={{
+          headerShown: false,
+          statusBarHidden: false,
+          animation: "simple_push",
+          presentation: "card",
+        }}
+      />
+      <Stack.Screen
+        name="create/habit"
         options={{
           headerShown: false,
           statusBarHidden: false,

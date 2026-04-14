@@ -1,24 +1,30 @@
 import {
-    CATEGORY_TAGS,
-    CategoryType,
-    PRIORITY_TAGS,
-    PriorityType,
-} from "@/constants/tags";
-import { BACKGROUND, BORDER, PRIMARY, SURFACE, TEXT } from "@/theme/colors";
-import { fonts } from "@/theme/fonts";
-import { moderateScale, responsiveFontSize } from "@/utils/responsive";
+  CATEGORY_TAGS,
+  CategoryType,
+  PRIORITY_TAGS,
+  PriorityType,
+} from "@/shared/constants/tags";
+import {
+  BACKGROUND,
+  BORDER,
+  PRIMARY,
+  SURFACE,
+  TEXT,
+} from "@/shared/theme/colors";
+import { fonts } from "@/shared/theme/fonts";
+import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface TaskData {

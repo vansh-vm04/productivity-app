@@ -3,7 +3,7 @@ import {
     CategoryType,
     PRIORITY_TAGS,
     PriorityType,
-} from "@/constants/tags";
+} from "@/shared/constants/tags";
 import {
     BORDER,
     CARD_PALETTES,
@@ -11,9 +11,9 @@ import {
     SURFACE,
     TAG,
     TEXT,
-} from "@/theme/colors";
-import { fonts } from "@/theme/fonts";
-import { moderateScale, responsiveFontSize } from "@/utils/responsive";
+} from "@/shared/theme/colors";
+import { fonts } from "@/shared/theme/fonts";
+import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useState } from "react";
