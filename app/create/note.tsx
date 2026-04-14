@@ -1,5 +1,6 @@
 import { BACKGROUND, PRIMARY, SURFACE, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
+import { CreateNoteParams } from "@/shared/types/note";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -20,17 +21,9 @@ import {
   View,
 } from "react-native";
 
-type Params = {
-  mode?: string;
-  noteId?: string;
-  title?: string;
-  body?: string;
-  category?: string;
-};
-
 function CreateNote() {
   const router = useRouter();
-  const params = useLocalSearchParams<Params>();
+  const params = useLocalSearchParams<CreateNoteParams>();
 
   const [title, setTitle] = useState(
     typeof params.title === "string" ? params.title : "",

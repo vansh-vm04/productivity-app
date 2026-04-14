@@ -24,50 +24,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-
-// Mock data - replace with actual data source
-const MOCK_TASKS = [
-  {
-    id: "1",
-    name: "Finish Project Report",
-    category: "work" as CategoryType,
-    priority: "urgent" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 14, 18, 0),
-  },
-  {
-    id: "2",
-    name: "Gym Workout",
-    category: "health" as CategoryType,
-    priority: "important" as PriorityType,
-    completed: true,
-    dueDate: new Date(2026, 3, 12, 7, 0),
-  },
-  {
-    id: "3",
-    name: "Buy Groceries",
-    category: "personal" as CategoryType,
-    priority: "normal" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 13, 14, 30),
-  },
-  {
-    id: "4",
-    name: "Team Meeting",
-    category: "work" as CategoryType,
-    priority: "urgent" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 12, 10, 0),
-  },
-  {
-    id: "5",
-    name: "Read Book",
-    category: "growth" as CategoryType,
-    priority: "low" as PriorityType,
-    completed: true,
-    dueDate: new Date(2026, 3, 15, 20, 0),
-  },
-];
+import { TODAY_TASKS_MOCKS } from "@/features/tasks/mocks/tasks.mocks";
 
 interface Task {
   id: string;
@@ -165,7 +122,7 @@ const formatDueDate = (date: Date) => {
 };
 
 export default function TasksScrollable() {
-  const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
+  const [tasks, setTasks] = useState<Task[]>(TODAY_TASKS_MOCKS);
 
   const toggleTask = (id: string) => {
     setTasks(

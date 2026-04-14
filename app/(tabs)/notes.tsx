@@ -10,18 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-type NoteCategory = "all" | "work" | "personal" | "ideas" | "study" | "health";
-
-type Note = {
-  id: string;
-  title: string;
-  body: string;
-  category: Exclude<NoteCategory, "all">;
-  updatedAt: string;
-  bgColor: string;
-  accentColor: string;
-};
+import { NOTES_MOCKS } from "@/features/notes/mocks/notes.mocks";
+import { Note, NoteCategory } from "@/shared/types/note";
 
 const CATEGORIES: { key: NoteCategory; label: string }[] = [
   { key: "all", label: "All" },
@@ -32,88 +22,13 @@ const CATEGORIES: { key: NoteCategory; label: string }[] = [
   { key: "health", label: "Health" },
 ];
 
-const MOCK_NOTES: Note[] = [
-  {
-    id: "1",
-    title: "Sprint Retrospective",
-    body: "Capture wins, blockers, and one process upgrade for next sprint.",
-    category: "work",
-    updatedAt: "Today",
-    bgColor: "#1F3D2B",
-    accentColor: "#2E5E42",
-  },
-  {
-    id: "2",
-    title: "Morning Journal",
-    body: "Three things I am grateful for and one intention for tonight.",
-    category: "personal",
-    updatedAt: "Today",
-    bgColor: "#1E3A5F",
-    accentColor: "#2C5D8A",
-  },
-  {
-    id: "3",
-    title: "App Feature Ideas",
-    body: "Voice notes to tasks, swipe actions, and timeline-based reminders.",
-    category: "ideas",
-    updatedAt: "Yesterday",
-    bgColor: "#2A2245",
-    accentColor: "#3E3270",
-  },
-  {
-    id: "4",
-    title: "DSA Revision",
-    body: "Graphs: BFS vs DFS patterns, topological sort and shortest path cheatsheet.",
-    category: "study",
-    updatedAt: "Yesterday",
-    bgColor: "#3A2230",
-    accentColor: "#5A3247",
-  },
-  {
-    id: "5",
-    title: "Workout Plan",
-    body: "Push day split with warmup, compounds first, then accessories and cooldown.",
-    category: "health",
-    updatedAt: "2d ago",
-    bgColor: "#3D2A1F",
-    accentColor: "#5E3F2E",
-  },
-  {
-    id: "6",
-    title: "Meeting Notes",
-    body: "Client wants milestone visibility and weekly summary email automation.",
-    category: "work",
-    updatedAt: "2d ago",
-    bgColor: "#1F3F3D",
-    accentColor: "#2F6B66",
-  },
-  {
-    id: "7",
-    title: "Weekend Plan",
-    body: "Cafe + reading slot, family call, and reset workspace for Monday.",
-    category: "personal",
-    updatedAt: "3d ago",
-    bgColor: "#3D3A1F",
-    accentColor: "#5E5A2E",
-  },
-  {
-    id: "8",
-    title: "Product Brainstorm",
-    body: "Lightweight habits streak with frictionless quick-add interaction.",
-    category: "ideas",
-    updatedAt: "3d ago",
-    bgColor: "#1F3D2B",
-    accentColor: "#2E5E42",
-  },
-];
-
 export default function Notes() {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<NoteCategory>("all");
 
   const filteredNotes = useMemo(() => {
-    if (activeCategory === "all") return MOCK_NOTES;
-    return MOCK_NOTES.filter((note) => note.category === activeCategory);
+    if (activeCategory === "all") return NOTES_MOCKS;
+    return NOTES_MOCKS.filter((note) => note.category === activeCategory);
   }, [activeCategory]);
 
   const leftColumnNotes = useMemo(

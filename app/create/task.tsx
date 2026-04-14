@@ -12,6 +12,7 @@ import {
   TEXT,
 } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
+import { TaskData } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -26,15 +27,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-interface TaskData {
-  id?: string;
-  name: string;
-  priority: PriorityType;
-  category: CategoryType | "custom";
-  customCategory: string;
-  dueDate: Date | null;
-}
 
 export default function CreateTask() {
   const router = useRouter();

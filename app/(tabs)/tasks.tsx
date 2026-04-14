@@ -2,7 +2,6 @@ import {
   CATEGORY_TAGS,
   CategoryType,
   PRIORITY_TAGS,
-  PriorityType,
 } from "@/shared/constants/tags";
 import {
   BACKGROUND,
@@ -28,99 +27,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-// Mock data with due dates
-const MOCK_TASKS = [
-  {
-    id: "1",
-    name: "Finish Project Report",
-    category: "work" as CategoryType,
-    priority: "urgent" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 14, 18, 0),
-  },
-  {
-    id: "2",
-    name: "Gym Workout",
-    category: "health" as CategoryType,
-    priority: "important" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 12, 7, 0),
-  },
-  {
-    id: "3",
-    name: "Buy Groceries",
-    category: "personal" as CategoryType,
-    priority: "normal" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 13, 14, 30),
-  },
-  {
-    id: "4",
-    name: "Team Meeting",
-    category: "work" as CategoryType,
-    priority: "urgent" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 12, 10, 0),
-  },
-  {
-    id: "5",
-    name: "Read Book",
-    category: "growth" as CategoryType,
-    priority: "low" as PriorityType,
-    completed: true,
-    dueDate: new Date(2026, 3, 15, 20, 0),
-  },
-  {
-    id: "6",
-    name: "Deep Work Session",
-    category: "deepwork" as CategoryType,
-    priority: "important" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 14, 9, 0),
-  },
-  {
-    id: "7",
-    name: "Client Call",
-    category: "work" as CategoryType,
-    priority: "urgent" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 12, 15, 0),
-  },
-  {
-    id: "8",
-    name: "Meditation",
-    category: "health" as CategoryType,
-    priority: "normal" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 14, 7, 0),
-  },
-  {
-    id: "9",
-    name: "Code Review",
-    category: "work" as CategoryType,
-    priority: "important" as PriorityType,
-    completed: false,
-    dueDate: new Date(2026, 3, 13, 11, 0),
-  },
-  {
-    id: "10",
-    name: "Personal Project",
-    category: "personal" as CategoryType,
-    priority: "low" as PriorityType,
-    completed: true,
-    dueDate: new Date(2026, 3, 16, 19, 0),
-  },
-];
-
-interface Task {
-  id: string;
-  name: string;
-  category: CategoryType;
-  priority: PriorityType;
-  completed: boolean;
-  dueDate: Date;
-}
+import { Task } from "@/shared/types/task";
+import { TASKS_MOCKS } from "@/features/tasks/mocks/tasks.mocks";
 
 const getCardColors = (index: number) => {
   return CARD_PALETTES[index % CARD_PALETTES.length];
@@ -179,7 +87,7 @@ const formatDueDate = (date: Date) => {
 };
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
+  const [tasks, setTasks] = useState<Task[]>(TASKS_MOCKS);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
