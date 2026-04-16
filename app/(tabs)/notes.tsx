@@ -1,5 +1,7 @@
+import { NOTES_MOCKS } from "@/features/notes/mocks/notes.mocks";
 import { BACKGROUND, PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
+import { Note, NoteCategory } from "@/shared/types/note";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
@@ -10,17 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { NOTES_MOCKS } from "@/features/notes/mocks/notes.mocks";
-import { Note, NoteCategory } from "@/shared/types/note";
-
-const CATEGORIES: { key: NoteCategory; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "work", label: "Work" },
-  { key: "personal", label: "Personal" },
-  { key: "ideas", label: "Ideas" },
-  { key: "study", label: "Study" },
-  { key: "health", label: "Health" },
-];
+import { NOTE_CATEGORIES } from "../../shared/constants/notes";
 
 export default function Notes() {
   const router = useRouter();
@@ -100,7 +92,7 @@ export default function Notes() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.categoryScrollContent}
       >
-        {CATEGORIES.map((category) => {
+        {NOTE_CATEGORIES.map((category) => {
           const selected = activeCategory === category.key;
           return (
             <TouchableOpacity
