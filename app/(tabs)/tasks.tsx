@@ -1,37 +1,26 @@
-import {
-  CATEGORY_TAGS,
-  PRIORITY_TAGS,
-} from "@/shared/constants/tags";
-import {
-  BACKGROUND,
-  BORDER,
-  MODAL,
-  PRIMARY,
-  SURFACE,
-  TAG,
-  TEXT,
-} from "@/shared/theme/colors";
-import { fonts } from "@/shared/theme/fonts";
-import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Task } from "@/shared/types/task";
 import { TASKS_MOCKS } from "@/features/tasks/mocks/tasks.mocks";
 import {
   formatTaskDueDate,
   getTaskCardColors,
   getTaskCategoryIcon,
 } from "@/features/tasks/ui/tasks.helper";
+import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
+import { CATEGORY_TAGS, PRIORITY_TAGS } from "@/shared/constants/tags";
+import { BACKGROUND, PRIMARY, TAG, TEXT } from "@/shared/theme/colors";
+import { fonts } from "@/shared/theme/fonts";
+import { Task } from "@/shared/types/task";
+import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>(TASKS_MOCKS);
@@ -82,6 +71,31 @@ export default function Tasks() {
       },
     });
   };
+
+  const taskActions: ActionModalItem[] = [
+    {
+      key: "edit",
+      label: "Edit",
+      icon: "pencil" as const,
+      iconColor: PRIMARY.main,
+      onPress: handleEdit,
+    },
+    {
+      key: "complete",
+      label: selectedTask?.completed ? "Mark Incomplete" : "Mark Complete",
+      icon: selectedTask?.completed ? "undo" : "check",
+      iconColor: "#34D399",
+      onPress: handleComplete,
+    },
+    {
+      key: "delete",
+      label: "Delete",
+      icon: "trash-can" as const,
+      iconColor: "#EF4444",
+      danger: true,
+      onPress: handleDelete,
+    },
+  ];
 
   return (
     <View style={styles.container}>
@@ -199,70 +213,12 @@ export default function Tasks() {
         })}
       </ScrollView>
 
-      {/* Modal */}
-      <Modal
+      <ActionModal
         visible={modalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{selectedTask?.name}</Text>
-
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={handleEdit}
-              activeOpacity={0.7}
-            >
-              <MaterialCommunityIcons
-                name="pencil"
-                size={moderateScale(20)}
-                color={PRIMARY.main}
-              />
-              <Text style={styles.modalButtonText}>Edit</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={handleComplete}
-              activeOpacity={0.7}
-            >
-              <MaterialCommunityIcons
-                name={selectedTask?.completed ? "undo" : "check"}
-                size={moderateScale(20)}
-                color="#34D399"
-              />
-              <Text style={styles.modalButtonText}>
-                {selectedTask?.completed ? "Mark Incomplete" : "Mark Complete"}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.modalButton, styles.deleteButton]}
-              onPress={handleDelete}
-              activeOpacity={0.7}
-            >
-              <MaterialCommunityIcons
-                name="trash-can"
-                size={moderateScale(20)}
-                color="#EF4444"
-              />
-              <Text style={[styles.modalButtonText, styles.deleteButtonText]}>
-                Delete
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.modalCancelButton}
-              onPress={() => setModalVisible(false)}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.modalCancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        title={selectedTask?.name ?? "Task"}
+        actions={taskActions}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }
@@ -403,61 +359,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "transparent",
-  },
-  /* Modal Styles */
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: MODAL.overlay,
-    justifyContent: "center",
-    paddingHorizontal: moderateScale(20),
-  },
-  modalContent: {
-    backgroundColor: SURFACE.primary,
-    borderRadius: moderateScale(24),
-    padding: moderateScale(20),
-    paddingBottom: moderateScale(15),
-  },
-  modalTitle: {
-    fontSize: responsiveFontSize(18),
-    fontFamily: fonts.bold,
-    color: TEXT.primary,
-    marginBottom: moderateScale(10),
-    textAlign: "center",
-  },
-  modalButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: moderateScale(10),
-    paddingVertical: moderateScale(14),
-    paddingHorizontal: moderateScale(16),
-    borderRadius: moderateScale(12),
-    marginVertical: moderateScale(4),
-    backgroundColor: BACKGROUND.secondary,
-    borderWidth: 0.5,
-    borderColor: BORDER.primary,
-  },
-  modalButtonText: {
-    paddingTop: moderateScale(2),
-    fontSize: responsiveFontSize(14),
-    fontFamily: fonts.semibold,
-    color: TEXT.primary,
-    flex: 1,
-  },
-  deleteButton: {
-    borderColor: "rgba(239, 68, 68, 0.3)",
-  },
-  deleteButtonText: {
-    color: "#EF4444",
-  },
-  modalCancelButton: {
-    paddingVertical: moderateScale(12),
-    marginTop: moderateScale(12),
-  },
-  modalCancelButtonText: {
-    fontSize: responsiveFontSize(14),
-    fontFamily: fonts.semibold,
-    color: TEXT.secondary,
-    textAlign: "center",
   },
   tipText: {
     fontSize: responsiveFontSize(14),
