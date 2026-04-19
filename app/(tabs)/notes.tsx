@@ -1,4 +1,5 @@
 import { NOTES_MOCKS } from "@/features/notes/mocks/notes.mocks";
+import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { BACKGROUND, PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Note, NoteCategory } from "@/shared/types/note";
@@ -17,11 +18,14 @@ import { NOTE_CATEGORIES } from "../../shared/constants/notes";
 export default function Notes() {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<NoteCategory>("all");
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [notes, setNotes] = useState<Note[]>(NOTES_MOCKS);
 
   const filteredNotes = useMemo(() => {
-    if (activeCategory === "all") return NOTES_MOCKS;
-    return NOTES_MOCKS.filter((note) => note.category === activeCategory);
-  }, [activeCategory]);
+    if (activeCategory === "all") return notes;
+    return notes.filter((note) => note.category === activeCategory);
+  }, [activeCategory, notes]);
 
   const leftColumnNotes = useMemo(
     () => filteredNotes.filter((_, index) => index % 2 === 0),
@@ -32,6 +36,52 @@ export default function Notes() {
     () => filteredNotes.filter((_, index) => index % 2 !== 0),
     [filteredNotes],
   );
+
+  const handleLongPress = (note: Note) => {
+    setSelectedNote(note);
+    setModalVisible(true);
+  };
+
+  const handleEdit = () => {
+    if (!selectedNote) return;
+
+    setModalVisible(false);
+    router.push({
+      pathname: "/create/note",
+      params: {
+        mode: "edit",
+        noteId: selectedNote.id,
+        title: selectedNote.title,
+        body: selectedNote.body,
+        category: selectedNote.category,
+      },
+    });
+  };
+
+  const handleDelete = () => {
+    if (selectedNote) {
+      setNotes(notes.filter((note) => note.id !== selectedNote.id));
+    }
+    setModalVisible(false);
+  };
+
+  const noteActions: ActionModalItem[] = [
+    {
+      key: "edit",
+      label: "Edit",
+      icon: "pencil" as const,
+      iconColor: PRIMARY.main,
+      onPress: handleEdit,
+    },
+    {
+      key: "delete",
+      label: "Delete",
+      icon: "trash-can" as const,
+      iconColor: "#EF4444",
+      danger: true,
+      onPress: handleDelete,
+    },
+  ];
 
   const renderNoteCard = (note: Note) => {
     return (
@@ -51,6 +101,8 @@ export default function Notes() {
             },
           })
         }
+        onLongPress={() => handleLongPress(note)}
+        delayLongPress={300}
       >
         <View style={styles.noteCardHeader}>
           <Text
@@ -131,6 +183,13 @@ export default function Notes() {
           </View>
         </View>
       </ScrollView>
+
+      <ActionModal
+        visible={modalVisible}
+        title={selectedNote?.title || "Note"}
+        actions={noteActions}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }
