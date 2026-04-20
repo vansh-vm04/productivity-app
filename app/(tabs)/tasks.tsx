@@ -5,6 +5,7 @@ import {
   getTaskCategoryIcon,
 } from "@/features/tasks/ui/tasks.helper";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
+import { AddButton } from "@/shared/components/AddButton";
 import { CATEGORY_TAGS, PRIORITY_TAGS } from "@/shared/constants/tags";
 import { BACKGROUND, PRIMARY, TAG, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
@@ -102,16 +103,10 @@ export default function Tasks() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Tasks</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          activeOpacity={0.7}
-          onPress={() => {
-            router.push("/create/task");
-          }}
-        >
-          <Text style={styles.addButtonIcon}>+</Text>
-          <Text style={styles.addButtonText}>New Task</Text>
-        </TouchableOpacity>
+        <AddButton
+          label="New Task"
+          onPress={() => router.push("/create/task")}
+        />
       </View>
 
       {/* Tasks List */}
@@ -244,27 +239,7 @@ const styles = StyleSheet.create({
     color: TEXT.primary,
     lineHeight: moderateScale(32),
   },
-  addButton: {
-    flexDirection: "row",
-    paddingHorizontal: moderateScale(16),
-    paddingVertical: moderateScale(2),
-    borderRadius: moderateScale(12),
-    backgroundColor: PRIMARY.main,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: moderateScale(6),
-  },
-  addButtonText: {
-    fontSize: responsiveFontSize(12),
-    fontFamily: fonts.medium,
-    color: TEXT.primary,
-  },
-  addButtonIcon: {
-    paddingTop: moderateScale(2),
-    fontSize: responsiveFontSize(16),
-    fontFamily: fonts.medium,
-    color: TEXT.primary,
-  },
+
   scrollContent: {
     paddingHorizontal: moderateScale(16),
     paddingVertical: moderateScale(10),

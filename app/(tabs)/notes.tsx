@@ -1,5 +1,6 @@
 import { NOTES_MOCKS } from "@/features/notes/mocks/notes.mocks";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
+import { AddButton } from "@/shared/components/AddButton";
 import { BACKGROUND, PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Note, NoteCategory } from "@/shared/types/note";
@@ -128,14 +129,10 @@ export default function Notes() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Notes</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          activeOpacity={0.7}
+        <AddButton
+          label="New Note"
           onPress={() => router.push("/create/note")}
-        >
-          <Text style={styles.addButtonIcon}>+</Text>
-          <Text style={styles.addButtonText}>New Note</Text>
-        </TouchableOpacity>
+        />
       </View>
 
       {/* Category Capsules */}
@@ -215,27 +212,7 @@ const styles = StyleSheet.create({
     color: TEXT.primary,
     lineHeight: moderateScale(32),
   },
-  addButton: {
-    flexDirection: "row",
-    paddingHorizontal: moderateScale(16),
-    paddingVertical: moderateScale(2),
-    borderRadius: moderateScale(12),
-    backgroundColor: PRIMARY.main,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: moderateScale(6),
-  },
-  addButtonText: {
-    fontSize: responsiveFontSize(12),
-    fontFamily: fonts.medium,
-    color: TEXT.primary,
-  },
-  addButtonIcon: {
-    paddingTop: moderateScale(2),
-    fontSize: responsiveFontSize(16),
-    fontFamily: fonts.medium,
-    color: TEXT.primary,
-  },
+
   categoryScrollContent: {
     paddingHorizontal: moderateScale(16),
     paddingVertical: moderateScale(12),
