@@ -232,6 +232,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: "#000000",
     backgroundColor: "rgba(255,255,255,0.08)",
+    height: moderateScale(30),
   },
   periodCapsuleActive: {
     backgroundColor: PRIMARY.main,

@@ -1,8 +1,9 @@
 import { PRIMARY, TAB } from "@/shared/theme/colors";
 import { moderateScale } from "@/shared/utils/responsive";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Tabs } from "expo-router";
+import Octicons from "@expo/vector-icons/Octicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function TabLayout() {
   return (
@@ -27,11 +28,13 @@ export default function TabLayout() {
           borderLeftWidth: 0.5,
           borderTopLeftRadius: moderateScale(18),
           borderTopRightRadius: moderateScale(18),
+          paddingTop: moderateScale(6),
         },
         tabBarLabelStyle: {
           fontFamily: "Poppins-SemiBold",
           fontSize: 10,
         },
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
@@ -39,7 +42,7 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name="home-sharp" color={color} size={20} />
+            <Octicons name="home" color={color} size={24} />
           ),
           headerShown: false,
         }}
@@ -49,11 +52,11 @@ export default function TabLayout() {
         options={{
           title: "Tasks",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
+            <MaterialIcons
               name={
-                focused ? "checkmark-circle-sharp" : "checkmark-circle-outline"
+                focused ? "task-alt" : "task-alt"
               }
-              size={24}
+              size={25}
               color={color}
             />
           ),
@@ -66,8 +69,8 @@ export default function TabLayout() {
           title: "Notes",
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons
-              name={focused ? "note-edit" : "note-edit-outline"}
-              size={24}
+              name={focused ? "note-edit-outline" : "note-edit-outline"}
+              size={25.5}
               color={color}
             />
           ),
@@ -79,9 +82,9 @@ export default function TabLayout() {
         options={{
           title: "Habits",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "flame-sharp" : "flame-outline"}
-              size={22}
+            <MaterialIcons
+              name={focused ? "event-repeat" : "event-repeat"}
+              size={25.5}
               color={color}
             />
           ),

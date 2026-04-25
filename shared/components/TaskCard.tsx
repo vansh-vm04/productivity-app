@@ -1,7 +1,6 @@
 import {
-    formatTaskDueDate,
-    getTaskCardColors,
-    getTaskCategoryIcon,
+  formatTaskDueDate,
+  getTaskCategoryIcon,
 } from "@/features/tasks/ui/tasks.helper";
 import { CATEGORY_TAGS, PRIORITY_TAGS } from "@/shared/constants/tags";
 import { TAG, TEXT } from "@/shared/theme/colors";
@@ -12,13 +11,13 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
 import {
-    StyleProp,
-    StyleSheet,
-    Text,
-    TextStyle,
-    TouchableOpacity,
-    View,
-    ViewStyle,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from "react-native";
 
 interface TaskCardProps {
@@ -43,7 +42,10 @@ export const TaskCard = React.memo(
     categoryIconStyle,
     style,
   }: TaskCardProps) => {
-    const colors = getTaskCardColors(index);
+    // Light blue for non-completed tasks, green for completed
+    const colors = task.completed
+      ? { base: "#E9FBF3", glow: "#34D399", accent: "#059669" }
+      : { base: "#EAF3FF", glow: "#60A5FA", accent: "#2563EB" };
 
     return (
       <TouchableOpacity
@@ -53,8 +55,7 @@ export const TaskCard = React.memo(
         style={[
           styles.taskCard,
           {
-            backgroundColor: colors.base,
-            borderColor: colors.glow,
+            backgroundColor: "#FFFFFF",
           },
           style,
         ]}
@@ -100,13 +101,28 @@ export const TaskCard = React.memo(
 
           <View style={styles.cardFooter}>
             <View style={styles.tagsContainer}>
-              <View style={[styles.tag, styles.priorityTag]}>
+              <View
+                style={[
+                  styles.tag,
+                  {
+                    backgroundColor: colors.base,
+                    borderColor: colors.glow,
+                  },
+                ]}
+              >
                 <Text style={styles.tagText}>
                   {PRIORITY_TAGS[task.priority].label}
                 </Text>
               </View>
 
-              <View style={[styles.tag, styles.categoryTag]}>
+              <View
+                style={[
+                  styles.tag,
+                  {
+                    backgroundColor: colors.base,
+                  },
+                ]}
+              >
                 <Text style={styles.tagText}>
                   {CATEGORY_TAGS[task.category].label}
                 </Text>
@@ -138,12 +154,21 @@ const styles = StyleSheet.create({
     height: moderateScale(110),
     borderRadius: moderateScale(16),
     overflow: "hidden",
-    borderWidth: 0.5,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
     padding: moderateScale(16),
     justifyContent: "space-between",
     alignItems: "flex-start",
     flexDirection: "column",
     marginVertical: moderateScale(6),
+    shadowColor: "#000000",
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    elevation: 1,
   },
   cardContent: {
     width: "100%",
@@ -202,12 +227,6 @@ const styles = StyleSheet.create({
     borderRadius: moderateScale(12),
     alignItems: "center",
     justifyContent: "center",
-  },
-  priorityTag: {
-    backgroundColor: TAG.background,
-  },
-  categoryTag: {
-    backgroundColor: TAG.background,
   },
   tagText: {
     fontSize: responsiveFontSize(11),

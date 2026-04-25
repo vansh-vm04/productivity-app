@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: MODAL.overlay,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: moderateScale(20),
+    paddingHorizontal: moderateScale(14),
   },
   modalContent: {
     backgroundColor: SURFACE.primary,

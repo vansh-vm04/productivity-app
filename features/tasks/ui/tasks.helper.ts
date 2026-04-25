@@ -99,7 +99,7 @@ export const formatTaskDueDate = (date: Date) => {
 		month: "short",
 		day: "numeric",
 	});
-	return `${monthDay} ${time}`;
+	return `${monthDay}  ${time}`;
 };
 
 export const isTaskCategoryType = (value: string): value is CategoryType => {

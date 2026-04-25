@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: MODAL.overlay,
     justifyContent: "center",
-    paddingHorizontal: moderateScale(20),
+    paddingHorizontal: moderateScale(14),
   },
   content: {
     backgroundColor: SURFACE.primary,

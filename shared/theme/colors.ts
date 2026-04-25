@@ -155,7 +155,7 @@ const LIGHT_THEME: AppThemeColors = {
   },
   SCREEN: {
     gradientStart: "#9ccaff",
-    gradientEnd: "#ffffff",
+    gradientEnd: "#d7fff0",
   }
 };
 
