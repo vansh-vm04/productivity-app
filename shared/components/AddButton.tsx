@@ -1,4 +1,4 @@
-import { PRIMARY, TEXT } from "@/shared/theme/colors";
+import { BUTTON, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import React from "react";
@@ -33,21 +33,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(16),
     paddingVertical: moderateScale(2),
     borderRadius: moderateScale(12),
-    backgroundColor: PRIMARY.main,
+    backgroundColor: BUTTON.background,
     justifyContent: "center",
     alignItems: "center",
     gap: moderateScale(6),
     maxWidth: moderateScale(110),
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   addButtonText: {
     fontSize: responsiveFontSize(12),
     fontFamily: fonts.medium,
-    color: TEXT.button,
+    color: BUTTON.text,
   },
   addButtonIcon: {
     paddingTop: moderateScale(2),
     fontSize: responsiveFontSize(16),
     fontFamily: fonts.medium,
-    color: TEXT.button,
+    color: BUTTON.text,
   },
 });

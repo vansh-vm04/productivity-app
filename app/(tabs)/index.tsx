@@ -1,9 +1,10 @@
 import TasksScrollable from "@/features/tasks/components/TasksScrollable";
 import CreateModal from "@/shared/components/CreateModal";
 import TodayProgress from "@/shared/components/ProgressCard";
-import { BACKGROUND, PRIMARY, TEXT } from "@/shared/theme/colors";
+import { TEXT, SCREEN } from "@/shared/theme/colors";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import {
   ScrollView,
@@ -17,7 +18,12 @@ export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <>
+    <LinearGradient
+      colors={[SCREEN.gradientStart, SCREEN.gradientEnd]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={styles.gradientBackground}
+    >
       <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
@@ -31,11 +37,10 @@ export default function Home() {
           </View>
           <View style={{ flexDirection: "row", gap: moderateScale(8) }}>
             <TouchableOpacity style={styles.bellButton}>
-              <Text style={styles.unreadMarker}>●</Text>
               <MaterialCommunityIcons
-                name="bell-outline"
+                name="bell-ring-outline"
                 size={24}
-                color="#ffffff"
+                color="#000000"
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -59,14 +64,17 @@ export default function Home() {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
-    </>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradientBackground: {
+    flex: 1,
+  },
   screen: {
     flexGrow: 1,
-    backgroundColor: BACKGROUND.secondary,
+    backgroundColor: "transparent",
     paddingHorizontal: moderateScale(16),
     paddingBottom: moderateScale(40),
   },
@@ -102,22 +110,32 @@ const styles = StyleSheet.create({
     width: moderateScale(56),
     height: moderateScale(56),
     borderRadius: moderateScale(28),
-    backgroundColor: PRIMARY.main,
+    backgroundColor: "#ffffff",
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   bellButton: {
     width: moderateScale(56),
     height: moderateScale(56),
     borderRadius: moderateScale(28),
-    backgroundColor: PRIMARY.main,
+    backgroundColor: "#ffffff",
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   addButtonText: {
     fontSize: responsiveFontSize(26),
-    fontWeight: "200",
-    color: "#ffffff",
+    fontWeight: "300",
+    color: "#000000",
     textAlign: "center",
     lineHeight: moderateScale(40),
   },
@@ -125,7 +143,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 11,
     right: 17,
-    color: "#ffffff",
+    color: "#000000",
     zIndex: 1,
     fontSize: responsiveFontSize(18),
   },

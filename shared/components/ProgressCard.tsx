@@ -71,6 +71,11 @@ const styles = StyleSheet.create({
     backgroundColor: SURFACE.primary,
     borderWidth: 0.5,
     borderColor: BORDER.primary,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   cardTitle: {
     fontSize: responsiveFontSize(16),

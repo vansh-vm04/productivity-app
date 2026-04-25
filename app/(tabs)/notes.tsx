@@ -2,10 +2,11 @@ import { NOTES_MOCKS } from "@/features/notes/mocks/notes.mocks";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
 import { NoteCard } from "@/shared/components/NoteCard";
-import { BACKGROUND, PRIMARY, TEXT } from "@/shared/theme/colors";
+import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Note, NoteCategory } from "@/shared/types/note";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
@@ -86,112 +87,122 @@ export default function Notes() {
   ];
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Notes</Text>
-        <AddButton
-          label="New Note"
-          onPress={() => router.push("/create/note")}
+    <LinearGradient
+      colors={[SCREEN.gradientStart, SCREEN.gradientEnd]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={styles.gradientBackground}
+    >
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Notes</Text>
+          <AddButton
+            label="New Note"
+            onPress={() => router.push("/create/note")}
+          />
+        </View>
+
+        {/* Category Capsules */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoryScrollContent}
+        >
+          {NOTE_CATEGORIES.map((category) => {
+            const selected = activeCategory === category.key;
+            return (
+              <TouchableOpacity
+                key={category.key}
+                style={[
+                  styles.categoryCapsule,
+                  selected && styles.categoryCapsuleActive,
+                ]}
+                onPress={() => setActiveCategory(category.key)}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.categoryCapsuleText,
+                    selected && styles.categoryCapsuleTextActive,
+                  ]}
+                >
+                  {category.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
+        {/* Notes Grid */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.notesGridContent}
+        >
+          <View style={styles.notesColumnsContainer}>
+            <View style={styles.notesColumn}>
+              {leftColumnNotes.map((note) => (
+                <NoteCard
+                  key={note.id}
+                  note={note}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/create/note",
+                      params: {
+                        mode: "edit",
+                        noteId: note.id,
+                        title: note.title,
+                        body: note.body,
+                        category: note.category,
+                      },
+                    })
+                  }
+                  onLongPress={() => handleLongPress(note)}
+                />
+              ))}
+            </View>
+            <View style={styles.notesColumn}>
+              {rightColumnNotes.map((note) => (
+                <NoteCard
+                  key={note.id}
+                  note={note}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/create/note",
+                      params: {
+                        mode: "edit",
+                        noteId: note.id,
+                        title: note.title,
+                        body: note.body,
+                        category: note.category,
+                      },
+                    })
+                  }
+                  onLongPress={() => handleLongPress(note)}
+                />
+              ))}
+            </View>
+          </View>
+        </ScrollView>
+
+        <ActionModal
+          visible={modalVisible}
+          title={selectedNote?.title || "Note"}
+          actions={noteActions}
+          onClose={() => setModalVisible(false)}
         />
       </View>
-
-      {/* Category Capsules */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryScrollContent}
-      >
-        {NOTE_CATEGORIES.map((category) => {
-          const selected = activeCategory === category.key;
-          return (
-            <TouchableOpacity
-              key={category.key}
-              style={[
-                styles.categoryCapsule,
-                selected && styles.categoryCapsuleActive,
-              ]}
-              onPress={() => setActiveCategory(category.key)}
-              activeOpacity={0.7}
-            >
-              <Text
-                style={[
-                  styles.categoryCapsuleText,
-                  selected && styles.categoryCapsuleTextActive,
-                ]}
-              >
-                {category.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-
-      {/* Notes Grid */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.notesGridContent}
-      >
-        <View style={styles.notesColumnsContainer}>
-          <View style={styles.notesColumn}>
-            {leftColumnNotes.map((note) => (
-              <NoteCard
-                key={note.id}
-                note={note}
-                onPress={() =>
-                  router.push({
-                    pathname: "/create/note",
-                    params: {
-                      mode: "edit",
-                      noteId: note.id,
-                      title: note.title,
-                      body: note.body,
-                      category: note.category,
-                    },
-                  })
-                }
-                onLongPress={() => handleLongPress(note)}
-              />
-            ))}
-          </View>
-          <View style={styles.notesColumn}>
-            {rightColumnNotes.map((note) => (
-              <NoteCard
-                key={note.id}
-                note={note}
-                onPress={() =>
-                  router.push({
-                    pathname: "/create/note",
-                    params: {
-                      mode: "edit",
-                      noteId: note.id,
-                      title: note.title,
-                      body: note.body,
-                      category: note.category,
-                    },
-                  })
-                }
-                onLongPress={() => handleLongPress(note)}
-              />
-            ))}
-          </View>
-        </View>
-      </ScrollView>
-
-      <ActionModal
-        visible={modalVisible}
-        title={selectedNote?.title || "Note"}
-        actions={noteActions}
-        onClose={() => setModalVisible(false)}
-      />
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradientBackground: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND.secondary,
+    backgroundColor: "transparent",
   },
   header: {
     flexDirection: "row",

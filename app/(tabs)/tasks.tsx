@@ -2,10 +2,11 @@ import { TASKS_MOCKS } from "@/features/tasks/mocks/tasks.mocks";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
 import { TaskCard } from "@/shared/components/TaskCard";
-import { BACKGROUND, PRIMARY, TEXT } from "@/shared/theme/colors";
+import { PRIMARY, TEXT, SCREEN } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Task } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -86,48 +87,58 @@ export default function Tasks() {
   ];
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Tasks</Text>
-        <AddButton
-          label="New Task"
-          onPress={() => router.push("/create/task")}
+    <LinearGradient
+      colors={[SCREEN.gradientStart, SCREEN.gradientEnd]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={styles.gradientBackground}
+    >
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Tasks</Text>
+          <AddButton
+            label="New Task"
+            onPress={() => router.push("/create/task")}
+          />
+        </View>
+
+        {/* Tasks List */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          bounces={true}
+        >
+          <Text style={styles.tipText}>Long press a task for more options</Text>
+          {tasks.map((task, index) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              index={index}
+              onPress={() => toggleTask(task.id)}
+              onLongPress={() => handleLongPress(task)}
+            />
+          ))}
+        </ScrollView>
+
+        <ActionModal
+          visible={modalVisible}
+          title={selectedTask?.name ?? "Task"}
+          actions={taskActions}
+          onClose={() => setModalVisible(false)}
         />
       </View>
-
-      {/* Tasks List */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        bounces={true}
-      >
-        <Text style={styles.tipText}>Long press a task for more options</Text>
-        {tasks.map((task, index) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            index={index}
-            onPress={() => toggleTask(task.id)}
-            onLongPress={() => handleLongPress(task)}
-          />
-        ))}
-      </ScrollView>
-
-      <ActionModal
-        visible={modalVisible}
-        title={selectedTask?.name ?? "Task"}
-        actions={taskActions}
-        onClose={() => setModalVisible(false)}
-      />
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradientBackground: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: BACKGROUND.secondary,
+    backgroundColor: "transparent",
   },
   header: {
     flexDirection: "row",

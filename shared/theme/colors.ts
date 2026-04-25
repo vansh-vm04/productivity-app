@@ -1,3 +1,4 @@
+import { Background } from "@react-navigation/elements";
 import { useSyncExternalStore } from "react";
 import { Appearance } from "react-native";
 
@@ -48,6 +49,14 @@ export interface AppThemeColors {
   PROGRESS: {
     background: string;
   };
+  BUTTON: {
+    background: string;
+    text: string;
+  };
+  SCREEN: {
+    gradientStart: string;
+    gradientEnd: string;
+  };
 };
 
 const DARK_THEME: AppThemeColors = {
@@ -89,7 +98,15 @@ const DARK_THEME: AppThemeColors = {
   },
   PROGRESS: {
     background: "rgba(0, 0, 0, 0.3)"
-  }
+  },
+  BUTTON: {
+    background: "#ffffff",
+    text:"#000000"
+    },
+    SCREEN: {
+      gradientStart: "#9ccaff",
+      gradientEnd: "#000000",
+    }
 };
 
 const LIGHT_THEME: AppThemeColors = {
@@ -131,6 +148,14 @@ const LIGHT_THEME: AppThemeColors = {
   },
   PROGRESS: {
     background: "#ededed"
+  },
+  BUTTON: {
+    background: "#ffffff",
+    text:"#000000"
+  },
+  SCREEN: {
+    gradientStart: "#9ccaff",
+    gradientEnd: "#ffffff",
   }
 };
 
@@ -144,7 +169,7 @@ export const THEME_COLORS: Record<ThemeMode, AppThemeColors> = {
 // ========================================
 
 let currentMode: ThemeMode =
-  Appearance.getColorScheme() === "light" ? "light" : "dark";
+  Appearance.getColorScheme() === "light" ? "light" : "light";
 
 const listeners = new Set<() => void>();
 
@@ -223,6 +248,14 @@ export const BORDER = createSectionProxy("BORDER");
 export const MODAL = createSectionProxy("MODAL");
 
 export const TAG = createSectionProxy("TAG");
+
+export const UTILITY = createSectionProxy("UTILITY");
+
+export const PROGRESS = createSectionProxy("PROGRESS");
+
+export const BUTTON = createSectionProxy("BUTTON");
+
+export const SCREEN = createSectionProxy("SCREEN");
 
 // ========================================
 // CARD COLOR PALETTES
@@ -374,6 +407,3 @@ export const NOTE_CARD_PALETTES = new Proxy([] as NotePaletteColor[], {
     return typeof value === "function" ? value.bind(palettes) : value;
   },
 });
-
-export const UTILITY = createSectionProxy("UTILITY");
-export const PROGRESS = createSectionProxy("PROGRESS");
