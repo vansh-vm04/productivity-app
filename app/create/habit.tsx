@@ -268,7 +268,13 @@ export default function CreateHabit() {
                       })
                     }
                   >
-                    <Text style={styles.typeCardEmoji}>{value.emoji}</Text>
+                    <MaterialCommunityIcons
+                      name={value.icon as any}
+                      size={24}
+                      color={
+                        habitData.type === key ? PRIMARY.main : TEXT.secondary
+                      }
+                    />
                     <View style={styles.typeCardTextContainer}>
                       <Text
                         style={[
@@ -558,9 +564,6 @@ const styles = StyleSheet.create({
   activeTypeCard: {
     backgroundColor: `${PRIMARY.main}15`,
     borderColor: PRIMARY.main,
-  },
-  typeCardEmoji: {
-    fontSize: responsiveFontSize(24),
   },
   typeCardLabel: {
     fontSize: responsiveFontSize(13),

@@ -1,12 +1,13 @@
 import { BORDER, PRIMARY, SURFACE, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export interface CapsuleItem {
   label: string;
-  emoji: string;
+  icon: string;
 }
 
 interface CapsuleSelectorProps {
@@ -37,7 +38,11 @@ export const CapsuleSelector = React.memo(
               ]}
               onPress={() => onSelect(key)}
             >
-              <Text style={styles.capsuleEmoji}>{value.emoji}</Text>
+              <MaterialCommunityIcons
+                name={value.icon as any}
+                size={16}
+                color={selectedValue === key ? PRIMARY.main : TEXT.secondary}
+              />
               <Text
                 style={[
                   styles.capsuleLabel,
@@ -58,7 +63,11 @@ export const CapsuleSelector = React.memo(
             ]}
             onPress={onCustomSelect}
           >
-            <Text style={styles.capsuleEmoji}>✏️</Text>
+            <MaterialCommunityIcons
+              name="pencil"
+              size={16}
+              color={selectedValue === "custom" ? PRIMARY.main : TEXT.secondary}
+            />
             <Text
               style={[
                 styles.capsuleLabel,
@@ -97,13 +106,11 @@ const styles = StyleSheet.create({
     backgroundColor: `${PRIMARY.main}25`,
     borderColor: PRIMARY.main,
   },
-  capsuleEmoji: {
-    fontSize: responsiveFontSize(14),
-  },
   capsuleLabel: {
     fontSize: responsiveFontSize(12),
     fontFamily: fonts.medium,
     color: TEXT.secondary,
+    paddingTop: moderateScale(2),
   },
   activeCapsuleLabel: {
     color: PRIMARY.main,

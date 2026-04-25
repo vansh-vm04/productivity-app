@@ -16,23 +16,23 @@ export const HABIT_PERIODS: HabitPeriodOption[] = [
 export const HABIT_CATEGORIES = {
   health: {
     label: "Health",
-    emoji: "❤️",
+    icon: "heart",
   },
   study: {
     label: "Study",
-    emoji: "📚",
+    icon: "book-open",
   },
   fitness: {
     label: "Fitness",
-    emoji: "💪",
+    icon: "dumbbell",
   },
   productivity: {
     label: "Productivity",
-    emoji: "⚡",
+    icon: "lightning-bolt",
   },
   lifestyle: {
     label: "Lifestyle",
-    emoji: "🌟",
+    icon: "star",
   },
 } as const;
 
@@ -43,17 +43,17 @@ export const HABIT_TYPES = {
   binary: {
     label: "Binary",
     description: "Do this habit daily",
-    emoji: "✅",
+    icon: "check-circle",
   },
   count: {
     label: "Count-based",
     description: "Track a target count",
-    emoji: "🔢",
+    icon: "counter",
   },
   time: {
     label: "Time-based",
     description: "Track duration",
-    emoji: "⏱️",
+    icon: "timer",
   },
 } as const;
 
@@ -63,19 +63,19 @@ export type HabitTypeType = keyof typeof HABIT_TYPES;
 export const FREQUENCY_TYPES = {
   daily: {
     label: "Daily",
-    emoji: "📅",
+    icon: "calendar",
   },
   weekdays: {
     label: "Weekdays",
-    emoji: "📆",
+    icon: "calendar-week",
   },
   specific_days: {
     label: "Specific Days",
-    emoji: "🗓️",
+    icon: "calendar-multiple",
   },
   custom: {
     label: "Custom",
-    emoji: "⚙️",
+    icon: "cog",
   },
 } as const;
 

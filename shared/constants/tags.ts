@@ -2,19 +2,19 @@
 export const PRIORITY_TAGS = {
   urgent: {
     label: "Urgent",
-    emoji: "🔥",
+    icon: "fire",
   },
   important: {
     label: "Important",
-    emoji: "⭐",
+    icon: "star",
   },
   normal: {
     label: "Normal",
-    emoji: "📌",
+    icon: "pin",
   },
   low: {
     label: "Low",
-    emoji: "💤",
+    icon: "moon-waning-crescent",
   },
 } as const;
 
@@ -24,23 +24,23 @@ export type PriorityType = keyof typeof PRIORITY_TAGS;
 export const CATEGORY_TAGS = {
   growth: {
     label: "Growth",
-    emoji: "🌱",
+    icon: "sprout",
   },
   work: {
     label: "Work",
-    emoji: "💼",
+    icon: "briefcase",
   },
   personal: {
     label: "Personal",
-    emoji: "🏠",
+    icon: "home",
   },
   health: {
     label: "Health",
-    emoji: "❤️",
+    icon: "heart",
   },
   deepwork: {
     label: "Deep Work",
-    emoji: "🧠",
+    icon: "brain",
   },
 } as const;
 

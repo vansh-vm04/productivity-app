@@ -174,16 +174,17 @@ const styles = StyleSheet.create({
   addReminderButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: moderateScale(4),
+    gap: moderateScale(2),
     paddingHorizontal: moderateScale(12),
     paddingVertical: moderateScale(6),
     borderRadius: moderateScale(8),
     backgroundColor: `${PRIMARY.main}15`,
   },
   addReminderButtonText: {
-    fontSize: responsiveFontSize(12),
+    fontSize: responsiveFontSize(13),
     fontFamily: fonts.medium,
     color: PRIMARY.main,
+    lineHeight: moderateScale(16),
   },
   reminderItem: {
     flexDirection: "row",
