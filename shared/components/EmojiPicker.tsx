@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
   grid: {
     paddingHorizontal: moderateScale(16),
     paddingVertical: moderateScale(16),
+    paddingBottom: moderateScale(50),
   },
   emojiButton: {
     flex: 1,

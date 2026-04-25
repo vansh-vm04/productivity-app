@@ -139,10 +139,10 @@ export default function CreateTask() {
             placeholderTextColor={TEXT.tertiary}
             value={taskData.name}
             onChangeText={(text) => setTaskData({ ...taskData, name: text })}
-            maxLength={100}
+            maxLength={50}
           />
         </View>
-        <Text style={styles.charCount}>{taskData.name.length}/100</Text>
+        <Text style={styles.charCount}>{taskData.name.length}/50</Text>
       </View>
 
       {/* Priority Selection */}

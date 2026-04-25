@@ -459,7 +459,7 @@ export default function CreateHabit() {
           {/* Reminder System */}
           <View style={styles.section}>
             <View style={styles.remindersHeader}>
-              <Text style={styles.label}>Reminders</Text>
+              <Text style={styles.reminderLabel}>Reminders</Text>
               <TouchableOpacity
                 style={styles.addReminderButton}
                 onPress={handleAddReminder}
@@ -474,7 +474,7 @@ export default function CreateHabit() {
             </View>
 
             {habitData.reminders.map((reminder, index) => (
-              <View key={reminder.id} style={styles.reminderItem}>
+              <View key={index} style={styles.reminderItem}>
                 <TouchableOpacity
                   style={styles.reminderTimeButton}
                   onPress={() => {
@@ -521,7 +521,7 @@ export default function CreateHabit() {
                     name={
                       reminder.enabled ? "toggle-switch" : "toggle-switch-off"
                     }
-                    size={24}
+                    size={36}
                     color={reminder.enabled ? PRIMARY.main : TEXT.tertiary}
                   />
                 </TouchableOpacity>
@@ -613,6 +613,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: TEXT.primary,
     marginBottom: moderateScale(8),
+  },
+  reminderLabel: {
+    fontSize: responsiveFontSize(14),
+    fontFamily: fonts.medium,
+    color: TEXT.primary,
   },
   inputContainer: {
     backgroundColor: SURFACE.primary,
@@ -719,14 +724,14 @@ const styles = StyleSheet.create({
     gap: moderateScale(8),
   },
   dayButton: {
-    width: "13%",
-    aspectRatio: 1,
-    borderRadius: moderateScale(8),
+    borderRadius: moderateScale(16),
     backgroundColor: SURFACE.primary,
     borderWidth: 1,
     borderColor: BORDER.primary,
     alignItems: "center",
     justifyContent: "center",
+    paddingVertical: moderateScale(4),
+    width: moderateScale(60),
   },
   activeDayButton: {
     backgroundColor: PRIMARY.main,

@@ -216,11 +216,11 @@ const styles = StyleSheet.create({
   },
   periodCapsule: {
     paddingHorizontal: moderateScale(16),
-    paddingVertical: moderateScale(8),
+    paddingVertical: moderateScale(4),
     borderRadius: moderateScale(20),
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.2)",
+    borderWidth: 0.5,
+    borderColor: "#000000",
+    backgroundColor: "rgba(255,255,255,0.08)",
   },
   periodCapsuleActive: {
     backgroundColor: PRIMARY.main,
