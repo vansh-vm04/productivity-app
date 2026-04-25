@@ -1,4 +1,11 @@
 import {
+  formatTaskDate,
+  formatTaskTime,
+  isTaskCategoryType,
+  isTaskPriorityType,
+} from "@/features/tasks/ui/tasks.helper";
+import { CapsuleSelector } from "@/shared/components/CapsuleSelector";
+import {
   CATEGORY_TAGS,
   CategoryType,
   PRIORITY_TAGS,
@@ -11,12 +18,6 @@ import {
   SURFACE,
   TEXT,
 } from "@/shared/theme/colors";
-import {
-  formatTaskDate,
-  formatTaskTime,
-  isTaskCategoryType,
-  isTaskPriorityType,
-} from "@/features/tasks/ui/tasks.helper";
 import { fonts } from "@/shared/theme/fonts";
 import { TaskData } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
@@ -147,76 +148,32 @@ export default function CreateTask() {
       {/* Priority Selection */}
       <View style={styles.section}>
         <Text style={styles.label}>Priority</Text>
-        <View style={styles.capsulesContainer}>
-          {(Object.entries(PRIORITY_TAGS) as [PriorityType, any][]).map(
-            ([key, value]) => (
-              <TouchableOpacity
-                key={key}
-                style={[
-                  styles.capsule,
-                  taskData.priority === key && styles.activeCapsule,
-                ]}
-                onPress={() => setTaskData({ ...taskData, priority: key })}
-              >
-                <Text style={styles.capsuleEmoji}>{value.emoji}</Text>
-                <Text
-                  style={[
-                    styles.capsuleLabel,
-                    taskData.priority === key && styles.activeCapsuleLabel,
-                  ]}
-                >
-                  {value.label}
-                </Text>
-              </TouchableOpacity>
-            ),
-          )}
-        </View>
+        <CapsuleSelector
+          items={PRIORITY_TAGS}
+          selectedValue={taskData.priority}
+          onSelect={(key) =>
+            setTaskData({ ...taskData, priority: key as PriorityType })
+          }
+        />
       </View>
 
       {/* Category Selection */}
       <View style={styles.section}>
         <Text style={styles.label}>Category</Text>
-        <View style={styles.capsulesContainer}>
-          {(Object.entries(CATEGORY_TAGS) as [CategoryType, any][]).map(
-            ([key, value]) => (
-              <TouchableOpacity
-                key={key}
-                style={[
-                  styles.capsule,
-                  taskData.category === key && styles.activeCapsule,
-                ]}
-                onPress={() => setTaskData({ ...taskData, category: key })}
-              >
-                <Text style={styles.capsuleEmoji}>{value.emoji}</Text>
-                <Text
-                  style={[
-                    styles.capsuleLabel,
-                    taskData.category === key && styles.activeCapsuleLabel,
-                  ]}
-                >
-                  {value.label}
-                </Text>
-              </TouchableOpacity>
-            ),
-          )}
-          <TouchableOpacity
-            style={[
-              styles.capsule,
-              taskData.category === "custom" && styles.activeCapsule,
-            ]}
-            onPress={() => setTaskData({ ...taskData, category: "custom" })}
-          >
-            <Text style={styles.capsuleEmoji}>✏️</Text>
-            <Text
-              style={[
-                styles.capsuleLabel,
-                taskData.category === "custom" && styles.activeCapsuleLabel,
-              ]}
-            >
-              Custom
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <CapsuleSelector
+          items={CATEGORY_TAGS}
+          selectedValue={taskData.category}
+          onSelect={(key) =>
+            setTaskData({
+              ...taskData,
+              category: key as CategoryType | "custom",
+            })
+          }
+          showCustomOption={true}
+          onCustomSelect={() =>
+            setTaskData({ ...taskData, category: "custom" })
+          }
+        />
 
         {/* Custom Category Input */}
         {taskData.category === "custom" && (
@@ -378,38 +335,6 @@ const styles = StyleSheet.create({
     color: TEXT.tertiary,
     marginTop: moderateScale(6),
     alignSelf: "flex-end",
-  },
-  capsulesContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: moderateScale(10),
-  },
-  capsule: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: moderateScale(4),
-    paddingHorizontal: moderateScale(14),
-    paddingVertical: moderateScale(6),
-    borderRadius: moderateScale(20),
-    backgroundColor: SURFACE.primary,
-    borderWidth: 1,
-    borderColor: BORDER.primary,
-  },
-  activeCapsule: {
-    backgroundColor: `${PRIMARY.main}25`,
-    borderColor: PRIMARY.main,
-  },
-  capsuleEmoji: {
-    fontSize: responsiveFontSize(14),
-  },
-  capsuleLabel: {
-    paddingTop: moderateScale(2),
-    fontSize: responsiveFontSize(12),
-    fontFamily: fonts.medium,
-    color: TEXT.secondary,
-  },
-  activeCapsuleLabel: {
-    color: PRIMARY.main,
   },
   dateTimeContainer: {
     flexDirection: "row",

@@ -1,5 +1,5 @@
-import { Habit } from "@/shared/types/habit";
 import { CARD_PALETTES } from "@/shared/theme/colors";
+import { Habit } from "@/shared/types/habit";
 
 export const HABITS_MOCKS: Habit[] = [
   {
@@ -13,11 +13,22 @@ export const HABITS_MOCKS: Habit[] = [
     lastCompletedAt: new Date(),
     backgroundColor: CARD_PALETTES[0].base,
     accentColor: CARD_PALETTES[0].accent,
+    category: "fitness",
+    priority: "normal",
+    type: "binary",
+    reminders: [
+      {
+        id: "1",
+        time: "09:00",
+        label: "morning",
+        enabled: true,
+      },
+    ],
   },
   {
     id: "2",
     name: "Coding",
-    icon: "🤓",
+    icon: "🧑‍💻",
     streak: 20,
     completed: true,
     frequency: "daily",
@@ -25,6 +36,18 @@ export const HABITS_MOCKS: Habit[] = [
     lastCompletedAt: new Date(),
     backgroundColor: CARD_PALETTES[1].base,
     accentColor: CARD_PALETTES[1].accent,
+    category: "productivity",
+    priority: "important",
+    type: "time",
+    targetDuration: 120,
+    reminders: [
+      {
+        id: "1",
+        time: "10:00",
+        label: "morning session",
+        enabled: true,
+      },
+    ],
   },
   {
     id: "3",
@@ -37,6 +60,18 @@ export const HABITS_MOCKS: Habit[] = [
     lastCompletedAt: new Date(),
     backgroundColor: CARD_PALETTES[2].base,
     accentColor: CARD_PALETTES[2].accent,
+    category: "fitness",
+    priority: "normal",
+    type: "time",
+    targetDuration: 30,
+    reminders: [
+      {
+        id: "1",
+        time: "06:00",
+        label: "early morning",
+        enabled: true,
+      },
+    ],
   },
   {
     id: "4",
@@ -49,6 +84,18 @@ export const HABITS_MOCKS: Habit[] = [
     lastCompletedAt: new Date(),
     backgroundColor: CARD_PALETTES[3].base,
     accentColor: CARD_PALETTES[3].accent,
+    category: "study",
+    priority: "important",
+    type: "time",
+    targetDuration: 45,
+    reminders: [
+      {
+        id: "1",
+        time: "20:00",
+        label: "evening read",
+        enabled: true,
+      },
+    ],
   },
   {
     id: "5",
@@ -61,11 +108,23 @@ export const HABITS_MOCKS: Habit[] = [
     lastCompletedAt: new Date(),
     backgroundColor: CARD_PALETTES[4].base,
     accentColor: CARD_PALETTES[4].accent,
+    category: "health",
+    priority: "normal",
+    type: "time",
+    targetDuration: 20,
+    reminders: [
+      {
+        id: "1",
+        time: "07:00",
+        label: "morning stretch",
+        enabled: true,
+      },
+    ],
   },
   {
     id: "6",
-    name: "Eat healthy meal",
-    icon: "🧠",
+    name: "Drink Water",
+    icon: "💧",
     streak: 12,
     completed: true,
     frequency: "daily",
@@ -73,5 +132,24 @@ export const HABITS_MOCKS: Habit[] = [
     lastCompletedAt: new Date(),
     backgroundColor: CARD_PALETTES[5].base,
     accentColor: CARD_PALETTES[5].accent,
+    category: "health",
+    priority: "low",
+    type: "count",
+    targetCount: 8,
+    countUnit: "glasses",
+    reminders: [
+      {
+        id: "1",
+        time: "09:00",
+        label: "morning",
+        enabled: true,
+      },
+      {
+        id: "2",
+        time: "18:00",
+        label: "evening",
+        enabled: true,
+      },
+    ],
   },
 ];
