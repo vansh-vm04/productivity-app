@@ -4,7 +4,9 @@ import {
   isTaskCategoryType,
   isTaskPriorityType,
 } from "@/features/tasks/ui/tasks.helper";
+import { ActionButtons } from "@/shared/components/ActionButtons";
 import { CapsuleSelector } from "@/shared/components/CapsuleSelector";
+import { RemindersList } from "@/shared/components/RemindersList";
 import {
   CATEGORY_TAGS,
   CategoryType,
@@ -26,6 +28,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -68,11 +71,21 @@ export default function CreateTask() {
     category: initialCategory,
     customCategory: "",
     dueDate: initialDueDate,
+    reminders: [
+      {
+        id: "1",
+        time: "09:00",
+        label: "reminder",
+        enabled: true,
+      },
+    ],
   });
 
   const [customCategoryInput, setCustomCategoryInput] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showReminderTimePicker, setShowReminderTimePicker] = useState(false);
+  const [selectedReminderIndex, setSelectedReminderIndex] = useState(0);
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (Platform.OS === "android") {
@@ -91,6 +104,24 @@ export default function CreateTask() {
       const newDate = new Date(taskData.dueDate);
       newDate.setHours(selectedTime.getHours(), selectedTime.getMinutes());
       setTaskData({ ...taskData, dueDate: newDate });
+    }
+  };
+
+  const handleReminderTimeChange = (event: any, selectedTime?: Date) => {
+    if (Platform.OS === "android") {
+      setShowReminderTimePicker(false);
+    }
+    if (selectedTime && taskData.reminders) {
+      const hours = String(selectedTime.getHours()).padStart(2, "0");
+      const minutes = String(selectedTime.getMinutes()).padStart(2, "0");
+      const timeString = `${hours}:${minutes}`;
+
+      const updatedReminders = [...taskData.reminders];
+      updatedReminders[selectedReminderIndex] = {
+        ...updatedReminders[selectedReminderIndex],
+        time: timeString,
+      };
+      setTaskData({ ...taskData, reminders: updatedReminders });
     }
   };
 
@@ -113,182 +144,213 @@ export default function CreateTask() {
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <MaterialCommunityIcons
-            name="chevron-left"
-            size={28}
-            color={TEXT.primary}
-          />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {isEditMode ? "Edit Task" : "Create Task"}
-        </Text>
-        <View style={{ width: 28 }} />
-      </View>
+    <View style={styles.outerContainer}>
+      <KeyboardAvoidingView
+        style={styles.wrapper}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? moderateScale(60) : 0}
+      >
+        <ScrollView
+          style={styles.container}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()}>
+              <MaterialCommunityIcons
+                name="chevron-left"
+                size={28}
+                color={TEXT.primary}
+              />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>
+              {isEditMode ? "Edit Task" : "Create Task"}
+            </Text>
+            <View style={{ width: 28 }} />
+          </View>
 
-      {/* Task Name Input */}
-      <View>
-        <Text style={styles.label}>Task Name</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter task name..."
-            placeholderTextColor={TEXT.tertiary}
-            value={taskData.name}
-            onChangeText={(text) => setTaskData({ ...taskData, name: text })}
-            maxLength={50}
-          />
-        </View>
-        <Text style={styles.charCount}>{taskData.name.length}/50</Text>
-      </View>
+          {/* Task Name Input */}
+          <View>
+            <Text style={styles.label}>Task Name</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter task name..."
+                placeholderTextColor={TEXT.tertiary}
+                value={taskData.name}
+                onChangeText={(text) =>
+                  setTaskData({ ...taskData, name: text })
+                }
+                maxLength={50}
+              />
+            </View>
+            <Text style={styles.charCount}>{taskData.name.length}/50</Text>
+          </View>
 
-      {/* Priority Selection */}
-      <View style={styles.section}>
-        <Text style={styles.label}>Priority</Text>
-        <CapsuleSelector
-          items={PRIORITY_TAGS}
-          selectedValue={taskData.priority}
-          onSelect={(key) =>
-            setTaskData({ ...taskData, priority: key as PriorityType })
-          }
-        />
-      </View>
-
-      {/* Category Selection */}
-      <View style={styles.section}>
-        <Text style={styles.label}>Category</Text>
-        <CapsuleSelector
-          items={CATEGORY_TAGS}
-          selectedValue={taskData.category}
-          onSelect={(key) =>
-            setTaskData({
-              ...taskData,
-              category: key as CategoryType | "custom",
-            })
-          }
-          showCustomOption={true}
-          onCustomSelect={() =>
-            setTaskData({ ...taskData, category: "custom" })
-          }
-        />
-
-        {/* Custom Category Input */}
-        {taskData.category === "custom" && (
-          <View
-            style={[styles.inputContainer, { marginTop: moderateScale(12) }]}
-          >
-            <TextInput
-              style={styles.input}
-              placeholder="Enter custom category..."
-              placeholderTextColor={TEXT.tertiary}
-              value={customCategoryInput}
-              onChangeText={setCustomCategoryInput}
-              maxLength={30}
+          {/* Priority Selection */}
+          <View style={styles.section}>
+            <Text style={styles.label}>Priority</Text>
+            <CapsuleSelector
+              items={PRIORITY_TAGS}
+              selectedValue={taskData.priority}
+              onSelect={(key) =>
+                setTaskData({ ...taskData, priority: key as PriorityType })
+              }
             />
           </View>
-        )}
-      </View>
 
-      {/* Due Date & Time */}
-      <View style={styles.section}>
-        <Text style={styles.label}>Due Date & Time</Text>
-        <View style={styles.dateTimeContainer}>
-          <TouchableOpacity
-            style={styles.dateTimeButton}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <MaterialCommunityIcons
-              name="calendar"
-              size={20}
-              color={PRIMARY.main}
+          {/* Category Selection */}
+          <View style={styles.section}>
+            <Text style={styles.label}>Category</Text>
+            <CapsuleSelector
+              items={CATEGORY_TAGS}
+              selectedValue={taskData.category}
+              onSelect={(key) =>
+                setTaskData({
+                  ...taskData,
+                  category: key as CategoryType | "custom",
+                })
+              }
+              showCustomOption={true}
+              onCustomSelect={() =>
+                setTaskData({ ...taskData, category: "custom" })
+              }
             />
-            <Text style={styles.dateTimeButtonText}>
-              {formatTaskDate(taskData.dueDate)}
-            </Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.dateTimeButton,
-              !taskData.dueDate && styles.dateTimeButtonDisabled,
-            ]}
-            onPress={() => taskData.dueDate && setShowTimePicker(true)}
-            disabled={!taskData.dueDate}
-          >
-            <MaterialCommunityIcons
-              name="clock"
-              size={20}
-              color={taskData.dueDate ? PRIMARY.main : TEXT.tertiary}
+            {/* Custom Category Input */}
+            {taskData.category === "custom" && (
+              <View
+                style={[
+                  styles.inputContainer,
+                  { marginTop: moderateScale(12) },
+                ]}
+              >
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter custom category..."
+                  placeholderTextColor={TEXT.tertiary}
+                  value={customCategoryInput}
+                  onChangeText={setCustomCategoryInput}
+                  maxLength={30}
+                />
+              </View>
+            )}
+          </View>
+
+          {/* Due Date & Time */}
+          <View style={styles.section}>
+            <Text style={styles.label}>Due Date & Time</Text>
+            <View style={styles.dateTimeContainer}>
+              <TouchableOpacity
+                style={styles.dateTimeButton}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <MaterialCommunityIcons
+                  name="calendar"
+                  size={20}
+                  color={PRIMARY.main}
+                />
+                <Text style={styles.dateTimeButtonText}>
+                  {formatTaskDate(taskData.dueDate)}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.dateTimeButton,
+                  !taskData.dueDate && styles.dateTimeButtonDisabled,
+                ]}
+                onPress={() => taskData.dueDate && setShowTimePicker(true)}
+                disabled={!taskData.dueDate}
+              >
+                <MaterialCommunityIcons
+                  name="clock"
+                  size={20}
+                  color={taskData.dueDate ? PRIMARY.main : TEXT.tertiary}
+                />
+                <Text
+                  style={[
+                    styles.dateTimeButtonText,
+                    !taskData.dueDate && styles.dateTimeButtonDisabledText,
+                  ]}
+                >
+                  {formatTaskTime(taskData.dueDate)}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {taskData.dueDate && (
+              <TouchableOpacity
+                onPress={() => setTaskData({ ...taskData, dueDate: null })}
+                style={styles.clearDateButton}
+              >
+                <Text style={styles.clearDateText}>Clear date & time</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Date Picker Modal */}
+          {showDatePicker && (
+            <DateTimePicker
+              value={taskData.dueDate || new Date()}
+              mode="date"
+              display="default"
+              onValueChange={handleDateChange}
+              onDismiss={() => setShowDatePicker(false)}
             />
-            <Text
-              style={[
-                styles.dateTimeButtonText,
-                !taskData.dueDate && styles.dateTimeButtonDisabledText,
-              ]}
-            >
-              {formatTaskTime(taskData.dueDate)}
-            </Text>
-          </TouchableOpacity>
-        </View>
+          )}
 
-        {taskData.dueDate && (
-          <TouchableOpacity
-            onPress={() => setTaskData({ ...taskData, dueDate: null })}
-            style={styles.clearDateButton}
-          >
-            <Text style={styles.clearDateText}>Clear date & time</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+          {/* Time Picker Modal */}
+          {showTimePicker && (
+            <DateTimePicker
+              value={taskData.dueDate || new Date()}
+              mode="time"
+              display="default"
+              onValueChange={handleTimeChange}
+              onDismiss={() => setShowTimePicker(false)}
+            />
+          )}
 
-      {/* Date Picker Modal */}
-      {showDatePicker && (
-        <DateTimePicker
-          value={taskData.dueDate || new Date()}
-          mode="date"
-          display="default"
-          onValueChange={handleDateChange}
-          onDismiss={() => setShowDatePicker(false)}
-        />
-      )}
+          {/* Reminders */}
+          {taskData.reminders && taskData.reminders.length > 0 && (
+            <View style={styles.section}>
+              <RemindersList
+                reminders={taskData.reminders}
+                onRemindersChange={(reminders) =>
+                  setTaskData({ ...taskData, reminders })
+                }
+                showTimePicker={showReminderTimePicker}
+                selectedReminderIndex={selectedReminderIndex}
+                onShowTimePicker={(index) => {
+                  setSelectedReminderIndex(index);
+                  setShowReminderTimePicker(true);
+                }}
+                onHideTimePicker={() => setShowReminderTimePicker(false)}
+                onTimeChange={handleReminderTimeChange}
+              />
+            </View>
+          )}
 
-      {/* Time Picker Modal */}
-      {showTimePicker && (
-        <DateTimePicker
-          value={taskData.dueDate || new Date()}
-          mode="time"
-          display="default"
-          onValueChange={handleTimeChange}
-          onDismiss={() => setShowTimePicker(false)}
-        />
-      )}
-
-      {/* Action Buttons */}
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.createButton}
-          onPress={handleCreateTask}
-        >
-          <Text style={styles.createButtonText}>
-            {isEditMode ? "Update Task" : "Create Task"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          {/* Action Buttons */}
+          <ActionButtons
+            onCancel={() => router.back()}
+            onSubmit={handleCreateTask}
+            submitLabel={isEditMode ? "Update Task" : "Create Task"}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    backgroundColor: BACKGROUND.secondary,
+  },
+  wrapper: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: BACKGROUND.secondary,
@@ -402,38 +464,5 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(12),
     fontFamily: fonts.medium,
     color: PRIMARY.main,
-  },
-  buttonsContainer: {
-    flexDirection: "row",
-    gap: moderateScale(12),
-    marginBottom: moderateScale(40),
-    marginTop: moderateScale(20),
-    height: moderateScale(44),
-  },
-  cancelButton: {
-    flex: 1,
-    borderRadius: moderateScale(12),
-    backgroundColor: SURFACE.primary,
-    borderWidth: 1,
-    borderColor: BORDER.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cancelButtonText: {
-    fontSize: responsiveFontSize(14),
-    fontFamily: fonts.semibold,
-    color: TEXT.secondary,
-  },
-  createButton: {
-    flex: 1,
-    borderRadius: moderateScale(12),
-    backgroundColor: PRIMARY.main,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  createButtonText: {
-    fontSize: responsiveFontSize(14),
-    fontFamily: fonts.semibold,
-    color: TEXT.primary,
   },
 });

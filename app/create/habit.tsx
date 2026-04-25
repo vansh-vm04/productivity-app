@@ -1,5 +1,7 @@
+import { ActionButtons } from "@/shared/components/ActionButtons";
 import { CapsuleSelector } from "@/shared/components/CapsuleSelector";
 import { EmojiPicker } from "@/shared/components/EmojiPicker";
+import { RemindersList } from "@/shared/components/RemindersList";
 import {
   DAYS_OF_WEEK,
   FREQUENCY_TYPES,
@@ -16,10 +18,9 @@ import {
   TEXT,
 } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
-import { HabitData, Reminder } from "@/shared/types/habit";
+import { HabitData } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -72,26 +73,6 @@ export default function CreateHabit() {
   const [selectedReminderIndex, setSelectedReminderIndex] = useState(0);
   const [customCategoryInput, setCustomCategoryInput] = useState("");
 
-  const handleAddReminder = () => {
-    const newReminder: Reminder = {
-      id: `${habitData.reminders.length + 1}`,
-      time: "09:00",
-      label: "reminder",
-      enabled: true,
-    };
-    setHabitData({
-      ...habitData,
-      reminders: [...habitData.reminders, newReminder],
-    });
-  };
-
-  const handleRemoveReminder = (index: number) => {
-    setHabitData({
-      ...habitData,
-      reminders: habitData.reminders.filter((_, i) => i !== index),
-    });
-  };
-
   const handleReminderTimeChange = (event: any, selectedTime?: Date) => {
     if (Platform.OS === "android") {
       setShowReminderTimePicker(false);
@@ -141,13 +122,6 @@ export default function CreateHabit() {
 
     // TODO: Save habit to database/state
     router.back();
-  };
-
-  const getReminderTime = (timeString: string): Date => {
-    const [hours, minutes] = timeString.split(":").map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes);
-    return date;
   };
 
   return (
@@ -458,121 +432,28 @@ export default function CreateHabit() {
 
           {/* Reminder System */}
           <View style={styles.section}>
-            <View style={styles.remindersHeader}>
-              <Text style={styles.reminderLabel}>Reminders</Text>
-              <TouchableOpacity
-                style={styles.addReminderButton}
-                onPress={handleAddReminder}
-              >
-                <MaterialCommunityIcons
-                  name="plus"
-                  size={18}
-                  color={PRIMARY.main}
-                />
-                <Text style={styles.addReminderButtonText}>Add</Text>
-              </TouchableOpacity>
-            </View>
-
-            {habitData.reminders.map((reminder, index) => (
-              <View key={index} style={styles.reminderItem}>
-                <TouchableOpacity
-                  style={styles.reminderTimeButton}
-                  onPress={() => {
-                    setSelectedReminderIndex(index);
-                    setShowReminderTimePicker(true);
-                  }}
-                >
-                  <MaterialCommunityIcons
-                    name="clock"
-                    size={18}
-                    color={PRIMARY.main}
-                  />
-                  <Text style={styles.reminderTimeText}>{reminder.time}</Text>
-                </TouchableOpacity>
-
-                <TextInput
-                  style={styles.reminderLabelInput}
-                  placeholder="e.g., Morning"
-                  placeholderTextColor={TEXT.tertiary}
-                  value={reminder.label}
-                  onChangeText={(text) => {
-                    const updatedReminders = [...habitData.reminders];
-                    updatedReminders[index] = {
-                      ...updatedReminders[index],
-                      label: text,
-                    };
-                    setHabitData({ ...habitData, reminders: updatedReminders });
-                  }}
-                  maxLength={20}
-                />
-
-                <TouchableOpacity
-                  style={styles.reminderToggle}
-                  onPress={() => {
-                    const updatedReminders = [...habitData.reminders];
-                    updatedReminders[index] = {
-                      ...updatedReminders[index],
-                      enabled: !updatedReminders[index].enabled,
-                    };
-                    setHabitData({ ...habitData, reminders: updatedReminders });
-                  }}
-                >
-                  <MaterialCommunityIcons
-                    name={
-                      reminder.enabled ? "toggle-switch" : "toggle-switch-off"
-                    }
-                    size={36}
-                    color={reminder.enabled ? PRIMARY.main : TEXT.tertiary}
-                  />
-                </TouchableOpacity>
-
-                {habitData.reminders.length > 1 && (
-                  <TouchableOpacity
-                    style={styles.removeReminderButton}
-                    onPress={() => handleRemoveReminder(index)}
-                  >
-                    <MaterialCommunityIcons
-                      name="close"
-                      size={18}
-                      color={TEXT.tertiary}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-            ))}
-          </View>
-
-          {/* Time Picker Modal for Reminders */}
-          {showReminderTimePicker && (
-            <DateTimePicker
-              value={getReminderTime(
-                habitData.reminders[selectedReminderIndex]?.time || "09:00",
-              )}
-              mode="time"
-              display="default"
-              onValueChange={handleReminderTimeChange}
-              onDismiss={() => setShowReminderTimePicker(false)}
+            <RemindersList
+              reminders={habitData.reminders}
+              onRemindersChange={(reminders) =>
+                setHabitData({ ...habitData, reminders })
+              }
+              showTimePicker={showReminderTimePicker}
+              selectedReminderIndex={selectedReminderIndex}
+              onShowTimePicker={(index) => {
+                setSelectedReminderIndex(index);
+                setShowReminderTimePicker(true);
+              }}
+              onHideTimePicker={() => setShowReminderTimePicker(false)}
+              onTimeChange={handleReminderTimeChange}
             />
-          )}
+          </View>
 
           {/* Action Buttons */}
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => router.back()}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.createButton}
-              onPress={handleCreateHabit}
-            >
-              <Text style={styles.createButtonText}>
-                {isEditMode ? "Update Habit" : "Create Habit"}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <ActionButtons
+            onCancel={() => router.back()}
+            onSubmit={handleCreateHabit}
+            submitLabel={isEditMode ? "Update Habit" : "Create Habit"}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -613,11 +494,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: TEXT.primary,
     marginBottom: moderateScale(8),
-  },
-  reminderLabel: {
-    fontSize: responsiveFontSize(14),
-    fontFamily: fonts.medium,
-    color: TEXT.primary,
   },
   inputContainer: {
     backgroundColor: SURFACE.primary,
@@ -743,98 +619,6 @@ const styles = StyleSheet.create({
     color: TEXT.primary,
   },
   activeDayButtonText: {
-    color: TEXT.primary,
-  },
-  remindersHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: moderateScale(12),
-  },
-  addReminderButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: moderateScale(4),
-    paddingHorizontal: moderateScale(12),
-    paddingVertical: moderateScale(6),
-    borderRadius: moderateScale(8),
-    backgroundColor: `${PRIMARY.main}15`,
-  },
-  addReminderButtonText: {
-    fontSize: responsiveFontSize(12),
-    fontFamily: fonts.medium,
-    color: PRIMARY.main,
-  },
-  reminderItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: moderateScale(10),
-    paddingHorizontal: moderateScale(12),
-    paddingVertical: moderateScale(12),
-    marginBottom: moderateScale(10),
-    backgroundColor: SURFACE.primary,
-    borderRadius: moderateScale(12),
-    borderWidth: 1,
-    borderColor: BORDER.primary,
-  },
-  reminderTimeButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: moderateScale(6),
-    paddingHorizontal: moderateScale(10),
-    paddingVertical: moderateScale(8),
-    borderRadius: moderateScale(8),
-    backgroundColor: `${PRIMARY.main}15`,
-  },
-  reminderTimeText: {
-    fontSize: responsiveFontSize(12),
-    fontFamily: fonts.medium,
-    color: PRIMARY.main,
-  },
-  reminderLabelInput: {
-    flex: 1,
-    fontSize: responsiveFontSize(12),
-    fontFamily: fonts.regular,
-    color: TEXT.primary,
-    paddingVertical: moderateScale(4),
-  },
-  reminderToggle: {
-    paddingHorizontal: moderateScale(8),
-  },
-  removeReminderButton: {
-    paddingHorizontal: moderateScale(8),
-  },
-  buttonsContainer: {
-    flexDirection: "row",
-    gap: moderateScale(12),
-    marginBottom: moderateScale(80),
-    marginTop: moderateScale(20),
-    height: moderateScale(44),
-  },
-  cancelButton: {
-    flex: 1,
-    borderRadius: moderateScale(12),
-    backgroundColor: SURFACE.primary,
-    borderWidth: 1,
-    borderColor: BORDER.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cancelButtonText: {
-    fontSize: responsiveFontSize(14),
-    fontFamily: fonts.semibold,
-    color: TEXT.secondary,
-  },
-  createButton: {
-    flex: 1,
-    borderRadius: moderateScale(12),
-    backgroundColor: PRIMARY.main,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  createButtonText: {
-    fontSize: responsiveFontSize(14),
-    fontFamily: fonts.semibold,
     color: TEXT.primary,
   },
 });

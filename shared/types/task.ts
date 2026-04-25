@@ -1,4 +1,5 @@
 import { CategoryType, PriorityType } from "@/shared/constants/tags";
+import { Reminder } from "./habit";
 
 export interface TaskData {
   id?: string;
@@ -7,6 +8,7 @@ export interface TaskData {
   category: CategoryType | "custom";
   customCategory: string;
   dueDate: Date | null;
+  reminders?: Reminder[];
 }
 
 export interface Task {
