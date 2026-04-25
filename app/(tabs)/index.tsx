@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     fontSize: responsiveFontSize(26),
     fontWeight: "200",
-    color: TEXT.button,
+    color: "#ffffff",
     textAlign: "center",
     lineHeight: moderateScale(40),
   },

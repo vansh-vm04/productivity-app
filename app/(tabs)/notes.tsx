@@ -1,6 +1,7 @@
 import { NOTES_MOCKS } from "@/features/notes/mocks/notes.mocks";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
+import { NoteCard } from "@/shared/components/NoteCard";
 import { BACKGROUND, PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Note, NoteCategory } from "@/shared/types/note";
@@ -84,46 +85,6 @@ export default function Notes() {
     },
   ];
 
-  const renderNoteCard = (note: Note) => {
-    return (
-      <TouchableOpacity
-        key={note.id}
-        activeOpacity={0.85}
-        style={[styles.noteCard, { backgroundColor: note.bgColor }]}
-        onPress={() =>
-          router.push({
-            pathname: "/create/note",
-            params: {
-              mode: "edit",
-              noteId: note.id,
-              title: note.title,
-              body: note.body,
-              category: note.category,
-            },
-          })
-        }
-        onLongPress={() => handleLongPress(note)}
-        delayLongPress={300}
-      >
-        <View style={styles.noteCardHeader}>
-          <Text
-            style={[
-              styles.noteCardCategory,
-              { backgroundColor: note.accentColor },
-            ]}
-          >
-            {note.category}
-          </Text>
-        </View>
-        <Text style={styles.noteCardTitle} numberOfLines={2}>
-          {note.title}
-        </Text>
-        <Text style={styles.noteCardBody}>{note.body}</Text>
-        <Text style={styles.noteCardDate}>{note.updatedAt}</Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -173,10 +134,46 @@ export default function Notes() {
       >
         <View style={styles.notesColumnsContainer}>
           <View style={styles.notesColumn}>
-            {leftColumnNotes.map(renderNoteCard)}
+            {leftColumnNotes.map((note) => (
+              <NoteCard
+                key={note.id}
+                note={note}
+                onPress={() =>
+                  router.push({
+                    pathname: "/create/note",
+                    params: {
+                      mode: "edit",
+                      noteId: note.id,
+                      title: note.title,
+                      body: note.body,
+                      category: note.category,
+                    },
+                  })
+                }
+                onLongPress={() => handleLongPress(note)}
+              />
+            ))}
           </View>
           <View style={styles.notesColumn}>
-            {rightColumnNotes.map(renderNoteCard)}
+            {rightColumnNotes.map((note) => (
+              <NoteCard
+                key={note.id}
+                note={note}
+                onPress={() =>
+                  router.push({
+                    pathname: "/create/note",
+                    params: {
+                      mode: "edit",
+                      noteId: note.id,
+                      title: note.title,
+                      body: note.body,
+                      category: note.category,
+                    },
+                  })
+                }
+                onLongPress={() => handleLongPress(note)}
+              />
+            ))}
           </View>
         </View>
       </ScrollView>
@@ -253,53 +250,5 @@ const styles = StyleSheet.create({
   },
   notesColumn: {
     width: "48%",
-  },
-  noteCard: {
-    width: "100%",
-    maxHeight: moderateScale(240),
-    overflow: "hidden",
-    borderRadius: moderateScale(16),
-    borderWidth: 0.5,
-    borderColor: "#000000",
-    padding: moderateScale(12),
-    marginBottom: moderateScale(10),
-    alignSelf: "flex-start",
-  },
-  noteCardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: moderateScale(8),
-  },
-  noteCardCategory: {
-    textTransform: "capitalize",
-    fontSize: responsiveFontSize(10),
-    fontFamily: fonts.semibold,
-    color: TEXT.secondary,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    borderRadius: moderateScale(10),
-    paddingHorizontal: moderateScale(8),
-    height: moderateScale(20),
-    paddingVertical: moderateScale(2),
-  },
-  noteCardTitle: {
-    fontSize: responsiveFontSize(14),
-    fontFamily: fonts.bold,
-    color: TEXT.primary,
-    marginBottom: moderateScale(6),
-  },
-  noteCardBody: {
-    fontSize: responsiveFontSize(12),
-    fontFamily: fonts.regular,
-    color: TEXT.secondary,
-    lineHeight: moderateScale(16),
-    flexShrink: 1,
-  },
-  noteCardDate: {
-    marginTop: "auto",
-    fontSize: responsiveFontSize(10),
-    fontFamily: fonts.medium,
-    color: TEXT.tertiary,
-    paddingTop: moderateScale(8),
   },
 });

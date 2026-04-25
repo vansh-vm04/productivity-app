@@ -45,7 +45,10 @@ export interface AppThemeColors {
   UTILITY: {
     transparentBlack30: string;
   };
-}
+  PROGRESS: {
+    background: string;
+  };
+};
 
 const DARK_THEME: AppThemeColors = {
   PRIMARY: {
@@ -59,7 +62,7 @@ const DARK_THEME: AppThemeColors = {
     primary: "#FFFFFF",
     secondary: "rgba(255, 255, 255, 0.8)",
     tertiary: "rgba(255, 255, 255, 0.6)",
-    button: "#000000",
+    button: "#ffffff",
     capsules: "rgba(255, 255, 255, 0.8)",
     capsulesActive: "#ffffff",
   },
@@ -84,6 +87,9 @@ const DARK_THEME: AppThemeColors = {
   UTILITY: {
     transparentBlack30: "rgba(0, 0, 0, 0.3)",
   },
+  PROGRESS: {
+    background: "rgba(0, 0, 0, 0.3)"
+  }
 };
 
 const LIGHT_THEME: AppThemeColors = {
@@ -123,6 +129,9 @@ const LIGHT_THEME: AppThemeColors = {
   UTILITY: {
     transparentBlack30: "rgba(0, 0, 0, 0.3)",
   },
+  PROGRESS: {
+    background: "#ededed"
+  }
 };
 
 export const THEME_COLORS: Record<ThemeMode, AppThemeColors> = {
@@ -226,6 +235,11 @@ export interface CardPaletteColor {
   accent: string;
 }
 
+export interface NotePaletteColor {
+  base: string;
+  accent: string;
+}
+
 const DARK_CARD_PALETTES: CardPaletteColor[] = [
   // Blue - Calm & Productivity
   {
@@ -324,4 +338,42 @@ export const CARD_PALETTES = new Proxy([] as CardPaletteColor[], {
   },
 });
 
+const DARK_NOTE_PALETTES: NotePaletteColor[] = [
+  { base: "#202020", accent: "#374151" },
+  { base: "#1F2937", accent: "#4B5563" },
+  { base: "#1E1B4B", accent: "#6366F1" },
+  { base: "#3F1D2E", accent: "#BE185D" },
+  { base: "#102A43", accent: "#2563EB" },
+  { base: "#1A2E22", accent: "#059669" },
+];
+
+const LIGHT_NOTE_PALETTES: NotePaletteColor[] = [
+  { base: "#FFF8E8", accent: "#F59E0B" },
+  { base: "#F5F3FF", accent: "#7C3AED" },
+  { base: "#ECFDF5", accent: "#10B981" },
+  { base: "#EFF6FF", accent: "#3B82F6" },
+  { base: "#FFF1F2", accent: "#F43F5E" },
+  { base: "#F0F9FF", accent: "#06B6D4" },
+];
+
+const NOTE_PALETTES_BY_THEME: Record<ThemeMode, NotePaletteColor[]> = {
+  dark: DARK_NOTE_PALETTES,
+  light: LIGHT_NOTE_PALETTES,
+};
+
+export const getNotePalettes = (
+  mode: ThemeMode = currentMode,
+): NotePaletteColor[] => {
+  return NOTE_PALETTES_BY_THEME[mode];
+};
+
+export const NOTE_CARD_PALETTES = new Proxy([] as NotePaletteColor[], {
+  get(_, prop: string | symbol) {
+    const palettes = getNotePalettes();
+    const value = Reflect.get(palettes, prop);
+    return typeof value === "function" ? value.bind(palettes) : value;
+  },
+});
+
 export const UTILITY = createSectionProxy("UTILITY");
+export const PROGRESS = createSectionProxy("PROGRESS");

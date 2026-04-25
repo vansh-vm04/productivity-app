@@ -1,4 +1,4 @@
-import { BORDER, PRIMARY, SURFACE, TEXT, UTILITY } from "@/shared/theme/colors";
+import { BORDER, PRIMARY, SURFACE, TEXT, PROGRESS } from "@/shared/theme/colors";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
@@ -39,7 +39,7 @@ export default function TodayProgress({ completed, total }: Props) {
           width={moderateScale(12)}
           fill={progress}
           tintColor={PRIMARY.main}
-          backgroundColor={UTILITY.transparentBlack30}
+          backgroundColor={PROGRESS.background}
           arcSweepAngle={180}
           rotation={270}
           lineCap="round"
