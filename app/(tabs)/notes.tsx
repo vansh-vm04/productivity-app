@@ -235,10 +235,10 @@ const styles = StyleSheet.create({
   categoryCapsuleText: {
     fontSize: responsiveFontSize(12),
     fontFamily: fonts.medium,
-    color: TEXT.secondary,
+    color: TEXT.capsules,
   },
   categoryCapsuleTextActive: {
-    color: TEXT.primary,
+    color: TEXT.capsulesActive,
   },
   notesGridContent: {
     paddingHorizontal: moderateScale(16),

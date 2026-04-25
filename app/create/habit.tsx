@@ -622,6 +622,6 @@ const styles = StyleSheet.create({
     color: TEXT.primary,
   },
   activeDayButtonText: {
-    color: TEXT.primary,
+    color: TEXT.capsulesActive,
   },
 });

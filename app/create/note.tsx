@@ -211,7 +211,7 @@ function CreateNote() {
             <MaterialCommunityIcons
               name={isListening ? "microphone" : "microphone-outline"}
               size={moderateScale(28)}
-              color={TEXT.primary}
+              color={TEXT.button}
             />
           </TouchableOpacity>
         </View>

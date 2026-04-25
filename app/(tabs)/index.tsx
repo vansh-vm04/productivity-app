@@ -1,6 +1,6 @@
+import TasksScrollable from "@/features/tasks/components/TasksScrollable";
 import CreateModal from "@/shared/components/CreateModal";
 import TodayProgress from "@/shared/components/ProgressCard";
-import TasksScrollable from "@/features/tasks/components/TasksScrollable";
 import { BACKGROUND, PRIMARY, TEXT } from "@/shared/theme/colors";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     fontSize: responsiveFontSize(26),
     fontWeight: "200",
-    color: TEXT.primary,
+    color: TEXT.button,
     textAlign: "center",
     lineHeight: moderateScale(40),
   },

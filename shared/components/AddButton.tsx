@@ -42,12 +42,12 @@ const styles = StyleSheet.create({
   addButtonText: {
     fontSize: responsiveFontSize(12),
     fontFamily: fonts.medium,
-    color: TEXT.primary,
+    color: TEXT.button,
   },
   addButtonIcon: {
     paddingTop: moderateScale(2),
     fontSize: responsiveFontSize(16),
     fontFamily: fonts.medium,
-    color: TEXT.primary,
+    color: TEXT.button,
   },
 });

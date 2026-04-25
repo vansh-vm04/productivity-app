@@ -3,10 +3,15 @@ import { HABITS_MOCKS } from "@/features/habits/mocks/habits.mocks";
 import { filterHabitsByPeriod } from "@/features/habits/ui/habits.helper";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
-import { BACKGROUND, CARD_PALETTES, PRIMARY, TEXT } from "@/shared/theme/colors";
+import { HABIT_PERIODS, HabitPeriod } from "@/shared/constants/habits";
+import {
+  BACKGROUND,
+  CARD_PALETTES,
+  PRIMARY,
+  TEXT,
+} from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Habit } from "@/shared/types/habit";
-import { HABIT_PERIODS, HabitPeriod } from "@/shared/constants/habits";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
@@ -229,10 +234,10 @@ const styles = StyleSheet.create({
   periodCapsuleText: {
     fontSize: responsiveFontSize(13),
     fontFamily: fonts.medium,
-    color: TEXT.secondary,
+    color: TEXT.capsules,
   },
   periodCapsuleTextActive: {
-    color: TEXT.primary,
+    color: TEXT.capsulesActive,
   },
   scrollContent: {
     paddingHorizontal: moderateScale(16),

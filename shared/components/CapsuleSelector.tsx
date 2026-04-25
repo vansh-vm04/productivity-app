@@ -41,7 +41,7 @@ export const CapsuleSelector = React.memo(
               <MaterialCommunityIcons
                 name={value.icon as any}
                 size={16}
-                color={selectedValue === key ? PRIMARY.main : TEXT.secondary}
+                color={selectedValue === key ? PRIMARY.main : TEXT.capsules}
               />
               <Text
                 style={[
@@ -66,7 +66,7 @@ export const CapsuleSelector = React.memo(
             <MaterialCommunityIcons
               name="pencil"
               size={16}
-              color={selectedValue === "custom" ? PRIMARY.main : TEXT.secondary}
+              color={selectedValue === "custom" ? PRIMARY.main : TEXT.capsules}
             />
             <Text
               style={[
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   capsuleLabel: {
     fontSize: responsiveFontSize(12),
     fontFamily: fonts.medium,
-    color: TEXT.secondary,
+    color: TEXT.capsules,
     paddingTop: moderateScale(2),
   },
   activeCapsuleLabel: {

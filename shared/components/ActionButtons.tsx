@@ -82,6 +82,6 @@ const styles = StyleSheet.create({
   createButtonText: {
     fontSize: responsiveFontSize(14),
     fontFamily: fonts.semibold,
-    color: TEXT.primary,
+    color: TEXT.button,
   },
 });
