@@ -8,6 +8,7 @@ import {
 import { fonts } from "@/shared/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -48,20 +49,20 @@ export default function CreateModal({ visible, onClose }: Props) {
 
   const options: {
     label: "task" | "note" | "habit";
-    icon: keyof typeof MaterialCommunityIcons.glyphMap;
+    icon: keyof typeof MaterialIcons.glyphMap;
     description: string;
   }[] = [
     {
       label: "task",
-      icon: "checkbox-marked-outline",
+      icon: "task-alt",
       description: "Create a task",
     },
     {
       label: "note",
-      icon: "note-multiple-outline",
+      icon: "notes",
       description: "Create a note",
     },
-    { label: "habit", icon: "fire", description: "Create a habit" },
+    { label: "habit", icon: "event-repeat", description: "Create a habit" },
   ];
 
   return (
@@ -100,7 +101,7 @@ export default function CreateModal({ visible, onClose }: Props) {
                     activeOpacity={0.7}
                   >
                     <View style={styles.optionIconContainer}>
-                      <MaterialCommunityIcons
+                      <MaterialIcons
                         name={option.icon}
                         size={28}
                         color={PRIMARY.main}

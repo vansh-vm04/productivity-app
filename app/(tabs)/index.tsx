@@ -2,6 +2,7 @@ import TasksScrollable from "@/features/tasks/components/TasksScrollable";
 import CreateModal from "@/shared/components/CreateModal";
 import TodayProgress from "@/shared/components/ProgressCard";
 import { TEXT, SCREEN } from "@/shared/theme/colors";
+import { fonts } from "@/shared/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -89,17 +90,17 @@ const styles = StyleSheet.create({
   },
   headerGreeting: {
     fontSize: responsiveFontSize(26),
-    fontFamily: "Poppins-Light",
+    fontFamily: fonts.medium,
     color: TEXT.primary,
   },
   headerName: {
     fontSize: responsiveFontSize(26),
-    fontFamily: "Poppins-Medium",
+    fontFamily: fonts.medium,
     color: TEXT.primary,
   },
   headerTextSmall: {
     fontSize: responsiveFontSize(12),
-    fontFamily: "Poppins-Light",
+    fontFamily: fonts.regular,
     color: TEXT.primary,
   },
   headerLeft: {

@@ -82,9 +82,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(8),
     height: moderateScale(20),
     paddingVertical: moderateScale(2),
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: PRIMARY.main,
-    borderStyle: "dotted",
+    borderStyle: "dashed",
   },
   noteCardTitle: {
     fontSize: responsiveFontSize(14),
@@ -104,6 +104,6 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(10),
     fontFamily: fonts.medium,
     color: TEXT.tertiary,
-    paddingTop: moderateScale(8),
+    paddingTop: moderateScale(16),
   },
 });
