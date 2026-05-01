@@ -276,8 +276,9 @@ const styles = StyleSheet.create({
   },
   periodScrollContent: {
     paddingHorizontal: moderateScale(16),
-    paddingVertical: moderateScale(20),
     gap: moderateScale(8),
+    paddingVertical: moderateScale(12),
+    marginBottom: moderateScale(8),
   },
   periodCapsule: {
     paddingHorizontal: moderateScale(16),
@@ -302,7 +303,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: moderateScale(16),
-    paddingVertical: moderateScale(10),
     paddingBottom: moderateScale(40),
   },
   emptyState: {

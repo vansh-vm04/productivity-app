@@ -2,6 +2,7 @@ import { PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Habit } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -39,11 +40,13 @@ export const HabitCardWeekly = React.memo(
               {habit.name}
             </Text>
             <View style={styles.streakContainer}>
-              <Text style={[styles.fireEmoji, { color: PRIMARY.main }]}>
-                🔥
-              </Text>
+              <MaterialCommunityIcons
+              name="check"
+              size={moderateScale(16)}
+              style={styles.fireEmoji}
+              />
               <Text style={[styles.streakText, { color: PRIMARY.main }]}>
-                {habit.streak} Days
+                {habit.streak} days this week
               </Text>
             </View>
           </View>
@@ -57,11 +60,11 @@ export const HabitCardWeekly = React.memo(
               style={[
                 styles.dayBadge,
                 completedDays.includes(day) && {
-                  backgroundColor: habit.accentColor,
-                  borderColor: habit.accentColor,
+                  backgroundColor: "#059669",
+                  borderColor: "#059669",
                 },
                 !completedDays.includes(day) && {
-                  borderColor: habit.accentColor,
+                  borderColor: "#a4a4a4",
                 },
               ]}
             >
@@ -89,7 +92,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: moderateScale(16),
     padding: moderateScale(16),
-    marginVertical: moderateScale(4),
+    marginBottom: moderateScale(8),
     flexDirection: "column",
     gap: moderateScale(12),
     overflow: "hidden",
@@ -138,7 +141,7 @@ const styles = StyleSheet.create({
     gap: moderateScale(4),
   },
   fireEmoji: {
-    fontSize: responsiveFontSize(14),
+    color: PRIMARY.main,
   },
   streakText: {
     fontSize: responsiveFontSize(12),
@@ -156,10 +159,11 @@ const styles = StyleSheet.create({
     flex: 1,
     height: moderateScale(28),
     borderRadius: moderateScale(8),
-    borderWidth: 1.5,
+    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "transparent",
+    borderStyle: "dotted",
   },
   dayText: {
     fontSize: responsiveFontSize(10),

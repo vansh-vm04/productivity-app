@@ -44,7 +44,7 @@ export const TaskCard = React.memo(
   }: TaskCardProps) => {
     // Light blue for non-completed tasks, green for completed
     const colors = task.completed
-      ? { base: "#E9FBF3", glow: "#34D399", accent: "#059669" }
+      ? { base: "#E9FBF3", glow: "#059669", accent: "#059669" }
       : { base: "#EAF3FF", glow: PRIMARY.main, accent: PRIMARY.main };
 
     return (
@@ -89,9 +89,9 @@ export const TaskCard = React.memo(
               ]}
             >
               {task.completed && (
-                <FontAwesome5
+                <MaterialCommunityIcons
                   name="check"
-                  size={14}
+                  size={moderateScale(16)}
                   color="#ffffff"
                   style={{ fontWeight: "bold" }}
                 />

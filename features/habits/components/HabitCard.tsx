@@ -37,11 +37,14 @@ export const HabitCard = React.memo(
               {habit.name}
             </Text>
             <View style={styles.streakContainer}>
-              <Text style={[styles.fireEmoji, { color: PRIMARY.main }]}>
-                🔥
-              </Text>
+              <MaterialCommunityIcons
+              name="check"
+              size={moderateScale(16)}
+              color="#ffffff"
+              style={styles.fireEmoji}
+              />
               <Text style={[styles.streakText, { color: PRIMARY.main }]}>
-                {habit.streak} Days Completed
+                {habit.streak} days completed
               </Text>
             </View>
           </View>
@@ -52,11 +55,11 @@ export const HabitCard = React.memo(
           style={[
             styles.checkbox,
             habit.completed && {
-              backgroundColor: habit.accentColor,
-              borderColor: habit.accentColor,
+              backgroundColor: "#059669",
+              borderColor: "#059669",
             },
             !habit.completed && {
-              borderColor: habit.accentColor,
+              borderColor: PRIMARY.main,
             },
           ]}
         >
@@ -84,7 +87,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: "#D1D5DB",
     padding: moderateScale(16),
-    marginVertical: moderateScale(4),
+    marginBottom: moderateScale(8),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -134,6 +137,7 @@ const styles = StyleSheet.create({
   },
   fireEmoji: {
     fontSize: responsiveFontSize(14),
+    color: PRIMARY.main,
   },
   streakText: {
     fontSize: responsiveFontSize(12),

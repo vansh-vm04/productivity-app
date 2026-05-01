@@ -2,6 +2,7 @@ import { PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Habit } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useMemo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -96,16 +97,18 @@ export const HabitCardMonthly = React.memo(
                 {habit.name}
               </Text>
               <View style={styles.streakContainer}>
-                <Text style={[styles.fireEmoji, { color: PRIMARY.main }]}>
-                  🔥
-                </Text>
+                <MaterialCommunityIcons
+                  name="check"
+                  size={moderateScale(16)}
+                  style={styles.fireEmoji}
+                />
                 <Text style={[styles.streakText, { color: PRIMARY.main }]}>
-                  {habit.streak} Days
+                  {habit.streak} days this month
                 </Text>
               </View>
             </View>
             <View style={styles.monthLabel}>
-              <Text style={[styles.monthText, { color: habit.accentColor }]}>
+              <Text style={[styles.monthText, { color: PRIMARY.main }]}>
                 {monthName}
               </Text>
             </View>
@@ -129,7 +132,8 @@ export const HabitCardMonthly = React.memo(
                   style={[
                     styles.dayCell,
                     {
-                      backgroundColor: getHeatmapColor(dayObj.isCompleted),
+                      backgroundColor: dayObj.isCompleted ? "#059669" : "transparent",
+                      borderColor: dayObj.isCompleted ? "#059669" : "rgba(0, 0, 0, 0.1)",
                     },
                   ]}
                 >
@@ -160,7 +164,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: moderateScale(16),
     padding: moderateScale(16),
-    marginVertical: moderateScale(4),
+    marginBottom: moderateScale(8),
     overflow: "hidden",
     shadowColor: "#000000",
     shadowOpacity: 0.04,
@@ -211,7 +215,7 @@ const styles = StyleSheet.create({
     gap: moderateScale(4),
   },
   fireEmoji: {
-    fontSize: responsiveFontSize(14),
+    color: PRIMARY.main,
   },
   streakText: {
     fontSize: responsiveFontSize(12),
@@ -261,6 +265,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     margin: moderateScale(3),
+    borderWidth: 1,
+    borderStyle: "dotted",
   },
   dayNumber: {
     fontSize: responsiveFontSize(10),

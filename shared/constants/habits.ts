@@ -9,7 +9,6 @@ export const HABIT_PERIODS: HabitPeriodOption[] = [
   { key: "today", label: "Today" },
   { key: "weekly", label: "Weekly" },
   { key: "monthly", label: "Monthly" },
-  { key: "overall", label: "Overall" },
 ];
 
 // Habit Categories
