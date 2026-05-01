@@ -50,7 +50,7 @@ export default function TasksScrollable() {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    marginVertical: moderateScale(10),
+    marginBottom: moderateScale(10),
     backgroundColor: SURFACE.primary,
     paddingHorizontal: moderateScale(2),
     paddingVertical: moderateScale(6),

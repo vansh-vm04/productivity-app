@@ -22,7 +22,6 @@ export const HabitCardWeekly = React.memo(
           styles.habitCard,
           {
             backgroundColor: "#ffffff",
-            borderColor: habit.accentColor,
           },
         ]}
         onPress={onPress}
@@ -89,12 +88,21 @@ const styles = StyleSheet.create({
   habitCard: {
     width: "100%",
     borderRadius: moderateScale(16),
-    borderWidth: 0.5,
     padding: moderateScale(16),
     marginVertical: moderateScale(4),
     flexDirection: "column",
     gap: moderateScale(12),
     overflow: "hidden",
+    shadowColor: "#000000",
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    elevation: 1,
+    borderWidth: 0.5,
+    borderColor: "#D1D5DB",
   },
   headerSection: {
     flexDirection: "row",

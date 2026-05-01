@@ -20,7 +20,6 @@ export const HabitCard = React.memo(
           styles.habitCard,
           {
             backgroundColor: "#ffffff",
-            borderColor: habit.accentColor,
           },
         ]}
         onPress={onPress}
@@ -83,12 +82,21 @@ const styles = StyleSheet.create({
     minHeight: moderateScale(80),
     borderRadius: moderateScale(16),
     borderWidth: 0.5,
+    borderColor: "#D1D5DB",
     padding: moderateScale(16),
     marginVertical: moderateScale(4),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     overflow: "hidden",
+    shadowColor: "#000000",
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    elevation: 1,
   },
   leftSection: {
     flex: 1,

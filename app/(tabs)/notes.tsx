@@ -260,6 +260,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   notesColumn: {
-    width: "48%",
+    width: "49%",
   },
 });
