@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   capsulesContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: moderateScale(10),
+    gap: moderateScale(6),
   },
   capsule: {
     flexDirection: "row",

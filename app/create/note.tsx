@@ -1,3 +1,5 @@
+import { CapsuleSelector } from "@/shared/components/CapsuleSelector";
+import { NOTE_CATEGORIES } from "@/shared/constants/notes";
 import { BACKGROUND, PRIMARY, SURFACE, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { CreateNoteParams } from "@/shared/types/note";
@@ -8,7 +10,7 @@ import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
 } from "expo-speech-recognition";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -33,9 +35,21 @@ function CreateNote() {
   );
   const [isListening, setIsListening] = useState(false);
   const [transcriptPreview, setTranscriptPreview] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(
+    typeof params.category === "string" ? params.category : "personal",
+  );
+  const [customCategory, setCustomCategory] = useState("");
 
   const isEditMode = params.mode === "edit";
   const baseBodyRef = useRef(body);
+
+  const categoryItems = useMemo(() => {
+    const items: Record<string, { label: string; icon: string }> = {};
+    NOTE_CATEGORIES.filter((cat) => cat.key !== "all").forEach((cat) => {
+      items[cat.key] = { label: cat.label, icon: "tag" };
+    });
+    return items;
+  }, []);
 
   useSpeechRecognitionEvent("start", () => {
     setIsListening(true);
@@ -137,16 +151,26 @@ function CreateNote() {
       return;
     }
 
+    const finalCategory =
+      selectedCategory === "custom" ? customCategory : selectedCategory;
+
     const payload = {
       id: params.noteId,
       mode: isEditMode ? "edit" : "create",
       title,
       body,
-      category: params.category,
+      category: finalCategory || "personal",
     };
 
     console.log(isEditMode ? "Updating note:" : "Creating note:", payload);
     router.back();
+  };
+
+  const handleCategorySelect = (key: string) => {
+    setSelectedCategory(key);
+    if (key !== "custom") {
+      setCustomCategory("");
+    }
   };
 
   return (
@@ -174,6 +198,28 @@ function CreateNote() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? moderateScale(6) : 0}
       >
+        {/* Category Selector */}
+        <CapsuleSelector
+          items={categoryItems}
+          selectedValue={selectedCategory}
+          onSelect={handleCategorySelect}
+          showCustomOption={true}
+          onCustomSelect={() => setSelectedCategory("custom")}
+        />
+
+        {/* Custom Category Input */}
+        {selectedCategory === "custom" && (
+          <TextInput
+            value={customCategory}
+            onChangeText={setCustomCategory}
+            placeholder="Enter custom category"
+            placeholderTextColor={TEXT.tertiary}
+            style={styles.customCategoryInput}
+            selectionColor={PRIMARY.main}
+            maxLength={15}
+          />
+        )}
+
         <TextInput
           value={title}
           onChangeText={setTitle}
@@ -253,6 +299,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: PRIMARY.main,
     marginRight: moderateScale(8),
+    lineHeight: moderateScale(18),
   },
   editorArea: {
     flex: 1,
@@ -260,11 +307,24 @@ const styles = StyleSheet.create({
     paddingTop: moderateScale(12),
     paddingBottom: moderateScale(20),
   },
+  customCategoryInput: {
+    color: TEXT.primary,
+    fontFamily: fonts.regular,
+    fontSize: responsiveFontSize(14),
+    borderWidth: 1,
+    borderColor: PRIMARY.main,
+    borderRadius: moderateScale(8),
+    paddingHorizontal: moderateScale(12),
+    paddingVertical: moderateScale(8),
+    marginBottom: moderateScale(12),
+    marginTop: moderateScale(8),
+  },
   titleInput: {
     color: TEXT.primary,
     fontFamily: fonts.bold,
     fontSize: responsiveFontSize(20),
     marginBottom: moderateScale(8),
+    marginTop: moderateScale(12),
     paddingVertical: moderateScale(8),
   },
   bodyInput: {
