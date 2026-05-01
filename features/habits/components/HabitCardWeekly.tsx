@@ -2,18 +2,20 @@ import { PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Habit } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-interface HabitCardProps {
+interface HabitCardWeeklyProps {
   habit: Habit;
   onPress?: () => void;
   onLongPress?: () => void;
+  completedDays: string[]; // ["Monday", "Wednesday", "Friday"]
 }
 
-export const HabitCard = React.memo(
-  ({ habit, onPress, onLongPress }: HabitCardProps) => {
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+export const HabitCardWeekly = React.memo(
+  ({ habit, onPress, onLongPress, completedDays }: HabitCardWeeklyProps) => {
     return (
       <TouchableOpacity
         style={[
@@ -28,8 +30,8 @@ export const HabitCard = React.memo(
         delayLongPress={300}
         activeOpacity={0.8}
       >
-        {/* Left section: Icon and Name */}
-        <View style={styles.leftSection}>
+        {/* Header section: Icon, Name, and Streak */}
+        <View style={styles.headerSection}>
           <View style={styles.iconContainer}>
             <Text style={styles.habitIcon}>{habit.icon}</Text>
           </View>
@@ -42,56 +44,59 @@ export const HabitCard = React.memo(
                 🔥
               </Text>
               <Text style={[styles.streakText, { color: PRIMARY.main }]}>
-                {habit.streak} Days Completed
+                {habit.streak} Days
               </Text>
             </View>
           </View>
         </View>
 
-        {/* Right section: Checkmark */}
-        <View
-          style={[
-            styles.checkbox,
-            habit.completed && {
-              backgroundColor: habit.accentColor,
-              borderColor: habit.accentColor,
-            },
-            !habit.completed && {
-              borderColor: habit.accentColor,
-            },
-          ]}
-        >
-          {habit.completed && (
-            <MaterialCommunityIcons
-              name="check"
-              size={moderateScale(16)}
-              color="#ffffff"
-              style={{ fontWeight: "bold" }}
-            />
-          )}
+        {/* Week days section */}
+        <View style={styles.weekDaysContainer}>
+          {WEEKDAYS.map((day, index) => (
+            <View
+              key={day}
+              style={[
+                styles.dayBadge,
+                completedDays.includes(day) && {
+                  backgroundColor: habit.accentColor,
+                  borderColor: habit.accentColor,
+                },
+                !completedDays.includes(day) && {
+                  borderColor: habit.accentColor,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.dayText,
+                  completedDays.includes(day) && { color: "#ffffff" },
+                  !completedDays.includes(day) && { color: TEXT.secondary },
+                ]}
+              >
+                {day}
+              </Text>
+            </View>
+          ))}
         </View>
       </TouchableOpacity>
     );
   },
 );
 
-HabitCard.displayName = "HabitCard";
+HabitCardWeekly.displayName = "HabitCardWeekly";
 
 const styles = StyleSheet.create({
   habitCard: {
     width: "100%",
-    minHeight: moderateScale(80),
     borderRadius: moderateScale(16),
     borderWidth: 0.5,
     padding: moderateScale(16),
     marginVertical: moderateScale(4),
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: "column",
+    gap: moderateScale(12),
     overflow: "hidden",
   },
-  leftSection: {
-    flex: 1,
+  headerSection: {
     flexDirection: "row",
     alignItems: "center",
     gap: moderateScale(12),
@@ -133,13 +138,24 @@ const styles = StyleSheet.create({
     color: TEXT.secondary,
     lineHeight: moderateScale(14),
   },
-  checkbox: {
-    width: moderateScale(28),
+  weekDaysContainer: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: moderateScale(6),
+  },
+  dayBadge: {
+    flex: 1,
     height: moderateScale(28),
     borderRadius: moderateScale(8),
-    borderWidth: 2,
+    borderWidth: 1.5,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "transparent",
+  },
+  dayText: {
+    fontSize: responsiveFontSize(10),
+    fontFamily: fonts.medium,
+    lineHeight: moderateScale(13),
   },
 });

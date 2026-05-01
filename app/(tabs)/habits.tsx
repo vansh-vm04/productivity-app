@@ -1,4 +1,8 @@
-import { HabitCard } from "@/features/habits/components/HabitCard";
+import {
+  HabitCard,
+  HabitCardMonthly,
+  HabitCardWeekly,
+} from "@/features/habits/components";
 import { HABITS_MOCKS } from "@/features/habits/mocks/habits.mocks";
 import { filterHabitsByPeriod } from "@/features/habits/ui/habits.helper";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
@@ -29,6 +33,33 @@ export default function Habits() {
   const filteredHabits = useMemo(() => {
     return filterHabitsByPeriod(habits, activePeriod);
   }, [activePeriod, habits]);
+
+  // Helper function to generate weekly completion data
+  const getWeeklyCompletedDays = (habit: Habit): string[] => {
+    const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const streak = habit.streak;
+    const completedDays = weekdays.slice(0, Math.min(streak, 7));
+    return completedDays;
+  };
+
+  // Helper function to generate monthly completion dates
+  const getMonthlyCompletionDates = (habit: Habit): string[] => {
+    const dates: string[] = [];
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const streak = habit.streak;
+
+    // Generate dates based on streak, working backwards from today
+    for (let i = 0; i < Math.min(streak, 30); i++) {
+      const date = new Date(year, month, today.getDate() - i);
+      if (date.getMonth() === month) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        dates.push(dateStr);
+      }
+    }
+    return dates;
+  };
 
   const toggleHabit = (id: string) => {
     setHabits(
@@ -170,12 +201,36 @@ export default function Habits() {
           ) : (
             filteredHabits.map((habit, index) => {
               const colors = CARD_PALETTES[index % CARD_PALETTES.length];
+
+              if (activePeriod === "weekly") {
+                return (
+                  <HabitCardWeekly
+                    key={habit.id}
+                    habit={habit}
+                    completedDays={getWeeklyCompletedDays(habit)}
+                    onPress={() => toggleHabit(habit.id)}
+                    onLongPress={() => handleLongPress(habit)}
+                  />
+                );
+              }
+
+              if (activePeriod === "monthly") {
+                return (
+                  <HabitCardMonthly
+                    key={habit.id}
+                    habit={habit}
+                    completionDates={getMonthlyCompletionDates(habit)}
+                    onPress={() => toggleHabit(habit.id)}
+                    onLongPress={() => handleLongPress(habit)}
+                  />
+                );
+              }
+
+              // Default to today view
               return (
                 <HabitCard
                   key={habit.id}
                   habit={habit}
-                  backgroundColor={colors.base}
-                  accentColor={colors.accent}
                   onPress={() => toggleHabit(habit.id)}
                   onLongPress={() => handleLongPress(habit)}
                 />
@@ -219,10 +274,9 @@ const styles = StyleSheet.create({
     color: TEXT.primary,
     lineHeight: moderateScale(32),
   },
-
   periodScrollContent: {
     paddingHorizontal: moderateScale(16),
-    paddingVertical: moderateScale(12),
+    paddingVertical: moderateScale(20),
     gap: moderateScale(8),
   },
   periodCapsule: {

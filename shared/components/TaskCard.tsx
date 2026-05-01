@@ -3,7 +3,7 @@ import {
   getTaskCategoryIcon,
 } from "@/features/tasks/ui/tasks.helper";
 import { CATEGORY_TAGS, PRIORITY_TAGS } from "@/shared/constants/tags";
-import { TAG, TEXT } from "@/shared/theme/colors";
+import { PRIMARY, TAG, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Task } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
@@ -45,7 +45,7 @@ export const TaskCard = React.memo(
     // Light blue for non-completed tasks, green for completed
     const colors = task.completed
       ? { base: "#E9FBF3", glow: "#34D399", accent: "#059669" }
-      : { base: "#EAF3FF", glow: "#60A5FA", accent: "#2563EB" };
+      : { base: "#EAF3FF", glow: PRIMARY.main, accent: PRIMARY.main };
 
     return (
       <TouchableOpacity
