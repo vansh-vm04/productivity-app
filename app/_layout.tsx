@@ -2,6 +2,7 @@ import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { enableScreens } from 'react-native-screens';
+import { initializeAllSchemas } from "@/storage";
 
 SplashScreen.preventAutoHideAsync();
 enableScreens(true);
@@ -15,6 +16,18 @@ export default function RootLayout() {
     "Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
   });
+
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        await initializeAllSchemas();
+      } catch (error) {
+        console.error('Failed to initialize app storage:', error);
+      }
+    };
+
+    initializeApp();
+  }, []);
 
   useEffect(() => {
     if (loaded || error) {
