@@ -1,3 +1,10 @@
-export { getDatabase, closeDatabase, executeAsync, getAllAsync, getFirstAsync } from './db/database';
-export { initializeAllSchemas } from './schema';
-export { initializeTaskSchema } from './schema/tasks.schema';
+export {
+  closeDatabase,
+  executeAsync,
+  getAllAsync,
+  getDatabase,
+  getFirstAsync,
+} from "./db/database";
+export { tasksRepository } from "./repositories";
+export { initializeAllSchemas } from "./schema";
+export { initializeTaskSchema } from "./schema/tasks.schema";

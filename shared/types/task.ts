@@ -17,5 +17,8 @@ export interface Task {
   category: CategoryType;
   priority: PriorityType;
   completed: boolean;
-  dueDate: Date;
+  dueDate: Date | null;
+  customCategory?: string;
+  createdAt: number;
+  updatedAt: number;
 }
