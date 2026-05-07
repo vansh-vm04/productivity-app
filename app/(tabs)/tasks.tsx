@@ -1,5 +1,6 @@
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { TaskCard } from "@/shared/components/TaskCard";
 import { useTasks } from "@/shared/hooks";
 import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
@@ -12,8 +13,7 @@ import { useCallback, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function Tasks() {
-  const { tasks, loading, error, refetch, toggleTaskCompletion, deleteTask } =
-    useTasks(true);
+  const { tasks, refetch, toggleTaskCompletion, deleteTask } = useTasks(true);
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -117,16 +117,27 @@ export default function Tasks() {
           contentContainerStyle={styles.scrollContent}
           bounces={true}
         >
-          <Text style={styles.tipText}>Long press a task for more options</Text>
-          {tasks.map((task, index) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              index={index}
-              onPress={() => handleToggleTask(task.id)}
-              onLongPress={() => handleLongPress(task)}
+          {tasks.length === 0 ? (
+            <EmptyState
+              title="No tasks yet"
+              subtitle="Create your first task to get started"
             />
-          ))}
+          ) : (
+            <>
+              <Text style={styles.tipText}>
+                Long press a task for more options
+              </Text>
+              {tasks.map((task, index) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  index={index}
+                  onPress={() => handleToggleTask(task.id)}
+                  onLongPress={() => handleLongPress(task)}
+                />
+              ))}
+            </>
+          )}
         </ScrollView>
 
         <ActionModal
@@ -201,22 +212,5 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(12),
     fontFamily: fonts.medium,
     color: "#c33",
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: 300,
-  },
-  emptyStateText: {
-    fontSize: responsiveFontSize(18),
-    fontFamily: fonts.semibold,
-    color: TEXT.primary,
-  },
-  emptyStateSubtext: {
-    fontSize: responsiveFontSize(14),
-    fontFamily: fonts.regular,
-    color: TEXT.tertiary,
-    marginTop: moderateScale(8),
   },
 });

@@ -1,5 +1,6 @@
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { NoteCard } from "@/shared/components/NoteCard";
 import { useNotes } from "@/shared/hooks";
 import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
@@ -147,9 +148,10 @@ export default function Notes() {
           contentContainerStyle={styles.notesGridContent}
         >
           {filteredNotes.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>No notes created</Text>
-            </View>
+            <EmptyState
+              title="No notes yet"
+              subtitle="Create your first note to get started"
+            />
           ) : (
             <View style={styles.notesColumnsContainer}>
               <View style={styles.notesColumn}>
@@ -276,16 +278,5 @@ const styles = StyleSheet.create({
   },
   notesColumn: {
     width: "49%",
-  },
-  emptyState: {
-    width: "100%",
-    minHeight: 300,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  emptyStateText: {
-    fontSize: responsiveFontSize(18),
-    fontFamily: fonts.semibold,
-    color: TEXT.primary,
   },
 });

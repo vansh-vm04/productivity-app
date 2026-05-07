@@ -1,3 +1,4 @@
+import { EmptyState } from "@/shared/components/EmptyState";
 import { TaskCard } from "@/shared/components/TaskCard";
 import { useTasks } from "@/shared/hooks";
 import { BORDER, SURFACE, TEXT } from "@/shared/theme/colors";
@@ -5,7 +6,7 @@ import { fonts } from "@/shared/theme/fonts";
 import { Task } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import { useFocusEffect } from "expo-router";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function TasksScrollable() {
@@ -31,7 +32,7 @@ export default function TasksScrollable() {
   useFocusEffect(
     useCallback(() => {
       loadTodaysTasks();
-    }, [loadTodaysTasks])
+    }, [loadTodaysTasks]),
   );
 
   const handleToggleTask = useCallback(
@@ -40,7 +41,7 @@ export default function TasksScrollable() {
       // Refetch today's tasks
       await loadTodaysTasks();
     },
-    [toggleTaskCompletion, loadTodaysTasks]
+    [toggleTaskCompletion, loadTodaysTasks],
   );
 
   return (
@@ -54,19 +55,29 @@ export default function TasksScrollable() {
         style={styles.scrollView}
         scrollEventThrottle={16}
       >
-        {tasks.map((task, index) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            index={index}
-            onPress={() => handleToggleTask(task.id)}
-            onLongPress={() => {
-              // TODO: Handle long press if needed
-            }}
-            dueIconSize={moderateScale(12)}
-            categoryIconStyle={styles.icon}
+        {tasks.length === 0 ? (
+          <EmptyState
+            title="No tasks yet"
+            subtitle="Create your first task to get started"
+            compact
           />
-        ))}
+        ) : (
+          <>
+            {tasks.map((task, index) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                index={index}
+                onPress={() => handleToggleTask(task.id)}
+                onLongPress={() => {
+                  // TODO: Handle long press if needed
+                }}
+                dueIconSize={moderateScale(12)}
+                categoryIconStyle={styles.icon}
+              />
+            ))}
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -140,16 +151,5 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(12),
     fontFamily: fonts.medium,
     color: "#c33",
-  },
-  emptyContainer: {
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: moderateScale(24),
-  },
-  emptyText: {
-    fontSize: responsiveFontSize(14),
-    fontFamily: fonts.regular,
-    color: TEXT.tertiary,
   },
 });
