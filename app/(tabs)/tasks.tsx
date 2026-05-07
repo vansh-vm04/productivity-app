@@ -1,26 +1,19 @@
-import { TASKS_MOCKS } from "@/features/tasks/mocks/tasks.mocks";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
 import { TaskCard } from "@/shared/components/TaskCard";
 import { useTasks } from "@/shared/hooks";
-import { PRIMARY, TEXT, SCREEN } from "@/shared/theme/colors";
+import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Task } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter, useFocusEffect } from "expo-router";
-import { useState, useCallback } from "react";
-import { ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function Tasks() {
-  const {
-    tasks,
-    loading,
-    error,
-    refetch,
-    toggleTaskCompletion,
-    deleteTask,
-  } = useTasks(true);
+  const { tasks, loading, error, refetch, toggleTaskCompletion, deleteTask } =
+    useTasks(true);
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -30,14 +23,14 @@ export default function Tasks() {
   useFocusEffect(
     useCallback(() => {
       refetch();
-    }, [refetch])
+    }, [refetch]),
   );
 
   const handleToggleTask = useCallback(
     async (id: string) => {
       await toggleTaskCompletion(id);
     },
-    [toggleTaskCompletion]
+    [toggleTaskCompletion],
   );
 
   const handleLongPress = (task: Task) => {

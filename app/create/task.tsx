@@ -13,6 +13,7 @@ import {
   PRIORITY_TAGS,
   PriorityType,
 } from "@/shared/constants/tags";
+import { useTasks } from "@/shared/hooks";
 import {
   BACKGROUND,
   BORDER,
@@ -22,12 +23,11 @@ import {
 } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { TaskData } from "@/shared/types/task";
-import { useTasks } from "@/shared/hooks";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -70,7 +70,8 @@ export default function CreateTask() {
       : null;
 
   // Generate unique ID if not in edit mode
-  const generateTaskId = () => `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const generateTaskId = () =>
+    `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   const [taskData, setTaskData] = useState<TaskData>({
     id: typeof params.taskId === "string" ? params.taskId : generateTaskId(),
@@ -105,7 +106,7 @@ export default function CreateTask() {
           if (existingTask) {
             // Check if the category is a predefined one or custom
             const isPredefinedCategory = Object.keys(CATEGORY_TAGS).includes(
-              existingTask.category
+              existingTask.category,
             );
 
             // If it's not a predefined category, treat it as custom
@@ -201,7 +202,9 @@ export default function CreateTask() {
       setSaveError(null);
 
       const finalCategory =
-        taskData.category === "custom" ? customCategoryInput : taskData.category;
+        taskData.category === "custom"
+          ? customCategoryInput
+          : taskData.category;
 
       const taskPayload: TaskData & { id: string } = {
         id: taskData.id || generateTaskId(),
@@ -228,7 +231,8 @@ export default function CreateTask() {
 
       router.back();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to save task";
+      const message =
+        error instanceof Error ? error.message : "Failed to save task";
       setSaveError(message);
       console.error("Error saving task:", error);
     } finally {
