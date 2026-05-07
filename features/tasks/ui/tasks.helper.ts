@@ -11,6 +11,7 @@ import {
 } from "@/shared/constants/tags";
 import { CARD_PALETTES } from "@/shared/theme/colors";
 import { moderateScale } from "@/shared/utils/responsive";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 type IconStyle = StyleProp<TextStyle>;
 
@@ -69,8 +70,8 @@ export const getTaskCategoryIcon = (
 				style,
 			});
 		default:
-			return createElement(FontAwesome5, {
-				name: "tasks",
+			return createElement(MaterialIcons, {
+				name: "task-alt",
 				size,
 				color,
 				style,

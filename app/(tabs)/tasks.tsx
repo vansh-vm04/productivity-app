@@ -2,49 +2,64 @@ import { TASKS_MOCKS } from "@/features/tasks/mocks/tasks.mocks";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
 import { TaskCard } from "@/shared/components/TaskCard";
+import { useTasks } from "@/shared/hooks";
 import { PRIMARY, TEXT, SCREEN } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Task } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useRouter, useFocusEffect } from "expo-router";
+import { useState, useCallback } from "react";
+import { ScrollView, StyleSheet, Text, View, ActivityIndicator } from "react-native";
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState<Task[]>(TASKS_MOCKS);
+  const {
+    tasks,
+    loading,
+    error,
+    refetch,
+    toggleTaskCompletion,
+    deleteTask,
+  } = useTasks(true);
+
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
 
-  const toggleTask = (id: string) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task,
-      ),
-    );
-  };
+  // Refetch tasks when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
+  const handleToggleTask = useCallback(
+    async (id: string) => {
+      await toggleTaskCompletion(id);
+    },
+    [toggleTaskCompletion]
+  );
 
   const handleLongPress = (task: Task) => {
     setSelectedTask(task);
     setModalVisible(true);
   };
 
-  const handleComplete = () => {
+  const handleComplete = useCallback(async () => {
     if (selectedTask) {
-      toggleTask(selectedTask.id);
+      await handleToggleTask(selectedTask.id);
     }
     setModalVisible(false);
-  };
+  }, [selectedTask, handleToggleTask]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(async () => {
     if (selectedTask) {
-      setTasks(tasks.filter((task) => task.id !== selectedTask.id));
+      await deleteTask(selectedTask.id);
     }
     setModalVisible(false);
-  };
+  }, [selectedTask, deleteTask]);
 
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     if (!selectedTask) return;
 
     setModalVisible(false);
@@ -56,10 +71,10 @@ export default function Tasks() {
         name: selectedTask.name,
         category: selectedTask.category,
         priority: selectedTask.priority,
-        dueDate: selectedTask.dueDate.toISOString(),
+        dueDate: selectedTask.dueDate?.toISOString() || "",
       },
     });
-  };
+  }, [selectedTask, router]);
 
   const taskActions: ActionModalItem[] = [
     {
@@ -115,7 +130,7 @@ export default function Tasks() {
               key={task.id}
               task={task}
               index={index}
-              onPress={() => toggleTask(task.id)}
+              onPress={() => handleToggleTask(task.id)}
               onLongPress={() => handleLongPress(task)}
             />
           ))}
@@ -167,5 +182,48 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: PRIMARY.main,
     textAlign: "center",
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: 300,
+  },
+  loadingText: {
+    fontSize: responsiveFontSize(14),
+    fontFamily: fonts.regular,
+    color: TEXT.primary,
+    marginTop: moderateScale(12),
+  },
+  errorContainer: {
+    backgroundColor: "#fee",
+    borderRadius: moderateScale(12),
+    borderWidth: 1,
+    borderColor: "#fcc",
+    paddingHorizontal: moderateScale(12),
+    paddingVertical: moderateScale(10),
+    marginVertical: moderateScale(12),
+  },
+  errorText: {
+    fontSize: responsiveFontSize(12),
+    fontFamily: fonts.medium,
+    color: "#c33",
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: 300,
+  },
+  emptyStateText: {
+    fontSize: responsiveFontSize(18),
+    fontFamily: fonts.semibold,
+    color: TEXT.primary,
+  },
+  emptyStateSubtext: {
+    fontSize: responsiveFontSize(14),
+    fontFamily: fonts.regular,
+    color: TEXT.tertiary,
+    marginTop: moderateScale(8),
   },
 });

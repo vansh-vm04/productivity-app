@@ -22,11 +22,12 @@ import {
 } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { TaskData } from "@/shared/types/task";
+import { useTasks } from "@/shared/hooks";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -49,6 +50,10 @@ export default function CreateTask() {
     dueDate?: string;
   }>();
 
+  const { createTask, updateTask, getTaskById } = useTasks(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
   const isEditMode = params.mode === "edit";
 
   const initialCategory =
@@ -64,8 +69,11 @@ export default function CreateTask() {
       ? new Date(params.dueDate)
       : null;
 
+  // Generate unique ID if not in edit mode
+  const generateTaskId = () => `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
   const [taskData, setTaskData] = useState<TaskData>({
-    id: typeof params.taskId === "string" ? params.taskId : undefined,
+    id: typeof params.taskId === "string" ? params.taskId : generateTaskId(),
     name: typeof params.name === "string" ? params.name : "",
     priority: initialPriority,
     category: initialCategory,
@@ -86,6 +94,63 @@ export default function CreateTask() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showReminderTimePicker, setShowReminderTimePicker] = useState(false);
   const [selectedReminderIndex, setSelectedReminderIndex] = useState(0);
+
+  // Load existing task data if in edit mode
+  useEffect(() => {
+    if (isEditMode && typeof params.taskId === "string") {
+      const loadTaskData = async () => {
+        try {
+          setIsLoading(true);
+          const existingTask = await getTaskById(params.taskId as string);
+          if (existingTask) {
+            // Check if the category is a predefined one or custom
+            const isPredefinedCategory = Object.keys(CATEGORY_TAGS).includes(
+              existingTask.category
+            );
+
+            // If it's not a predefined category, treat it as custom
+            const loadedCategory = isPredefinedCategory
+              ? existingTask.category
+              : ("custom" as CategoryType | "custom");
+
+            // If it's custom, the custom category name is stored in the category field
+            const loadedCustomCategoryInput = !isPredefinedCategory
+              ? existingTask.category
+              : "";
+
+            setTaskData({
+              id: existingTask.id,
+              name: existingTask.name,
+              priority: existingTask.priority,
+              category: loadedCategory,
+              customCategory:
+                existingTask.customCategory || loadedCustomCategoryInput,
+              dueDate: existingTask.dueDate,
+              reminders: [
+                {
+                  id: "1",
+                  time: "09:00",
+                  label: "reminder",
+                  enabled: true,
+                },
+              ],
+            });
+
+            // Populate customCategoryInput if it's a custom category
+            if (!isPredefinedCategory) {
+              setCustomCategoryInput(existingTask.category);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load task:", error);
+          setSaveError("Failed to load task");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadTaskData();
+    }
+  }, [isEditMode, params.taskId, getTaskById]);
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (Platform.OS === "android") {
@@ -125,22 +190,50 @@ export default function CreateTask() {
     }
   };
 
-  const handleCreateTask = () => {
+  const handleCreateTask = async () => {
     if (!taskData.name.trim()) {
-      alert("Please enter a task name");
+      setSaveError("Please enter a task name");
       return;
     }
 
-    console.log(isEditMode ? "Updating task:" : "Creating task:", {
-      ...taskData,
-      category:
-        taskData.category === "custom"
-          ? customCategoryInput
-          : taskData.category,
-    });
+    try {
+      setIsLoading(true);
+      setSaveError(null);
 
-    // TODO: Save task to database/state
-    router.back();
+      const finalCategory =
+        taskData.category === "custom" ? customCategoryInput : taskData.category;
+
+      const taskPayload: TaskData & { id: string } = {
+        id: taskData.id || generateTaskId(),
+        name: taskData.name,
+        priority: taskData.priority,
+        category: finalCategory as CategoryType,
+        customCategory:
+          taskData.category === "custom" ? customCategoryInput : "",
+        dueDate: taskData.dueDate,
+        reminders: taskData.reminders,
+      };
+
+      if (isEditMode) {
+        await updateTask(taskPayload.id, {
+          name: taskPayload.name,
+          priority: taskPayload.priority,
+          category: taskPayload.category,
+          customCategory: taskPayload.customCategory || "",
+          dueDate: taskPayload.dueDate,
+        });
+      } else {
+        await createTask(taskPayload);
+      }
+
+      router.back();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to save task";
+      setSaveError(message);
+      console.error("Error saving task:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -295,8 +388,9 @@ export default function CreateTask() {
               value={taskData.dueDate || new Date()}
               mode="date"
               display="default"
-              onValueChange={handleDateChange}
-              onDismiss={() => setShowDatePicker(false)}
+              onChange={(event, selectedDate) => {
+                handleDateChange(event, selectedDate);
+              }}
             />
           )}
 
@@ -306,8 +400,9 @@ export default function CreateTask() {
               value={taskData.dueDate || new Date()}
               mode="time"
               display="default"
-              onValueChange={handleTimeChange}
-              onDismiss={() => setShowTimePicker(false)}
+              onChange={(event, selectedTime) => {
+                handleTimeChange(event, selectedTime);
+              }}
             />
           )}
 
@@ -331,11 +426,19 @@ export default function CreateTask() {
             </View>
           )}
 
+          {/* Error Message */}
+          {saveError && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{saveError}</Text>
+            </View>
+          )}
+
           {/* Action Buttons */}
           <ActionButtons
             onCancel={() => router.back()}
             onSubmit={handleCreateTask}
             submitLabel={isEditMode ? "Update Task" : "Create Task"}
+            isLoading={isLoading}
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -464,5 +567,19 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(12),
     fontFamily: fonts.medium,
     color: PRIMARY.main,
+  },
+  errorContainer: {
+    backgroundColor: "#fee",
+    borderRadius: moderateScale(12),
+    borderWidth: 1,
+    borderColor: "#fcc",
+    paddingHorizontal: moderateScale(12),
+    paddingVertical: moderateScale(10),
+    marginVertical: moderateScale(12),
+  },
+  errorText: {
+    fontSize: responsiveFontSize(12),
+    fontFamily: fonts.medium,
+    color: "#c33",
   },
 });

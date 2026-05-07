@@ -41,7 +41,7 @@ export const CATEGORY_TAGS = {
   deepwork: {
     label: "Deep Work",
     icon: "brain",
-  },
+  }
 } as const;
 
 export type CategoryType = keyof typeof CATEGORY_TAGS;

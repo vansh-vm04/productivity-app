@@ -7,7 +7,6 @@ import { PRIMARY, TAG, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Task } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
 import {
@@ -46,6 +45,7 @@ export const TaskCard = React.memo(
     const colors = task.completed
       ? { base: "#E9FBF3", glow: "#059669", accent: "#059669" }
       : { base: "#EAF3FF", glow: PRIMARY.main, accent: PRIMARY.main };
+      console.log("Rendering TaskCard:", task.customCategory, "Completed:", task.completed);
 
     return (
       <TouchableOpacity
@@ -123,22 +123,28 @@ export const TaskCard = React.memo(
                   },
                 ]}
               >
-                <Text style={styles.tagText}>
-                  {CATEGORY_TAGS[task.category].label}
-                </Text>
+                {typeof task.category !== "string" || !(task.category in CATEGORY_TAGS) ? (
+                  <Text style={styles.tagText}>{task.customCategory}</Text>
+                ) : (
+                  <Text style={styles.tagText}>
+                    {CATEGORY_TAGS[task.category].label}
+                  </Text>
+                )}
               </View>
             </View>
+            {task.dueDate && (
+              <View style={styles.dueDateInline}>
+                <MaterialCommunityIcons
+                  name="clock-outline"
+                  size={dueIconSize}
+                  color={TEXT.secondary}
+                />
 
-            <View style={styles.dueDateInline}>
-              <MaterialCommunityIcons
-                name="clock-outline"
-                size={dueIconSize}
-                color={TEXT.secondary}
-              />
-              <Text style={styles.dueDateText}>
-                {formatTaskDueDate(task.dueDate)}
-              </Text>
-            </View>
+                <Text style={styles.dueDateText}>
+                  {formatTaskDueDate(task.dueDate)}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       </TouchableOpacity>
