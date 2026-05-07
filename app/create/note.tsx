@@ -1,8 +1,9 @@
 import { CapsuleSelector } from "@/shared/components/CapsuleSelector";
 import { NOTE_CATEGORIES } from "@/shared/constants/notes";
+import { useNotes } from "@/shared/hooks";
 import { BACKGROUND, PRIMARY, SURFACE, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
-import { CreateNoteParams } from "@/shared/types/note";
+import { CreateNoteParams, NoteData } from "@/shared/types/note";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -26,6 +27,7 @@ import {
 function CreateNote() {
   const router = useRouter();
   const params = useLocalSearchParams<CreateNoteParams>();
+  const { createNote, updateNote, getNoteById } = useNotes(false);
 
   const [title, setTitle] = useState(
     typeof params.title === "string" ? params.title : "",
@@ -39,9 +41,20 @@ function CreateNote() {
     typeof params.category === "string" ? params.category : "personal",
   );
   const [customCategory, setCustomCategory] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const isEditMode = params.mode === "edit";
   const baseBodyRef = useRef(body);
+
+  const isPredefinedCategory = (value: string): boolean => {
+    return NOTE_CATEGORIES.some(
+      (cat) => cat.key !== "all" && cat.key === value,
+    );
+  };
+
+  const generateNoteId = () =>
+    `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   const categoryItems = useMemo(() => {
     const items: Record<string, { label: string; icon: string }> = {};
@@ -123,6 +136,49 @@ function CreateNote() {
     // Ask once when screen opens so user gets the native allow/deny dialog directly.
   }, []);
 
+  useEffect(() => {
+    const incomingCategory =
+      typeof params.category === "string" ? params.category : "";
+    const incomingCustomCategory =
+      typeof params.customCategory === "string" ? params.customCategory : "";
+
+    if (!incomingCategory) {
+      setSelectedCategory("personal");
+      setCustomCategory("");
+      return;
+    }
+
+    if (isPredefinedCategory(incomingCategory)) {
+      setSelectedCategory(incomingCategory);
+      setCustomCategory(incomingCustomCategory);
+    } else {
+      setSelectedCategory("custom");
+      setCustomCategory(incomingCustomCategory || incomingCategory);
+    }
+  }, [params.category, params.customCategory]);
+
+  useEffect(() => {
+    if (!(isEditMode && typeof params.noteId === "string")) return;
+
+    const loadNote = async () => {
+      const existingNote = await getNoteById(params.noteId as string);
+      if (!existingNote) return;
+
+      setTitle(existingNote.title);
+      setBody(existingNote.body);
+
+      if (isPredefinedCategory(existingNote.category)) {
+        setSelectedCategory(existingNote.category);
+        setCustomCategory(existingNote.customCategory || "");
+      } else {
+        setSelectedCategory("custom");
+        setCustomCategory(existingNote.customCategory || existingNote.category);
+      }
+    };
+
+    loadNote();
+  }, [getNoteById, isEditMode, params.noteId]);
+
   const handleStartListening = async () => {
     const hasPermissions = await askForPermissions();
     if (!hasPermissions) {
@@ -145,25 +201,58 @@ function CreateNote() {
     ExpoSpeechRecognitionModule.stop();
   };
 
-  const handleDone = () => {
+  const handleDone = async () => {
     if (!title.trim() && !body.trim()) {
       router.back();
       return;
     }
 
-    const finalCategory =
-      selectedCategory === "custom" ? customCategory : selectedCategory;
+    if (selectedCategory === "custom" && !customCategory.trim()) {
+      setSaveError("Please enter a custom category");
+      return;
+    }
 
-    const payload = {
-      id: params.noteId,
-      mode: isEditMode ? "edit" : "create",
-      title,
-      body,
-      category: finalCategory || "personal",
-    };
+    try {
+      setIsSaving(true);
+      setSaveError(null);
 
-    console.log(isEditMode ? "Updating note:" : "Creating note:", payload);
-    router.back();
+      const finalCategory =
+        selectedCategory === "custom"
+          ? customCategory.trim()
+          : selectedCategory;
+
+      const notePayload: NoteData = {
+        title: title.trim(),
+        body: body.trim(),
+        category: finalCategory,
+        customCategory:
+          selectedCategory === "custom" ? customCategory.trim() : undefined,
+      };
+
+      let savedNote = null;
+      if (isEditMode && typeof params.noteId === "string") {
+        savedNote = await updateNote(params.noteId, notePayload);
+      } else {
+        savedNote = await createNote({
+          id: generateNoteId(),
+          ...notePayload,
+        });
+      }
+
+      if (!savedNote) {
+        setSaveError("Failed to save note");
+        return;
+      }
+
+      router.back();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to save note";
+      setSaveError(message);
+      console.error("Error saving note:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCategorySelect = (key: string) => {
@@ -188,10 +277,12 @@ function CreateNote() {
           <Text style={styles.headerTitle}>Note</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleDone}>
-          <Text style={styles.doneText}>Done</Text>
+        <TouchableOpacity onPress={handleDone} disabled={isSaving}>
+          <Text style={styles.doneText}>{isSaving ? "Saving..." : "Done"}</Text>
         </TouchableOpacity>
       </View>
+
+      {saveError ? <Text style={styles.errorText}>{saveError}</Text> : null}
 
       <KeyboardAvoidingView
         style={styles.editorArea}
@@ -300,6 +391,13 @@ const styles = StyleSheet.create({
     color: PRIMARY.main,
     marginRight: moderateScale(8),
     lineHeight: moderateScale(18),
+  },
+  errorText: {
+    fontSize: responsiveFontSize(12),
+    fontFamily: fonts.medium,
+    color: "#c33",
+    marginTop: moderateScale(8),
+    marginHorizontal: moderateScale(14),
   },
   editorArea: {
     flex: 1,

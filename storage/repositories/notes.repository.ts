@@ -1,13 +1,5 @@
-import { Note, NoteCategory } from "@/shared/types/note";
+import { Note, NoteData } from "@/shared/types/note";
 import { executeAsync, getAllAsync, getFirstAsync } from "../db/database";
-
-export interface NoteData {
-  id?: string;
-  title: string;
-  body: string;
-  category: Exclude<NoteCategory, "all">;
-  customCategory?: string;
-}
 
 interface NoteRowDB {
   id: string;
@@ -23,7 +15,7 @@ const convertDBRowToNote = (row: NoteRowDB): Note => ({
   id: row.id,
   title: row.title,
   body: row.body,
-  category: row.category as Exclude<NoteCategory, "all">,
+  category: row.category,
   customCategory: row.customCategory || undefined,
   updatedAt: row.updatedAt.toString(),
 });

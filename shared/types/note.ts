@@ -4,6 +4,7 @@ export type CreateNoteParams = {
   title?: string;
   body?: string;
   category?: string;
+  customCategory?: string;
 };
 
 export type NoteCategory =
@@ -18,7 +19,15 @@ export type Note = {
   id: string;
   title: string;
   body: string;
-  category: Exclude<NoteCategory, "all">;
+  category: Exclude<NoteCategory, "all"> | string;
   customCategory?: string;
   updatedAt: string;
+};
+
+export type NoteData = {
+  id?: string;
+  title: string;
+  body: string;
+  category: Exclude<NoteCategory, "all"> | string;
+  customCategory?: string;
 };

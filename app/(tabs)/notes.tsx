@@ -1,14 +1,14 @@
-import { NOTES_MOCKS } from "@/features/notes/mocks/notes.mocks";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
 import { NoteCard } from "@/shared/components/NoteCard";
+import { useNotes } from "@/shared/hooks";
 import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Note, NoteCategory } from "@/shared/types/note";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -20,10 +20,16 @@ import { NOTE_CATEGORIES } from "../../shared/constants/notes";
 
 export default function Notes() {
   const router = useRouter();
+  const { notes, deleteNote, refetch } = useNotes(true);
   const [activeCategory, setActiveCategory] = useState<NoteCategory>("all");
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [notes, setNotes] = useState<Note[]>(NOTES_MOCKS);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   const filteredNotes = useMemo(() => {
     if (activeCategory === "all") return notes;
@@ -57,13 +63,14 @@ export default function Notes() {
         title: selectedNote.title,
         body: selectedNote.body,
         category: selectedNote.category,
+        customCategory: selectedNote.customCategory,
       },
     });
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedNote) {
-      setNotes(notes.filter((note) => note.id !== selectedNote.id));
+      await deleteNote(selectedNote.id);
     }
     setModalVisible(false);
   };
@@ -139,50 +146,58 @@ export default function Notes() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.notesGridContent}
         >
-          <View style={styles.notesColumnsContainer}>
-            <View style={styles.notesColumn}>
-              {leftColumnNotes.map((note) => (
-                <NoteCard
-                  key={note.id}
-                  note={note}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/create/note",
-                      params: {
-                        mode: "edit",
-                        noteId: note.id,
-                        title: note.title,
-                        body: note.body,
-                        category: note.category,
-                      },
-                    })
-                  }
-                  onLongPress={() => handleLongPress(note)}
-                />
-              ))}
+          {filteredNotes.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>No notes created</Text>
             </View>
-            <View style={styles.notesColumn}>
-              {rightColumnNotes.map((note) => (
-                <NoteCard
-                  key={note.id}
-                  note={note}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/create/note",
-                      params: {
-                        mode: "edit",
-                        noteId: note.id,
-                        title: note.title,
-                        body: note.body,
-                        category: note.category,
-                      },
-                    })
-                  }
-                  onLongPress={() => handleLongPress(note)}
-                />
-              ))}
+          ) : (
+            <View style={styles.notesColumnsContainer}>
+              <View style={styles.notesColumn}>
+                {leftColumnNotes.map((note) => (
+                  <NoteCard
+                    key={note.id}
+                    note={note}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/create/note",
+                        params: {
+                          mode: "edit",
+                          noteId: note.id,
+                          title: note.title,
+                          body: note.body,
+                          category: note.category,
+                          customCategory: note.customCategory,
+                        },
+                      })
+                    }
+                    onLongPress={() => handleLongPress(note)}
+                  />
+                ))}
+              </View>
+              <View style={styles.notesColumn}>
+                {rightColumnNotes.map((note) => (
+                  <NoteCard
+                    key={note.id}
+                    note={note}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/create/note",
+                        params: {
+                          mode: "edit",
+                          noteId: note.id,
+                          title: note.title,
+                          body: note.body,
+                          category: note.category,
+                          customCategory: note.customCategory,
+                        },
+                      })
+                    }
+                    onLongPress={() => handleLongPress(note)}
+                  />
+                ))}
+              </View>
             </View>
-          </View>
+          )}
         </ScrollView>
 
         <ActionModal
@@ -261,5 +276,16 @@ const styles = StyleSheet.create({
   },
   notesColumn: {
     width: "49%",
+  },
+  emptyState: {
+    width: "100%",
+    minHeight: 300,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyStateText: {
+    fontSize: responsiveFontSize(18),
+    fontFamily: fonts.semibold,
+    color: TEXT.primary,
   },
 });
