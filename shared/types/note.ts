@@ -19,7 +19,6 @@ export type Note = {
   title: string;
   body: string;
   category: Exclude<NoteCategory, "all">;
+  customCategory?: string;
   updatedAt: string;
-  bgColor: string;
-  accentColor: string;
 };
