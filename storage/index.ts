@@ -8,6 +8,7 @@ export {
 export {
   habitsRepository,
   notesRepository,
+  remindersRepository,
   tasksRepository,
 } from "./repositories";
 export { initializeAllSchemas } from "./schema";
