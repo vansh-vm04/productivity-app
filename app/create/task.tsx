@@ -24,6 +24,7 @@ import {
 import { fonts } from "@/shared/theme/fonts";
 import { TaskData } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
+import { remindersRepository } from "@/storage";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -38,6 +39,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+const defaultReminders: TaskData["reminders"] = [
+  {
+    id: "1",
+    time: "09:00",
+    label: "reminder",
+    enabled: true,
+  },
+];
 
 export default function CreateTask() {
   const router = useRouter();
@@ -80,14 +90,7 @@ export default function CreateTask() {
     category: initialCategory,
     customCategory: "",
     dueDate: initialDueDate,
-    reminders: [
-      {
-        id: "1",
-        time: "09:00",
-        label: "reminder",
-        enabled: true,
-      },
-    ],
+    reminders: defaultReminders,
   });
 
   const [customCategoryInput, setCustomCategoryInput] = useState("");
@@ -104,6 +107,21 @@ export default function CreateTask() {
           setIsLoading(true);
           const existingTask = await getTaskById(params.taskId as string);
           if (existingTask) {
+            const existingReminders =
+              await remindersRepository.getRemindersByEntity(
+                "task",
+                existingTask.id,
+              );
+            const reminders =
+              existingReminders.length > 0
+                ? existingReminders.map((reminder) => ({
+                    id: reminder.id,
+                    time: reminder.time,
+                    label: reminder.label,
+                    enabled: reminder.enabled,
+                  }))
+                : defaultReminders;
+
             // Check if the category is a predefined one or custom
             const isPredefinedCategory = Object.keys(CATEGORY_TAGS).includes(
               existingTask.category,
@@ -127,14 +145,7 @@ export default function CreateTask() {
               customCategory:
                 existingTask.customCategory || loadedCustomCategoryInput,
               dueDate: existingTask.dueDate,
-              reminders: [
-                {
-                  id: "1",
-                  time: "09:00",
-                  label: "reminder",
-                  enabled: true,
-                },
-              ],
+              reminders,
             });
 
             // Populate customCategoryInput if it's a custom category
@@ -225,8 +236,31 @@ export default function CreateTask() {
           customCategory: taskPayload.customCategory || "",
           dueDate: taskPayload.dueDate,
         });
+
+        await remindersRepository.deleteRemindersByEntity(
+          "task",
+          taskPayload.id,
+        );
       } else {
         await createTask(taskPayload);
+      }
+      if (taskPayload.reminders && taskPayload.reminders.length > 0) {
+        const baseId = `reminder_${Date.now()}_${Math.random()
+          .toString(36)
+          .slice(2, 10)}`;
+
+        await Promise.all(
+          taskPayload.reminders.map((reminder, index) =>
+            remindersRepository.createReminder({
+              id: `${baseId}_${index}`,
+              entityType: "task",
+              entityId: taskPayload.id,
+              time: reminder.time,
+              label: reminder.label,
+              enabled: reminder.enabled,
+            }),
+          ),
+        );
       }
 
       router.back();

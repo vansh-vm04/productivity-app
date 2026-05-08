@@ -55,7 +55,7 @@ class RemindersRepository {
         now,
       ],
     );
-
+    console.log(`Created reminder with id ${reminder.id} for ${reminder.entityType} ${reminder.entityId}`);
     return this.getReminderById(reminder.id) as Promise<ReminderRecord>;
   }
 

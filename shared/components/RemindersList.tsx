@@ -1,9 +1,4 @@
-import {
-    BORDER,
-    PRIMARY,
-    SURFACE,
-    TEXT
-} from "@/shared/theme/colors";
+import { BORDER, PRIMARY, SURFACE, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Reminder } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
@@ -11,11 +6,11 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React from "react";
 import {
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface RemindersListProps {
@@ -38,7 +33,12 @@ export const RemindersList = React.memo(
     onHideTimePicker,
     onTimeChange,
   }: RemindersListProps) => {
+    const maxReminders = 5;
+    const canAddReminder = reminders.length < maxReminders;
+
     const handleAddReminder = () => {
+      if (!canAddReminder) return;
+
       const newReminder: Reminder = {
         id: `${reminders.length + 1}`,
         time: "09:00",
@@ -78,13 +78,21 @@ export const RemindersList = React.memo(
           <TouchableOpacity
             style={styles.addReminderButton}
             onPress={handleAddReminder}
+            disabled={!canAddReminder}
           >
             <MaterialCommunityIcons
               name="plus"
               size={18}
-              color={PRIMARY.main}
+              color={canAddReminder ? PRIMARY.main : TEXT.tertiary}
             />
-            <Text style={styles.addReminderButtonText}>Add</Text>
+            <Text
+              style={[
+                styles.addReminderButtonText,
+                !canAddReminder && { color: TEXT.tertiary },
+              ]}
+            >
+              Add
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -149,8 +157,7 @@ export const RemindersList = React.memo(
             )}
             mode="time"
             display="default"
-            onValueChange={onTimeChange}
-            onDismiss={onHideTimePicker}
+            onChange={onTimeChange}
           />
         )}
       </View>
