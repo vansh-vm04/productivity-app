@@ -10,6 +10,13 @@ type HabitUpdateInput = Partial<HabitData> & {
   streak?: number;
 };
 
+interface HabitCompletionRowDB {
+  id: string;
+  habitId: string;
+  completedDate: number;
+  createdAt: number;
+}
+
 interface HabitRowDB {
   id: string;
   name: string;
@@ -28,6 +35,13 @@ interface HabitRowDB {
   updatedAt: number;
 }
 
+export interface HabitCompletionRecord {
+  id: string;
+  habitId: string;
+  completedDate: Date;
+  createdAt: number;
+}
+
 const parseJson = <T>(value: string | null, fallback: T): T => {
   if (!value) return fallback;
 
@@ -36,6 +50,12 @@ const parseJson = <T>(value: string | null, fallback: T): T => {
   } catch {
     return fallback;
   }
+};
+
+const getStartOfDayTimestamp = (date: Date): number => {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  return startOfDay.getTime();
 };
 
 const mapFrequencyDetailsToHabitFrequency = (
@@ -54,7 +74,7 @@ const mapFrequencyDetailsToHabitFrequency = (
   }
 };
 
-const convertDBRowToHabit = (row: HabitRowDB): Habit => {
+const convertDBRowToHabit = (row: HabitRowDB, completed = false): Habit => {
   const frequencyDetails = parseJson<FrequencyDetails>(row.frequencyDetails, {
     type: "daily",
   });
@@ -64,7 +84,7 @@ const convertDBRowToHabit = (row: HabitRowDB): Habit => {
     name: row.name,
     icon: row.icon,
     streak: row.streak,
-    completed: false,
+    completed,
     frequency:
       (row.frequency as HabitFrequency) ||
       mapFrequencyDetailsToHabitFrequency(frequencyDetails),
@@ -83,7 +103,39 @@ const convertDBRowToHabit = (row: HabitRowDB): Habit => {
   };
 };
 
+const convertDBRowToHabitCompletion = (
+  row: HabitCompletionRowDB,
+): HabitCompletionRecord => ({
+  id: row.id,
+  habitId: row.habitId,
+  completedDate: new Date(row.completedDate),
+  createdAt: row.createdAt,
+});
+
 class HabitsRepository {
+  private async getCompletedHabitIdsByDate(
+    date: Date = new Date(),
+  ): Promise<Set<string>> {
+    const completedDate = getStartOfDayTimestamp(date);
+    const rows = await getAllAsync<{ habitId: string }>(
+      "SELECT DISTINCT habitId FROM habit_completion WHERE completedDate = ?",
+      [completedDate],
+    );
+
+    return new Set(rows.map((row) => row.habitId));
+  }
+
+  private async getHabitCompletionRow(
+    habitId: string,
+    date: Date = new Date(),
+  ): Promise<HabitCompletionRowDB | null> {
+    const completedDate = getStartOfDayTimestamp(date);
+    return await getFirstAsync<HabitCompletionRowDB>(
+      "SELECT * FROM habit_completion WHERE habitId = ? AND completedDate = ?",
+      [habitId, completedDate],
+    );
+  }
+
   /**
    * Create a new habit
    */
@@ -109,7 +161,7 @@ class HabitsRepository {
         streak,
         createdAt,
         updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         habit.id,
         habit.name,
@@ -136,21 +188,25 @@ class HabitsRepository {
    * Get all habits
    */
   async getAllHabits(): Promise<Habit[]> {
+    const completedHabitIds = await this.getCompletedHabitIdsByDate();
     const rows = await getAllAsync<HabitRowDB>(
-      "SELECT * FROM habits ORDER BY updatedAt DESC",
+      "SELECT * FROM habits ORDER BY createdAt DESC",
     );
-    return rows.map(convertDBRowToHabit);
+    return rows.map((row) =>
+      convertDBRowToHabit(row, completedHabitIds.has(row.id)),
+    );
   }
 
   /**
    * Get habit by ID
    */
   async getHabitById(id: string): Promise<Habit | null> {
+    const completedHabitIds = await this.getCompletedHabitIdsByDate();
     const row = await getFirstAsync<HabitRowDB>(
       "SELECT * FROM habits WHERE id = ?",
       [id],
     );
-    return row ? convertDBRowToHabit(row) : null;
+    return row ? convertDBRowToHabit(row, completedHabitIds.has(row.id)) : null;
   }
 
   /**
@@ -158,10 +214,10 @@ class HabitsRepository {
    */
   async getHabitsByCategory(category: string): Promise<Habit[]> {
     const rows = await getAllAsync<HabitRowDB>(
-      "SELECT * FROM habits WHERE category = ? ORDER BY updatedAt DESC",
+      "SELECT * FROM habits WHERE category = ? ORDER BY createdAt DESC",
       [category],
     );
-    return rows.map(convertDBRowToHabit);
+    return rows.map((row) => convertDBRowToHabit(row));
   }
 
   /**
@@ -169,10 +225,124 @@ class HabitsRepository {
    */
   async getHabitsByPriority(priority: string): Promise<Habit[]> {
     const rows = await getAllAsync<HabitRowDB>(
-      "SELECT * FROM habits WHERE priority = ? ORDER BY updatedAt DESC",
+      "SELECT * FROM habits WHERE priority = ? ORDER BY createdAt DESC",
       [priority],
     );
-    return rows.map(convertDBRowToHabit);
+    return rows.map((row) => convertDBRowToHabit(row));
+  }
+
+  /**
+   * Get completions for a habit
+   */
+  async getHabitCompletionsByHabitId(
+    habitId: string,
+  ): Promise<HabitCompletionRecord[]> {
+    const rows = await getAllAsync<HabitCompletionRowDB>(
+      "SELECT * FROM habit_completion WHERE habitId = ? ORDER BY completedDate DESC",
+      [habitId],
+    );
+
+    return rows.map(convertDBRowToHabitCompletion);
+  }
+
+  /**
+   * Get completions for a habit on a specific date
+   */
+  async getHabitCompletionByDate(
+    habitId: string,
+    date: Date = new Date(),
+  ): Promise<HabitCompletionRecord | null> {
+    const row = await this.getHabitCompletionRow(habitId, date);
+    return row ? convertDBRowToHabitCompletion(row) : null;
+  }
+
+  /**
+   * Add a completion for a habit
+   */
+  async addHabitCompletion(
+    habitId: string,
+    completedDate: Date = new Date(),
+  ): Promise<HabitCompletionRecord | null> {
+    const habit = await this.getHabitById(habitId);
+
+    if (!habit) {
+      throw new Error(`Habit with id ${habitId} not found`);
+    }
+
+    const existingCompletion = await this.getHabitCompletionRow(
+      habitId,
+      completedDate,
+    );
+    if (existingCompletion) {
+      return convertDBRowToHabitCompletion(existingCompletion);
+    }
+
+    const now = Date.now();
+    const startOfDay = getStartOfDayTimestamp(completedDate);
+    const completionId = `habit_completion_${now}_${Math.random().toString(36).slice(2, 10)}`;
+
+    await executeAsync(
+      `INSERT INTO habit_completion (id, habitId, completedDate, createdAt)
+       VALUES (?, ?, ?, ?)`,
+      [completionId, habitId, startOfDay, now],
+    );
+
+    await executeAsync("UPDATE habits SET updatedAt = ? WHERE id = ?", [
+      now,
+      habitId,
+    ]);
+
+    return this.getHabitCompletionByDate(habitId, completedDate);
+  }
+
+  /**
+   * Remove a completion for a habit
+   */
+  async removeHabitCompletion(
+    habitId: string,
+    completedDate: Date = new Date(),
+  ): Promise<boolean> {
+    const habit = await this.getHabitById(habitId);
+
+    if (!habit) {
+      throw new Error(`Habit with id ${habitId} not found`);
+    }
+
+    const startOfDay = getStartOfDayTimestamp(completedDate);
+    const result = await executeAsync(
+      "DELETE FROM habit_completion WHERE habitId = ? AND completedDate = ?",
+      [habitId, startOfDay],
+    );
+
+    if ((result.changes ?? 0) > 0) {
+      await executeAsync("UPDATE habits SET updatedAt = ? WHERE id = ?", [
+        Date.now(),
+        habitId,
+      ]);
+    }
+
+    return (result.changes ?? 0) > 0;
+  }
+
+  /**
+   * Toggle habit completion for a date
+   */
+  async toggleHabitCompletion(
+    habitId: string,
+    completedDate: Date = new Date(),
+  ): Promise<Habit | null> {
+    const existingCompletion = await this.getHabitCompletionRow(
+      habitId,
+      completedDate,
+    );
+
+    if (existingCompletion) {
+      await this.removeHabitCompletion(habitId, completedDate);
+    } else {
+      await this.addHabitCompletion(habitId, completedDate);
+    }
+
+    return this.getHabitById(habitId);
   }
 
   /**

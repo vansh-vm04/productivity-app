@@ -3,18 +3,18 @@ import {
   HabitCardMonthly,
   HabitCardWeekly,
 } from "@/features/habits/components";
-import { HABITS_MOCKS } from "@/features/habits/mocks/habits.mocks";
-import { filterHabitsByPeriod } from "@/features/habits/ui/habits.helper";
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { HABIT_PERIODS, HabitPeriod } from "@/shared/constants/habits";
-import { CARD_PALETTES, PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
+import { useHabits } from "@/shared/hooks";
+import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Habit } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -25,14 +25,14 @@ import {
 
 export default function Habits() {
   const router = useRouter();
+  const { habits, deleteHabit, toggleHabitCompletion, refetch, getHabitCompletionsByHabitId } = useHabits();
   const [activePeriod, setActivePeriod] = useState<HabitPeriod>("today");
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [habits, setHabits] = useState<Habit[]>(HABITS_MOCKS);
 
-  const filteredHabits = useMemo(() => {
-    return filterHabitsByPeriod(habits, activePeriod);
-  }, [activePeriod, habits]);
+  useFocusEffect(() =>{
+      refetch();
+  })
 
   // Helper function to generate weekly completion data
   const getWeeklyCompletedDays = (habit: Habit): string[] => {
@@ -61,20 +61,8 @@ export default function Habits() {
     return dates;
   };
 
-  const toggleHabit = (id: string) => {
-    setHabits(
-      habits.map((habit) =>
-        habit.id === id
-          ? {
-              ...habit,
-              completed: !habit.completed,
-              lastCompletedAt: !habit.completed
-                ? new Date()
-                : habit.lastCompletedAt,
-            }
-          : habit,
-      ),
-    );
+  const toggleHabit = async (id: string) => {
+    await toggleHabitCompletion(id);
   };
 
   const handleLongPress = (habit: Habit) => {
@@ -82,16 +70,16 @@ export default function Habits() {
     setModalVisible(true);
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (selectedHabit) {
-      toggleHabit(selectedHabit.id);
+      await toggleHabit(selectedHabit.id);
     }
     setModalVisible(false);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedHabit) {
-      setHabits(habits.filter((habit) => habit.id !== selectedHabit.id));
+      await deleteHabit(selectedHabit.id);
     }
     setModalVisible(false);
   };
@@ -191,17 +179,13 @@ export default function Habits() {
           contentContainerStyle={styles.scrollContent}
           bounces={true}
         >
-          {filteredHabits.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>No habits yet</Text>
-              <Text style={styles.emptyStateSubText}>
-                Create your first habit to get started!
-              </Text>
-            </View>
+          {habits.length === 0 ? (
+            <EmptyState
+              title="No habits yet"
+              subtitle="Create your first habit to get started"
+            />
           ) : (
-            filteredHabits.map((habit, index) => {
-              const colors = CARD_PALETTES[index % CARD_PALETTES.length];
-
+            habits.map((habit) => {
               if (activePeriod === "weekly") {
                 return (
                   <HabitCardWeekly

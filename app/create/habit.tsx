@@ -10,6 +10,7 @@ import {
   HABIT_TYPES,
 } from "@/shared/constants/habits";
 import { PRIORITY_TAGS, PriorityType } from "@/shared/constants/tags";
+import { useHabits } from "@/shared/hooks";
 import {
   BACKGROUND,
   BORDER,
@@ -22,7 +23,7 @@ import { HabitData } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -34,6 +35,15 @@ import {
   View,
 } from "react-native";
 
+const defaultReminders: HabitData["reminders"] = [
+  {
+    id: "1",
+    time: "09:00",
+    label: "morning",
+    enabled: true,
+  },
+];
+
 export default function CreateHabit() {
   const router = useRouter();
   const params = useLocalSearchParams<{
@@ -43,10 +53,15 @@ export default function CreateHabit() {
     category?: string;
   }>();
 
+  const { createHabit, updateHabit, getHabitById } = useHabits(false);
+
   const isEditMode = params.mode === "edit";
 
+  const generateHabitId = () =>
+    `habit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
   const [habitData, setHabitData] = useState<HabitData>({
-    id: typeof params.habitId === "string" ? params.habitId : undefined,
+    id: typeof params.habitId === "string" ? params.habitId : generateHabitId(),
     name: typeof params.name === "string" ? params.name : "",
     icon: "🎯",
     category: "health",
@@ -58,20 +73,52 @@ export default function CreateHabit() {
     frequency: {
       type: "daily",
     },
-    reminders: [
-      {
-        id: "1",
-        time: "09:00",
-        label: "morning",
-        enabled: true,
-      },
-    ],
+    reminders: defaultReminders,
   });
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showReminderTimePicker, setShowReminderTimePicker] = useState(false);
   const [selectedReminderIndex, setSelectedReminderIndex] = useState(0);
   const [customCategoryInput, setCustomCategoryInput] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (isEditMode && typeof params.habitId === "string") {
+      const loadHabit = async () => {
+        const existingHabit = await getHabitById(params.habitId as string);
+
+        if (!existingHabit) return;
+
+        const frequencyDetails: HabitData["frequency"] =
+          existingHabit.frequency === "weekly"
+            ? { type: "specific_days", specificDays: [] }
+            : existingHabit.frequency === "monthly"
+              ? { type: "custom", interval: 1 }
+              : { type: "daily" };
+
+        setHabitData({
+          id: existingHabit.id,
+          name: existingHabit.name,
+          icon: existingHabit.icon,
+          category: existingHabit.category,
+          customCategory: existingHabit.customCategory,
+          priority: existingHabit.priority,
+          type: existingHabit.type,
+          targetCount: existingHabit.targetCount ?? 1,
+          countUnit: existingHabit.countUnit ?? "",
+          targetDuration: existingHabit.targetDuration ?? 30,
+          frequency: frequencyDetails,
+          reminders: defaultReminders,
+        });
+
+        if (existingHabit.category === "custom") {
+          setCustomCategoryInput(existingHabit.customCategory || "");
+        }
+      };
+
+      loadHabit();
+    }
+  }, [getHabitById, isEditMode, params.habitId]);
 
   const handleReminderTimeChange = (event: any, selectedTime?: Date) => {
     if (Platform.OS === "android") {
@@ -106,22 +153,43 @@ export default function CreateHabit() {
     });
   };
 
-  const handleCreateHabit = () => {
+  const handleCreateHabit = async () => {
     if (!habitData.name.trim()) {
       alert("Please enter a habit name");
       return;
     }
 
-    console.log(isEditMode ? "Updating habit:" : "Creating habit:", {
-      ...habitData,
-      category:
-        habitData.category === "custom"
-          ? customCategoryInput
-          : habitData.category,
-    });
+    try {
+      setIsSaving(true);
+      const habitPayload: HabitData & { id: string } = {
+        ...habitData,
+        id: habitData.id || generateHabitId(),
+        customCategory:
+          habitData.category === "custom" ? customCategoryInput : undefined,
+      };
 
-    // TODO: Save habit to database/state
-    router.back();
+      if (isEditMode) {
+        await updateHabit(habitPayload.id, {
+          name: habitPayload.name,
+          icon: habitPayload.icon,
+          category: habitPayload.category,
+          customCategory: habitPayload.customCategory,
+          priority: habitPayload.priority,
+          type: habitPayload.type,
+          targetCount: habitPayload.targetCount,
+          countUnit: habitPayload.countUnit,
+          targetDuration: habitPayload.targetDuration,
+          frequency: habitPayload.frequency,
+          reminders: habitPayload.reminders,
+        });
+      } else {
+        await createHabit(habitPayload);
+      }
+
+      router.back();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -459,6 +527,7 @@ export default function CreateHabit() {
             onCancel={() => router.back()}
             onSubmit={handleCreateHabit}
             submitLabel={isEditMode ? "Update Habit" : "Create Habit"}
+            isLoading={isSaving}
           />
         </ScrollView>
       </KeyboardAvoidingView>
