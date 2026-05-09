@@ -14,7 +14,7 @@ import { Habit } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -28,18 +28,33 @@ export default function Habits() {
   const {
     habits,
     deleteHabit,
+    getHabitCompletionValuesByDate,
+    removeHabitCompletion,
+    setHabitCompletionValue,
     toggleHabitCompletion,
     refetch,
   } = useHabits();
   const [activePeriod, setActivePeriod] = useState<HabitPeriod>("today");
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [todayCompletionValues, setTodayCompletionValues] = useState<
+    Record<string, number>
+  >({});
 
   useFocusEffect(
     useCallback(() => {
       refetch();
     }, [refetch]),
   );
+
+  useEffect(() => {
+    const loadTodayCompletionValues = async () => {
+      const values = await getHabitCompletionValuesByDate(new Date());
+      setTodayCompletionValues(values);
+    };
+
+    loadTodayCompletionValues();
+  }, [habits, getHabitCompletionValuesByDate]);
 
   // Helper function to generate weekly completion data
   const getWeeklyCompletedDays = (habit: Habit): string[] => {
@@ -69,7 +84,33 @@ export default function Habits() {
   };
 
   const toggleHabit = async (id: string) => {
-    await toggleHabitCompletion(id);
+    const habit = habits.find((item) => item.id === id);
+    const completionValue =
+      habit?.type === "time"
+        ? (habit?.targetDuration ?? 1)
+        : habit?.type === "count"
+          ? (habit?.targetCount ?? 1)
+          : 1;
+
+    await toggleHabitCompletion(id, new Date(), completionValue);
+  };
+
+  const updateHabitValue = async (habitId: string, value: number) => {
+    if (value <= 0) {
+      setTodayCompletionValues((prev) => {
+        const next = { ...prev };
+        delete next[habitId];
+        return next;
+      });
+      await removeHabitCompletion(habitId, new Date());
+      return;
+    }
+
+    setTodayCompletionValues((prev) => ({
+      ...prev,
+      [habitId]: value,
+    }));
+    await setHabitCompletionValue(habitId, new Date(), value);
   };
 
   const handleLongPress = (habit: Habit) => {
@@ -222,7 +263,16 @@ export default function Habits() {
                 <HabitCard
                   key={habit.id}
                   habit={habit}
-                  onPress={() => toggleHabit(habit.id)}
+                  onPress={
+                    habit.type === "binary"
+                      ? () => toggleHabit(habit.id)
+                      : undefined
+                  }
+                  onCountChange={(value) => updateHabitValue(habit.id, value)}
+                  onDurationChange={(value) =>
+                    updateHabitValue(habit.id, value)
+                  }
+                  completionValue={todayCompletionValues[habit.id] ?? 0}
                   onLongPress={() => handleLongPress(habit)}
                 />
               );

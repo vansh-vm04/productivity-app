@@ -10,6 +10,9 @@ interface UseHabitsState {
 
 interface UseHabitsReturn extends UseHabitsState {
   refetch: () => Promise<void>;
+  getHabitCompletionValuesByDate: (
+    date?: Date,
+  ) => Promise<Record<string, number>>;
   createHabit: (habit: HabitData & { id: string }) => Promise<Habit | null>;
   updateHabit: (
     id: string,
@@ -24,6 +27,7 @@ interface UseHabitsReturn extends UseHabitsState {
       id: string;
       habitId: string;
       completedDate: Date;
+      value: number;
       createdAt: number;
     }[]
   >;
@@ -35,15 +39,29 @@ interface UseHabitsReturn extends UseHabitsState {
     habitId: string;
     completedDate: Date;
     createdAt: number;
+    value: number;
   } | null>;
   addHabitCompletion: (
     habitId: string,
     completedDate?: Date,
+    value?: number,
   ) => Promise<{
     id: string;
     habitId: string;
     completedDate: Date;
     createdAt: number;
+    value: number;
+  } | null>;
+  setHabitCompletionValue: (
+    habitId: string,
+    completedDate: Date | undefined,
+    value: number,
+  ) => Promise<{
+    id: string;
+    habitId: string;
+    completedDate: Date;
+    createdAt: number;
+    value: number;
   } | null>;
   removeHabitCompletion: (
     habitId: string,
@@ -52,6 +70,7 @@ interface UseHabitsReturn extends UseHabitsState {
   toggleHabitCompletion: (
     habitId: string,
     completedDate?: Date,
+    value?: number,
   ) => Promise<Habit | null>;
 }
 
@@ -187,6 +206,28 @@ export const useHabits = (autoFetch = true): UseHabitsReturn => {
     [],
   );
 
+  const getHabitCompletionValuesByDate = useCallback(async (date?: Date) => {
+    try {
+      const completionMap =
+        await habitsRepository.getHabitCompletionMapByDate(date);
+
+      const values: Record<string, number> = {};
+      completionMap.forEach((completion, habitId) => {
+        values[habitId] = completion.value;
+      });
+
+      return values;
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch habit completion values";
+      setError(message);
+      console.error("Error fetching habit completion values:", err);
+      return {};
+    }
+  }, []);
+
   const getHabitCompletionsByHabitId = useCallback(async (habitId: string) => {
     try {
       return await habitsRepository.getHabitCompletionsByHabitId(habitId);
@@ -219,11 +260,12 @@ export const useHabits = (autoFetch = true): UseHabitsReturn => {
   );
 
   const addHabitCompletion = useCallback(
-    async (habitId: string, completedDate?: Date) => {
+    async (habitId: string, completedDate?: Date, value?: number) => {
       try {
         return await habitsRepository.addHabitCompletion(
           habitId,
           completedDate,
+          value,
         );
       } catch (err) {
         const message =
@@ -236,13 +278,38 @@ export const useHabits = (autoFetch = true): UseHabitsReturn => {
     [],
   );
 
+  const setHabitCompletionValue = useCallback(
+    async (habitId: string, completedDate: Date | undefined, value: number) => {
+      try {
+        const completion = await habitsRepository.setHabitCompletionValue(
+          habitId,
+          completedDate,
+          value,
+        );
+        await refetch();
+        return completion;
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Failed to update habit completion";
+        setError(message);
+        console.error("Error updating habit completion:", err);
+        return null;
+      }
+    },
+    [refetch],
+  );
+
   const removeHabitCompletion = useCallback(
     async (habitId: string, completedDate?: Date) => {
       try {
-        return await habitsRepository.removeHabitCompletion(
+        const removed = await habitsRepository.removeHabitCompletion(
           habitId,
           completedDate,
         );
+        await refetch();
+        return removed;
       } catch (err) {
         const message =
           err instanceof Error
@@ -253,15 +320,16 @@ export const useHabits = (autoFetch = true): UseHabitsReturn => {
         return false;
       }
     },
-    [],
+    [refetch],
   );
 
   const toggleHabitCompletion = useCallback(
-    async (habitId: string, completedDate?: Date) => {
+    async (habitId: string, completedDate?: Date, value?: number) => {
       try {
         const updatedHabit = await habitsRepository.toggleHabitCompletion(
           habitId,
           completedDate,
+          value,
         );
         await refetch();
         return updatedHabit;
@@ -283,6 +351,7 @@ export const useHabits = (autoFetch = true): UseHabitsReturn => {
     loading,
     error,
     refetch,
+    getHabitCompletionValuesByDate,
     createHabit,
     updateHabit,
     deleteHabit,
@@ -292,6 +361,7 @@ export const useHabits = (autoFetch = true): UseHabitsReturn => {
     getHabitCompletionsByHabitId,
     getHabitCompletionByDate,
     addHabitCompletion,
+    setHabitCompletionValue,
     removeHabitCompletion,
     toggleHabitCompletion,
   };

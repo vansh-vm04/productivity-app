@@ -37,6 +37,7 @@ export const initializeHabitsSchema = async (): Promise<void> => {
         id TEXT PRIMARY KEY,
         habitId TEXT NOT NULL,
         completedDate INTEGER NOT NULL,
+        value INTEGER DEFAULT NULL,
         createdAt INTEGER NOT NULL,
         FOREIGN KEY (habitId) REFERENCES habits(id) ON DELETE CASCADE
       );

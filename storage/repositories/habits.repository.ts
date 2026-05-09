@@ -14,6 +14,7 @@ interface HabitCompletionRowDB {
   id: string;
   habitId: string;
   completedDate: number;
+  value: number;
   createdAt: number;
 }
 
@@ -38,6 +39,7 @@ export interface HabitCompletionRecord {
   id: string;
   habitId: string;
   completedDate: Date;
+  value: number;
   createdAt: number;
 }
 
@@ -73,7 +75,10 @@ const mapFrequencyDetailsToHabitFrequency = (
   }
 };
 
-const convertDBRowToHabit = (row: HabitRowDB, completed = false): Habit => {
+const convertDBRowToHabit = (
+  row: HabitRowDB,
+  completion: HabitCompletionRowDB | null = null,
+): Habit => {
   const frequencyDetails = parseJson<FrequencyDetails>(row.frequencyDetails, {
     type: "daily",
   });
@@ -83,7 +88,7 @@ const convertDBRowToHabit = (row: HabitRowDB, completed = false): Habit => {
     name: row.name,
     icon: row.icon,
     streak: row.streak,
-    completed,
+    completed: Boolean(completion),
     frequency:
       (row.frequency as HabitFrequency) ||
       mapFrequencyDetailsToHabitFrequency(frequencyDetails),
@@ -105,8 +110,21 @@ const convertDBRowToHabitCompletion = (
   id: row.id,
   habitId: row.habitId,
   completedDate: new Date(row.completedDate),
+  value: row.value,
   createdAt: row.createdAt,
 });
+
+const getCompletionValueForHabit = (habit: Habit): number => {
+  if (habit.type === "time") {
+    return habit.targetDuration ?? 1;
+  }
+
+  if (habit.type === "count") {
+    return habit.targetCount ?? 1;
+  }
+
+  return 1;
+};
 
 class HabitsRepository {
   private async getCompletedHabitIdsByDate(
@@ -130,6 +148,18 @@ class HabitsRepository {
       "SELECT * FROM habit_completion WHERE habitId = ? AND completedDate = ?",
       [habitId, completedDate],
     );
+  }
+
+  async getHabitCompletionMapByDate(
+    date: Date = new Date(),
+  ): Promise<Map<string, HabitCompletionRowDB>> {
+    const completedDate = getStartOfDayTimestamp(date);
+    const rows = await getAllAsync<HabitCompletionRowDB>(
+      "SELECT * FROM habit_completion WHERE completedDate = ?",
+      [completedDate],
+    );
+
+    return new Map(rows.map((row) => [row.habitId, row]));
   }
 
   /**
@@ -182,12 +212,12 @@ class HabitsRepository {
    * Get all habits
    */
   async getAllHabits(): Promise<Habit[]> {
-    const completedHabitIds = await this.getCompletedHabitIdsByDate();
+    const completionMap = await this.getHabitCompletionMapByDate();
     const rows = await getAllAsync<HabitRowDB>(
       "SELECT * FROM habits ORDER BY createdAt DESC",
     );
     return rows.map((row) =>
-      convertDBRowToHabit(row, completedHabitIds.has(row.id)),
+      convertDBRowToHabit(row, completionMap.get(row.id) ?? null),
     );
   }
 
@@ -195,23 +225,28 @@ class HabitsRepository {
    * Get habit by ID
    */
   async getHabitById(id: string): Promise<Habit | null> {
-    const completedHabitIds = await this.getCompletedHabitIdsByDate();
+    const completionMap = await this.getHabitCompletionMapByDate();
     const row = await getFirstAsync<HabitRowDB>(
       "SELECT * FROM habits WHERE id = ?",
       [id],
     );
-    return row ? convertDBRowToHabit(row, completedHabitIds.has(row.id)) : null;
+    return row
+      ? convertDBRowToHabit(row, completionMap.get(row.id) ?? null)
+      : null;
   }
 
   /**
    * Get habits by category
    */
   async getHabitsByCategory(category: string): Promise<Habit[]> {
+    const completionMap = await this.getHabitCompletionMapByDate();
     const rows = await getAllAsync<HabitRowDB>(
       "SELECT * FROM habits WHERE category = ? ORDER BY createdAt DESC",
       [category],
     );
-    return rows.map((row) => convertDBRowToHabit(row));
+    return rows.map((row) =>
+      convertDBRowToHabit(row, completionMap.get(row.id) ?? null),
+    );
   }
 
   /**
@@ -245,6 +280,7 @@ class HabitsRepository {
   async addHabitCompletion(
     habitId: string,
     completedDate: Date = new Date(),
+    value?: number,
   ): Promise<HabitCompletionRecord | null> {
     const habit = await this.getHabitById(habitId);
 
@@ -263,12 +299,71 @@ class HabitsRepository {
     const now = Date.now();
     const startOfDay = getStartOfDayTimestamp(completedDate);
     const completionId = `habit_completion_${now}_${Math.random().toString(36).slice(2, 10)}`;
+    const completionValue = value ?? getCompletionValueForHabit(habit);
 
     await executeAsync(
-      `INSERT INTO habit_completion (id, habitId, completedDate, createdAt)
-       VALUES (?, ?, ?, ?)`,
-      [completionId, habitId, startOfDay, now],
+      `INSERT INTO habit_completion (id, habitId, completedDate, value, createdAt)
+       VALUES (?, ?, ?, ?, ?)`,
+      [completionId, habitId, startOfDay, completionValue, now],
     );
+
+    await executeAsync("UPDATE habits SET updatedAt = ? WHERE id = ?", [
+      now,
+      habitId,
+    ]);
+
+    return this.getHabitCompletionByDate(habitId, completedDate);
+  }
+
+  /**
+   * Set or update the completion value for a habit on a specific date
+   */
+  async setHabitCompletionValue(
+    habitId: string,
+    completedDate: Date = new Date(),
+    value: number,
+  ): Promise<HabitCompletionRecord | null> {
+    const habit = await this.getHabitById(habitId);
+
+    if (!habit) {
+      throw new Error(`Habit with id ${habitId} not found`);
+    }
+
+    const normalizedValue = Math.max(0, Math.floor(value));
+    const existingCompletion = await this.getHabitCompletionRow(
+      habitId,
+      completedDate,
+    );
+
+    if (normalizedValue === 0) {
+      if (existingCompletion) {
+        await this.removeHabitCompletion(habitId, completedDate);
+      }
+
+      return null;
+    }
+
+    const now = Date.now();
+    const startOfDay = getStartOfDayTimestamp(completedDate);
+
+    if (existingCompletion) {
+      await executeAsync(
+        "UPDATE habit_completion SET value = ? WHERE habitId = ? AND completedDate = ?",
+        [normalizedValue, habitId, startOfDay],
+      );
+    } else {
+      await executeAsync(
+        `INSERT INTO habit_completion (id, habitId, completedDate, value, createdAt)
+         VALUES (?, ?, ?, ?, ?)`,
+        [
+          `habit_completion_${now}_${Math.random().toString(36).slice(2, 10)}`,
+          habitId,
+          startOfDay,
+          normalizedValue,
+          now,
+        ],
+      );
+    }
 
     await executeAsync("UPDATE habits SET updatedAt = ? WHERE id = ?", [
       now,
@@ -313,6 +408,7 @@ class HabitsRepository {
   async toggleHabitCompletion(
     habitId: string,
     completedDate: Date = new Date(),
+    value?: number,
   ): Promise<Habit | null> {
     const existingCompletion = await this.getHabitCompletionRow(
       habitId,
@@ -322,7 +418,7 @@ class HabitsRepository {
     if (existingCompletion) {
       await this.removeHabitCompletion(habitId, completedDate);
     } else {
-      await this.addHabitCompletion(habitId, completedDate);
+      await this.addHabitCompletion(habitId, completedDate, value);
     }
 
     return this.getHabitById(habitId);
