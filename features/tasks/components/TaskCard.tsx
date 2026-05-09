@@ -2,6 +2,7 @@ import {
   formatTaskDueDate,
   getTaskCategoryIcon,
 } from "@/features/tasks/ui/tasks.helper";
+import { formatTimestamp } from "@/shared/utils/formatTimestamp";
 import { CATEGORY_TAGS, PRIORITY_TAGS } from "@/shared/constants/tags";
 import { PRIMARY, TAG, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
@@ -145,8 +146,11 @@ export const TaskCard = React.memo(
                 </Text>
               </View>
             )}
+            <Text style={styles.createdAtText}>
+              {formatTimestamp(new Date(task.createdAt))}
+            </Text>
           </View>
-        </View>
+          </View>
       </TouchableOpacity>
     );
   },
@@ -212,6 +216,12 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(11),
     fontFamily: fonts.medium,
     color: TEXT.secondary,
+    paddingTop: moderateScale(2),
+  },
+  createdAtText: {
+    fontSize: responsiveFontSize(10),
+    fontFamily: fonts.regular,
+    color: TEXT.tertiary,
     paddingTop: moderateScale(2),
   },
   cardFooter: {

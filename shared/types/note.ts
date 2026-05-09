@@ -21,7 +21,7 @@ export type Note = {
   body: string;
   category: Exclude<NoteCategory, "all"> | string;
   customCategory?: string;
-  updatedAt: string;
+  updatedAt: Date;
 };
 
 export type NoteData = {

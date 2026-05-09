@@ -10,7 +10,7 @@ import {
   HABIT_TYPES,
 } from "@/shared/constants/habits";
 import { PRIORITY_TAGS, PriorityType } from "@/shared/constants/tags";
-import { useHabits } from "@/shared/hooks";
+import { useHabits } from "@/features/habits/hooks/useHabits";
 import {
   BACKGROUND,
   BORDER,

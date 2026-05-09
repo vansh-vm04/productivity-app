@@ -1,8 +1,8 @@
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
 import { EmptyState } from "@/shared/components/EmptyState";
-import { TaskCard } from "@/shared/components/TaskCard";
-import { useTasks } from "@/shared/hooks";
+import { TaskCard } from "@/features/tasks/components/TaskCard";
+import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Task } from "@/shared/types/task";

@@ -7,7 +7,7 @@ import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { HABIT_PERIODS, HabitPeriod } from "@/shared/constants/habits";
-import { useHabits } from "@/shared/hooks";
+import { useHabits } from "@/features/habits/hooks/useHabits";
 import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Habit } from "@/shared/types/habit";
@@ -25,14 +25,21 @@ import {
 
 export default function Habits() {
   const router = useRouter();
-  const { habits, deleteHabit, toggleHabitCompletion, refetch, getHabitCompletionsByHabitId } = useHabits();
+  const {
+    habits,
+    deleteHabit,
+    toggleHabitCompletion,
+    refetch,
+  } = useHabits();
   const [activePeriod, setActivePeriod] = useState<HabitPeriod>("today");
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  useFocusEffect(() =>{
+  useFocusEffect(
+    useCallback(() => {
       refetch();
-  })
+    }, [refetch]),
+  );
 
   // Helper function to generate weekly completion data
   const getWeeklyCompletedDays = (habit: Habit): string[] => {

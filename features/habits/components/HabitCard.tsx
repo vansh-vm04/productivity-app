@@ -1,6 +1,7 @@
 import { PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Habit } from "@/shared/types/habit";
+import { formatTimestamp } from "@/shared/utils/formatTimestamp";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
@@ -38,15 +39,18 @@ export const HabitCard = React.memo(
             </Text>
             <View style={styles.streakContainer}>
               <MaterialCommunityIcons
-              name="check"
-              size={moderateScale(16)}
-              color="#ffffff"
-              style={styles.fireEmoji}
+                name="check"
+                size={moderateScale(16)}
+                color="#ffffff"
+                style={styles.fireEmoji}
               />
               <Text style={[styles.streakText, { color: PRIMARY.main }]}>
                 {habit.streak} days completed
               </Text>
             </View>
+            <Text style={styles.timestampText}>
+              {formatTimestamp(habit.createdAt)}
+            </Text>
           </View>
         </View>
 
@@ -144,6 +148,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: TEXT.secondary,
     lineHeight: moderateScale(14),
+  },
+  timestampText: {
+    fontSize: responsiveFontSize(11),
+    fontFamily: fonts.regular,
+    color: TEXT.tertiary,
+    marginTop: moderateScale(4),
   },
   checkbox: {
     width: moderateScale(28),

@@ -1,8 +1,8 @@
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
 import { EmptyState } from "@/shared/components/EmptyState";
-import { NoteCard } from "@/shared/components/NoteCard";
-import { useNotes } from "@/shared/hooks";
+import { NoteCard } from "@/features/notes/components/NoteCard";
+import { useNotes } from "@/features/notes/hooks/useNotes";
 import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Note, NoteCategory } from "@/shared/types/note";

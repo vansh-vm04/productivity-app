@@ -13,7 +13,7 @@ import {
   PRIORITY_TAGS,
   PriorityType,
 } from "@/shared/constants/tags";
-import { useTasks } from "@/shared/hooks";
+import { useTasks } from "@/features/tasks/hooks/useTasks";
 import {
   BACKGROUND,
   BORDER,

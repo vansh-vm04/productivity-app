@@ -1,6 +1,6 @@
 import { EmptyState } from "@/shared/components/EmptyState";
-import { TaskCard } from "@/shared/components/TaskCard";
-import { useTasks } from "@/shared/hooks";
+import { TaskCard } from "@/features/tasks/components/TaskCard";
+import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { BORDER, SURFACE, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Task } from "@/shared/types/task";
@@ -10,8 +10,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function TasksScrollable() {
-  const { getTasksDueToday, toggleTaskCompletion } = useTasks(false);
+  const { getTasksDueToday, toggleTaskCompletion, refetch } = useTasks(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   // Load today's tasks
   const loadTodaysTasks = useCallback(async () => {

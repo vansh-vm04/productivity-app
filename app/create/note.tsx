@@ -1,6 +1,6 @@
 import { CapsuleSelector } from "@/shared/components/CapsuleSelector";
 import { NOTE_CATEGORIES } from "@/shared/constants/notes";
-import { useNotes } from "@/shared/hooks";
+import { useNotes } from "@/features/notes/hooks/useNotes";
 import { BACKGROUND, PRIMARY, SURFACE, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { CreateNoteParams, NoteData } from "@/shared/types/note";
@@ -342,7 +342,7 @@ function CreateNote() {
           <TouchableOpacity
             style={[styles.micButton, isListening && styles.micButtonActive]}
             activeOpacity={0.9}
-            onLongPress={handleStartListening}
+            onPressIn={handleStartListening}
             onPressOut={handleStopListening}
           >
             <MaterialCommunityIcons

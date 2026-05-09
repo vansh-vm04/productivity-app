@@ -17,7 +17,7 @@ const convertDBRowToNote = (row: NoteRowDB): Note => ({
   body: row.body,
   category: row.category,
   customCategory: row.customCategory || undefined,
-  updatedAt: row.updatedAt.toString(),
+  updatedAt: new Date(row.updatedAt),
 });
 
 class NotesRepository {

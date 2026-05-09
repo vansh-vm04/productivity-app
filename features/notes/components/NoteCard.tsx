@@ -2,6 +2,7 @@ import { NOTE_CARD_PALETTES, PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Note } from "@/shared/types/note";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
+import { formatTimestamp } from "@/shared/utils/formatTimestamp";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -49,7 +50,7 @@ export const NoteCard = React.memo(
 
         <Text style={styles.noteCardBody}>{note.body}</Text>
 
-        <Text style={styles.noteCardDate}>{note.updatedAt}</Text>
+        <Text style={styles.noteCardDate}>{formatTimestamp(note.updatedAt)}</Text>
       </TouchableOpacity>
     );
   },
