@@ -23,7 +23,6 @@ interface HabitRowDB {
   icon: string;
   category: string;
   customCategory: string | null;
-  priority: string;
   type: string;
   targetCount: number | null;
   countUnit: string | null;
@@ -90,11 +89,8 @@ const convertDBRowToHabit = (row: HabitRowDB, completed = false): Habit => {
       mapFrequencyDetailsToHabitFrequency(frequencyDetails),
     createdAt: new Date(row.createdAt),
     lastCompletedAt: undefined,
-    backgroundColor: "#FFFFFF",
-    accentColor: "#059669",
     category: row.category as Habit["category"],
     customCategory: row.customCategory || undefined,
-    priority: row.priority as Habit["priority"],
     type: row.type as Habit["type"],
     targetCount: row.targetCount ?? undefined,
     countUnit: row.countUnit ?? undefined,
@@ -151,7 +147,6 @@ class HabitsRepository {
         icon,
         category,
         customCategory,
-        priority,
         type,
         targetCount,
         countUnit,
@@ -161,14 +156,13 @@ class HabitsRepository {
         streak,
         createdAt,
         updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         habit.id,
         habit.name,
         habit.icon,
         habit.category,
         habit.customCategory || null,
-        habit.priority,
         habit.type,
         habit.targetCount ?? null,
         habit.countUnit ?? null,
@@ -216,17 +210,6 @@ class HabitsRepository {
     const rows = await getAllAsync<HabitRowDB>(
       "SELECT * FROM habits WHERE category = ? ORDER BY createdAt DESC",
       [category],
-    );
-    return rows.map((row) => convertDBRowToHabit(row));
-  }
-
-  /**
-   * Get habits by priority
-   */
-  async getHabitsByPriority(priority: string): Promise<Habit[]> {
-    const rows = await getAllAsync<HabitRowDB>(
-      "SELECT * FROM habits WHERE priority = ? ORDER BY createdAt DESC",
-      [priority],
     );
     return rows.map((row) => convertDBRowToHabit(row));
   }
@@ -377,10 +360,6 @@ class HabitsRepository {
     if (updates.customCategory !== undefined) {
       updateFields.push("customCategory = ?");
       values.push(updates.customCategory || null);
-    }
-    if (updates.priority !== undefined) {
-      updateFields.push("priority = ?");
-      values.push(updates.priority);
     }
     if (updates.type !== undefined) {
       updateFields.push("type = ?");

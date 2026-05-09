@@ -146,9 +146,6 @@ export const TaskCard = React.memo(
                 </Text>
               </View>
             )}
-            <Text style={styles.createdAtText}>
-              {formatTimestamp(new Date(task.createdAt))}
-            </Text>
           </View>
           </View>
       </TouchableOpacity>

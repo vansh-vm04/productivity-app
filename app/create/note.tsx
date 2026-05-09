@@ -17,6 +17,7 @@ import {
   KeyboardAvoidingView,
   Linking,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -85,7 +86,6 @@ function CreateNote() {
   useSpeechRecognitionEvent("error", (event) => {
     setIsListening(false);
     setTranscriptPreview("");
-    Alert.alert("Speech Error", event.message || "Unable to recognize speech.");
   });
 
   const askForPermissions = async () => {
@@ -339,18 +339,18 @@ function CreateNote() {
 
       <View style={styles.footer}>
         <View style={styles.toolsRow}>
-          <TouchableOpacity
+          <Pressable
             style={[styles.micButton, isListening && styles.micButtonActive]}
-            activeOpacity={0.9}
-            onPressIn={handleStartListening}
+            onLongPress={handleStartListening}
             onPressOut={handleStopListening}
+            delayLongPress={100}
           >
             <MaterialCommunityIcons
               name={isListening ? "microphone" : "microphone-outline"}
               size={moderateScale(28)}
               color={TEXT.button}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <Text style={styles.hintText}>
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
   },
   micButtonActive: {
     backgroundColor: PRIMARY.main,
-    transform: [{ scale: 1.04 }],
+    transform: [{ scale: 1.20 }],
   },
   hintText: {
     marginTop: moderateScale(8),

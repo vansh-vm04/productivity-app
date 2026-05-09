@@ -56,7 +56,7 @@ class TasksRepository {
    */
   async getAllTasks(): Promise<Task[]> {
     const rows = await getAllAsync<TaskRowDB>(
-      "SELECT * FROM tasks ORDER BY updatedAt DESC",
+      "SELECT * FROM tasks ORDER BY createdAt DESC",
     );
     return rows.map(convertDBRowToTask);
   }

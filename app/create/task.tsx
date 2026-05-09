@@ -77,7 +77,11 @@ export default function CreateTask() {
   const initialDueDate =
     typeof params.dueDate === "string" && params.dueDate
       ? new Date(params.dueDate)
-      : null;
+      : (() => {
+          const todayAtEndOfDay = new Date();
+          todayAtEndOfDay.setHours(23, 59, 0, 0);
+          return todayAtEndOfDay;
+        })();
 
   // Generate unique ID if not in edit mode
   const generateTaskId = () =>
@@ -409,15 +413,6 @@ export default function CreateTask() {
                 </Text>
               </TouchableOpacity>
             </View>
-
-            {taskData.dueDate && (
-              <TouchableOpacity
-                onPress={() => setTaskData({ ...taskData, dueDate: null })}
-                style={styles.clearDateButton}
-              >
-                <Text style={styles.clearDateText}>Clear date & time</Text>
-              </TouchableOpacity>
-            )}
           </View>
 
           {/* Date Picker Modal */}

@@ -9,7 +9,6 @@ import {
   HABIT_EMOJIS,
   HABIT_TYPES,
 } from "@/shared/constants/habits";
-import { PRIORITY_TAGS, PriorityType } from "@/shared/constants/tags";
 import { useHabits } from "@/features/habits/hooks/useHabits";
 import {
   BACKGROUND,
@@ -65,7 +64,6 @@ export default function CreateHabit() {
     name: typeof params.name === "string" ? params.name : "",
     icon: "🎯",
     category: "health",
-    priority: "normal",
     type: "binary",
     targetCount: 1,
     countUnit: "",
@@ -102,7 +100,6 @@ export default function CreateHabit() {
           icon: existingHabit.icon,
           category: existingHabit.category,
           customCategory: existingHabit.customCategory,
-          priority: existingHabit.priority,
           type: existingHabit.type,
           targetCount: existingHabit.targetCount ?? 1,
           countUnit: existingHabit.countUnit ?? "",
@@ -174,7 +171,6 @@ export default function CreateHabit() {
           icon: habitPayload.icon,
           category: habitPayload.category,
           customCategory: habitPayload.customCategory,
-          priority: habitPayload.priority,
           type: habitPayload.type,
           targetCount: habitPayload.targetCount,
           countUnit: habitPayload.countUnit,
@@ -303,18 +299,6 @@ export default function CreateHabit() {
                 />
               </View>
             )}
-          </View>
-
-          {/* Priority Selection */}
-          <View style={styles.section}>
-            <Text style={styles.label}>Priority</Text>
-            <CapsuleSelector
-              items={PRIORITY_TAGS}
-              selectedValue={habitData.priority}
-              onSelect={(key) =>
-                setHabitData({ ...habitData, priority: key as PriorityType })
-              }
-            />
           </View>
 
           {/* Habit Type Selection */}

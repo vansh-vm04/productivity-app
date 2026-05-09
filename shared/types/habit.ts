@@ -1,5 +1,3 @@
-import { PriorityType } from "@/shared/constants/tags";
-
 export type HabitFrequency = "daily" | "weekly" | "monthly";
 export type HabitType = "binary" | "count" | "time";
 export type HabitCategory =
@@ -29,7 +27,6 @@ export interface HabitData {
   icon: string;
   category: HabitCategory;
   customCategory?: string;
-  priority: PriorityType;
   type: HabitType;
   targetCount?: number; // For count-based habits
   countUnit?: string; // "glasses", "pages", etc.
@@ -47,11 +44,8 @@ export interface Habit {
   frequency: HabitFrequency;
   createdAt: Date;
   lastCompletedAt?: Date;
-  backgroundColor: string;
-  accentColor: string;
   category: HabitCategory;
   customCategory?: string;
-  priority: PriorityType;
   type: HabitType;
   targetCount?: number;
   countUnit?: string;

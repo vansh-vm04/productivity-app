@@ -10,7 +10,6 @@ export const initializeHabitsSchema = async (): Promise<void> => {
         icon TEXT NOT NULL,
         category TEXT NOT NULL,
         customCategory TEXT,
-        priority TEXT NOT NULL DEFAULT 'normal',
         type TEXT NOT NULL,
         targetCount INTEGER,
         countUnit TEXT,
