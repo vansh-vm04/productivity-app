@@ -1,7 +1,7 @@
 import {
   formatTaskDueDate,
   getTaskCategoryIcon,
-} from "@/features/tasks/ui/tasks.helper";
+} from "@/features/tasks/helpers/tasks.helper";
 import { formatTimestamp } from "@/shared/utils/formatTimestamp";
 import { CATEGORY_TAGS, PRIORITY_TAGS } from "@/shared/constants/tags";
 import { PRIMARY, TAG, TEXT } from "@/shared/theme/colors";

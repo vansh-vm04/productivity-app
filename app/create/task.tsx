@@ -3,7 +3,7 @@ import {
   formatTaskTime,
   isTaskCategoryType,
   isTaskPriorityType,
-} from "@/features/tasks/ui/tasks.helper";
+} from "@/features/tasks/helpers/tasks.helper";
 import { ActionButtons } from "@/shared/components/ActionButtons";
 import { CapsuleSelector } from "@/shared/components/CapsuleSelector";
 import { RemindersList } from "@/shared/components/RemindersList";
