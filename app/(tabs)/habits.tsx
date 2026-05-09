@@ -240,7 +240,6 @@ export default function Habits() {
                     key={habit.id}
                     habit={habit}
                     completedDays={getWeeklyCompletedDays(habit)}
-                    onPress={() => toggleHabit(habit.id)}
                     onLongPress={() => handleLongPress(habit)}
                   />
                 );
@@ -252,7 +251,6 @@ export default function Habits() {
                     key={habit.id}
                     habit={habit}
                     completionDates={getMonthlyCompletionDates(habit)}
-                    onPress={() => toggleHabit(habit.id)}
                     onLongPress={() => handleLongPress(habit)}
                   />
                 );

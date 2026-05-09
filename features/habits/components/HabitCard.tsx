@@ -32,6 +32,7 @@ export const HabitCard = React.memo(
     const durationValue = isTimeHabit ? completionValue : 0;
     const durationHours = Math.floor(durationValue / 60);
     const durationMinutes = durationValue % 60;
+    const isCompleted = isBinaryHabit ? habit.completed : isCountHabit ?  completionValue >= (habit.targetCount || 0) : completionValue >= (habit.targetDuration || 0);
 
     const handleCountChange = (delta: number) => {
       if (!isCountHabit) {
@@ -59,7 +60,6 @@ export const HabitCard = React.memo(
             backgroundColor: "#ffffff",
           },
         ]}
-        onPress={isBinaryHabit ? onPress : undefined}
         onLongPress={onLongPress}
         delayLongPress={300}
         activeOpacity={isBinaryHabit ? 0.8 : 1}
@@ -77,10 +77,10 @@ export const HabitCard = React.memo(
                 <MaterialCommunityIcons
                   name="check"
                   size={moderateScale(16)}
-                  color="#ffffff"
+                  color={isCompleted ? "#059669" : PRIMARY.main}
                   style={styles.fireEmoji}
                 />
-                <Text style={[styles.streakText, { color: PRIMARY.main }]}>
+                <Text style={[styles.streakText, { color: isCompleted ? "#059669" : PRIMARY.main }]}>
                   {habit.streak} days completed
                 </Text>
               </View>
@@ -92,23 +92,24 @@ export const HabitCard = React.memo(
               <TouchableOpacity
                 style={[
                   styles.completeButton,
-                  habit.completed && styles.completeButtonActive,
+                  isCompleted && styles.completeButtonActive,
                 ]}
                 onPress={onPress}
                 activeOpacity={0.85}
               >
-                <MaterialCommunityIcons
-                  name={habit.completed ? "check-circle" : "checkbox-blank-circle-outline"}
+                {isCompleted && (<MaterialCommunityIcons
+                  name={"check-circle"}
                   size={moderateScale(18)}
-                  color={habit.completed ? "#ffffff" : PRIMARY.main}
-                />
+                  color={"#ffffff"}
+                />)}
+                
                 <Text
                   style={[
                     styles.completeButtonText,
-                    habit.completed && styles.completeButtonTextActive,
+                    isCompleted && styles.completeButtonTextActive,
                   ]}
                 >
-                  {habit.completed ? "Completed" : "Complete"}
+                  {isCompleted ? "Completed" : "Complete"}
                 </Text>
               </TouchableOpacity>
             )}
@@ -116,9 +117,9 @@ export const HabitCard = React.memo(
             {isCountHabit && (
               <View style={styles.controlPanel}>
                 <View style={styles.controlHeader}>
-                  <Text style={styles.controlLabel}>Count</Text>
+                  <Text style={styles.controlLabel}>Today&apos;s target</Text>
                   <Text style={styles.controlSubLabel} numberOfLines={1}>
-                    {habit.targetCount ? `Goal ${habit.targetCount}` : "Set target"}
+                    {habit.targetCount ? `${habit.targetCount} ${habit.countUnit || ""}` : "Set target"}
                   </Text>
                 </View>
 
@@ -305,6 +306,7 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(13),
     fontFamily: fonts.semibold,
     color: PRIMARY.main,
+    lineHeight: moderateScale(18),
   },
   completeButtonTextActive: {
     color: "#ffffff",
@@ -429,7 +431,6 @@ const styles = StyleSheet.create({
   },
   fireEmoji: {
     fontSize: responsiveFontSize(14),
-    color: PRIMARY.main,
   },
   streakText: {
     fontSize: responsiveFontSize(12),

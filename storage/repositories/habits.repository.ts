@@ -82,18 +82,26 @@ const convertDBRowToHabit = (
   const frequencyDetails = parseJson<FrequencyDetails>(row.frequencyDetails, {
     type: "daily",
   });
+  const completionMeetsTarget = (comp: HabitCompletionRowDB | null) => {
+    if (!comp) return false;
+    if (row.type === "binary") return comp.value > 0;
+    if (row.type === "count" && row.targetCount) return comp.value >= row.targetCount;
+    if (row.type === "time" && row.targetDuration) return comp.value >= row.targetDuration;
+    return false;
+  };
 
+  const isCompleted = completionMeetsTarget(completion);
   return {
     id: row.id,
     name: row.name,
     icon: row.icon,
     streak: row.streak,
-    completed: Boolean(completion),
+    completed: isCompleted,
     frequency:
       (row.frequency as HabitFrequency) ||
       mapFrequencyDetailsToHabitFrequency(frequencyDetails),
     createdAt: new Date(row.createdAt),
-    lastCompletedAt: undefined,
+    lastCompletedAt: isCompleted && completion && completion.createdAt ? new Date(completion.createdAt) : undefined,
     category: row.category as Habit["category"],
     customCategory: row.customCategory || undefined,
     type: row.type as Habit["type"],
@@ -148,6 +156,63 @@ class HabitsRepository {
       "SELECT * FROM habit_completion WHERE habitId = ? AND completedDate = ?",
       [habitId, completedDate],
     );
+  }
+
+  private async recalculateStreak(habitId: string): Promise<number> {
+    const habit = await this.getHabitById(habitId);
+    
+    if (!habit) {
+      return 0;
+    }
+
+    const completions = await getAllAsync<HabitCompletionRowDB>(
+      "SELECT * FROM habit_completion WHERE habitId = ? ORDER BY completedDate DESC",
+      [habitId],
+    );
+
+    if (completions.length === 0) {
+      return 0;
+    }
+
+    const meetsTarget = (completion: HabitCompletionRowDB): boolean => {
+      if (habit.type === "binary") {
+        return completion.value > 0;
+      }
+      if (habit.type === "count" && habit.targetCount) {
+        return completion.value >= habit.targetCount;
+      }
+      if (habit.type === "time" && habit.targetDuration) {
+        return completion.value >= habit.targetDuration;
+      }
+      return false;
+    };
+
+    let streak = 0;
+    let currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    const currentTimestamp = currentDate.getTime();
+
+    for (const completion of completions) {
+      const dayTimestamp = getStartOfDayTimestamp(new Date(completion.completedDate));
+      
+      // Check if we're at or before the current date
+      if (dayTimestamp <= currentTimestamp) {
+        // Only count if value meets the target
+        if (meetsTarget(completion)) {
+          streak++;
+          currentDate.setDate(currentDate.getDate() - 1);
+          currentDate.setHours(0, 0, 0, 0);
+        } else {
+          // Stop counting if this completion doesn't meet target (break the streak)
+          break;
+        }
+      } else {
+        // Stop counting if we skip a day
+        break;
+      }
+    }
+
+    return streak;
   }
 
   async getHabitCompletionMapByDate(
@@ -300,12 +365,25 @@ class HabitsRepository {
     const startOfDay = getStartOfDayTimestamp(completedDate);
     const completionId = `habit_completion_${now}_${Math.random().toString(36).slice(2, 10)}`;
     const completionValue = value ?? getCompletionValueForHabit(habit);
+    const meetsTarget =
+      (habit.type === "binary" && completionValue > 0) ||
+      (habit.type === "count" && habit.targetCount && completionValue >= habit.targetCount) ||
+      (habit.type === "time" && habit.targetDuration && completionValue >= habit.targetDuration);
+
+    const createdAtValue = meetsTarget ? now : 0;
 
     await executeAsync(
       `INSERT INTO habit_completion (id, habitId, completedDate, value, createdAt)
        VALUES (?, ?, ?, ?, ?)`,
-      [completionId, habitId, startOfDay, completionValue, now],
+      [completionId, habitId, startOfDay, completionValue, createdAtValue],
     );
+
+    // Recalculate streak based on completion history
+    const newStreak = await this.recalculateStreak(habitId);
+    await executeAsync("UPDATE habits SET streak = ? WHERE id = ?", [
+      newStreak,
+      habitId,
+    ]);
 
     await executeAsync("UPDATE habits SET updatedAt = ? WHERE id = ?", [
       now,
@@ -339,17 +417,23 @@ class HabitsRepository {
       if (existingCompletion) {
         await this.removeHabitCompletion(habitId, completedDate);
       }
-
       return null;
     }
 
     const now = Date.now();
     const startOfDay = getStartOfDayTimestamp(completedDate);
 
+    const meetsTarget =
+      (habit.type === "binary" && normalizedValue > 0) ||
+      (habit.type === "count" && habit.targetCount && normalizedValue >= habit.targetCount) ||
+      (habit.type === "time" && habit.targetDuration && normalizedValue >= habit.targetDuration);
+
+    const createdAtValue = meetsTarget ? now : 0;
+
     if (existingCompletion) {
       await executeAsync(
-        "UPDATE habit_completion SET value = ? WHERE habitId = ? AND completedDate = ?",
-        [normalizedValue, habitId, startOfDay],
+        "UPDATE habit_completion SET value = ?, createdAt = ? WHERE habitId = ? AND completedDate = ?",
+        [normalizedValue, createdAtValue, habitId, startOfDay],
       );
     } else {
       await executeAsync(
@@ -360,11 +444,18 @@ class HabitsRepository {
           habitId,
           startOfDay,
           normalizedValue,
-          now,
+          createdAtValue,
         ],
       );
     }
 
+    // Recalculate streak based on completion history
+    const newStreak = await this.recalculateStreak(habitId);
+    await executeAsync("UPDATE habits SET streak = ? WHERE id = ?", [
+      newStreak,
+      habitId,
+    ]);
+    
     await executeAsync("UPDATE habits SET updatedAt = ? WHERE id = ?", [
       now,
       habitId,
@@ -393,6 +484,13 @@ class HabitsRepository {
     );
 
     if ((result.changes ?? 0) > 0) {
+      // Recalculate streak based on completion history
+      const newStreak = await this.recalculateStreak(habitId);
+      await executeAsync("UPDATE habits SET streak = ? WHERE id = ?", [
+        newStreak,
+        habitId,
+      ]);
+
       await executeAsync("UPDATE habits SET updatedAt = ? WHERE id = ?", [
         Date.now(),
         habitId,
