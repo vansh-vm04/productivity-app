@@ -56,6 +56,7 @@ export interface AppThemeColors {
   SCREEN: {
     gradientStart: string;
     gradientEnd: string;
+    base: string;
   };
 };
 
@@ -106,6 +107,7 @@ const DARK_THEME: AppThemeColors = {
     SCREEN: {
       gradientStart: "#9ccaff",
       gradientEnd: "#000000",
+      base: "#8cb9f8"
     }
 };
 
@@ -156,6 +158,7 @@ const LIGHT_THEME: AppThemeColors = {
   SCREEN: {
     gradientStart: "#9ccaff",
     gradientEnd: "#d7fff0",
+    base: "#8cb9f8"
   }
 };
 

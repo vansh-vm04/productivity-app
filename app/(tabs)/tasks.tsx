@@ -1,13 +1,13 @@
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
 import { EmptyState } from "@/shared/components/EmptyState";
+import ScreenWrapper from "@/shared/components/ScreenWrapper";
 import { TaskCard } from "@/features/tasks/components/TaskCard";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
-import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
+import { PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Task } from "@/shared/types/task";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
-import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -95,12 +95,7 @@ export default function Tasks() {
   ];
 
   return (
-    <LinearGradient
-      colors={[SCREEN.gradientStart, SCREEN.gradientEnd]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-      style={styles.gradientBackground}
-    >
+    <ScreenWrapper scrollable={false}>
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -147,14 +142,11 @@ export default function Tasks() {
           onClose={() => setModalVisible(false)}
         />
       </View>
-    </LinearGradient>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  gradientBackground: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: "transparent",
@@ -167,7 +159,7 @@ const styles = StyleSheet.create({
     paddingVertical: moderateScale(10),
     borderBottomWidth: 0.5,
     borderBottomColor: "#000000",
-    paddingTop: moderateScale(50),
+    paddingTop: moderateScale(20),
   },
   headerTitle: {
     fontSize: responsiveFontSize(24),

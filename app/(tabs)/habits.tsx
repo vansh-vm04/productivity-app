@@ -6,13 +6,13 @@ import {
 import ActionModal, { ActionModalItem } from "@/shared/components/ActionModal";
 import { AddButton } from "@/shared/components/AddButton";
 import { EmptyState } from "@/shared/components/EmptyState";
+import ScreenWrapper from "@/shared/components/ScreenWrapper";
 import { HABIT_PERIODS, HabitPeriod } from "@/shared/constants/habits";
 import { useHabits } from "@/features/habits/hooks/useHabits";
-import { PRIMARY, SCREEN, TEXT } from "@/shared/theme/colors";
+import { PRIMARY, TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { Habit } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
-import { LinearGradient } from "expo-linear-gradient";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -174,12 +174,7 @@ export default function Habits() {
   ];
 
   return (
-    <LinearGradient
-      colors={[SCREEN.gradientStart, SCREEN.gradientEnd]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-      style={styles.gradientBackground}
-    >
+    <ScreenWrapper scrollable={false}>
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -285,14 +280,11 @@ export default function Habits() {
           onClose={() => setModalVisible(false)}
         />
       </View>
-    </LinearGradient>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  gradientBackground: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: "transparent",
@@ -305,7 +297,7 @@ const styles = StyleSheet.create({
     paddingVertical: moderateScale(10),
     borderBottomWidth: 0.5,
     borderBottomColor: "#000000",
-    paddingTop: moderateScale(50),
+    paddingTop: moderateScale(20),
   },
   headerTitle: {
     fontSize: responsiveFontSize(24),

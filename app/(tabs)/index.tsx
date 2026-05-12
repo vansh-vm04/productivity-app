@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     paddingVertical: moderateScale(8),
-    paddingTop: moderateScale(50),
+    paddingTop: moderateScale(20),
   },
   headerGreeting: {
     fontSize: responsiveFontSize(26),
