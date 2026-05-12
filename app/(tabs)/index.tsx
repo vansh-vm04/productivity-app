@@ -1,11 +1,11 @@
 import TasksScrollable from "@/features/tasks/components/TasksScrollable";
 import CreateModal from "@/shared/components/CreateModal";
 import TodayProgress from "@/shared/components/ProgressCard";
-import { TEXT, SCREEN } from "@/shared/theme/colors";
+import ScreenWrapper from "@/shared/components/ScreenWrapper";
+import { TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import {
   ScrollView,
@@ -19,12 +19,7 @@ export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <LinearGradient
-      colors={[SCREEN.gradientStart, SCREEN.gradientEnd]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-      style={styles.gradientBackground}
-    >
+    <ScreenWrapper>
       <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
@@ -65,7 +60,7 @@ export default function Home() {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
-    </LinearGradient>
+    </ScreenWrapper>
   );
 }
 
