@@ -29,6 +29,8 @@ export default function TabLayout() {
           borderTopLeftRadius: moderateScale(18),
           borderTopRightRadius: moderateScale(18),
           paddingTop: moderateScale(6),
+          overflow: "hidden",
+          position: "absolute",
         },
         tabBarLabelStyle: {
           fontFamily: "Poppins-SemiBold",
