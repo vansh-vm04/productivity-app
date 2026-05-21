@@ -29,6 +29,7 @@ export default function Habits() {
     habits,
     deleteHabit,
     getHabitCompletionValuesByDate,
+    getHabitCompletionsByHabitId,
     removeHabitCompletion,
     setHabitCompletionValue,
     toggleHabitCompletion,
@@ -40,6 +41,12 @@ export default function Habits() {
   const [todayCompletionValues, setTodayCompletionValues] = useState<
     Record<string, number>
   >({});
+  const [weeklyCompletions, setWeeklyCompletions] = useState<
+    Record<string, string[]>
+  >({});
+  const [monthlyCompletions, setMonthlyCompletions] = useState<
+    Record<string, string[]>
+  >({});
 
   useFocusEffect(
     useCallback(() => {
@@ -47,25 +54,29 @@ export default function Habits() {
     }, [refetch]),
   );
 
-  useEffect(() => {
-    const loadTodayCompletionValues = async () => {
-      const values = await getHabitCompletionValuesByDate(new Date());
-      setTodayCompletionValues(values);
-    };
-
-    loadTodayCompletionValues();
-  }, [habits, getHabitCompletionValuesByDate]);
-
   // Helper function to generate weekly completion data
-  const getWeeklyCompletedDays = (habit: Habit): string[] => {
+  const getWeeklyCompletedDays = useCallback(async (habit: Habit): Promise<string[]> => {
     const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const streak = habit.streak;
-    const completedDays = weekdays.slice(0, Math.min(streak, 7));
-    return completedDays;
-  };
+    const completedDates = await getHabitCompletionsByHabitId(habit.id);
+    const days: string[] = [];
+    completedDates.forEach(
+      (dateStr: {
+        id: string;
+        habitId: string;
+        completedDate: Date;
+        createdAt: number;
+        value: number;
+      }) => {
+        const date = new Date(dateStr.completedDate);
+        const dayName = weekdays[date.getDay() === 0 ? 6 : date.getDay() - 1];
+        days.push(dayName);
+      },
+    );
+    return days;
+  }, [getHabitCompletionsByHabitId]);
 
   // Helper function to generate monthly completion dates
-  const getMonthlyCompletionDates = (habit: Habit): string[] => {
+  const getMonthlyCompletionDates = useCallback((habit: Habit): string[] => {
     const dates: string[] = [];
     const today = new Date();
     const year = today.getFullYear();
@@ -81,7 +92,30 @@ export default function Habits() {
       }
     }
     return dates;
-  };
+  }, []);
+
+  useEffect(() => {
+    const loadCompletionData = async () => {
+      const values = await getHabitCompletionValuesByDate(new Date());
+      setTodayCompletionValues(values);
+
+      const weekly: Record<string, string[]> = {};
+      for (const habit of habits) {
+        weekly[habit.id] = await getWeeklyCompletedDays(habit);
+      }
+      setWeeklyCompletions(weekly);
+
+      const monthly: Record<string, string[]> = {};
+      for (const habit of habits) {
+        monthly[habit.id] = getMonthlyCompletionDates(habit);
+      }
+      setMonthlyCompletions(monthly);
+    };
+
+    if (habits.length > 0) {
+      loadCompletionData();
+    }
+  }, [habits, getHabitCompletionValuesByDate, getWeeklyCompletedDays, getMonthlyCompletionDates]);
 
   const toggleHabit = async (id: string) => {
     const habit = habits.find((item) => item.id === id);
@@ -234,7 +268,7 @@ export default function Habits() {
                   <HabitCardWeekly
                     key={habit.id}
                     habit={habit}
-                    completedDays={getWeeklyCompletedDays(habit)}
+                    completedDays={weeklyCompletions[habit.id] || []}
                     onLongPress={() => handleLongPress(habit)}
                   />
                 );
@@ -245,7 +279,7 @@ export default function Habits() {
                   <HabitCardMonthly
                     key={habit.id}
                     habit={habit}
-                    completionDates={getMonthlyCompletionDates(habit)}
+                    completionDates={monthlyCompletions[habit.id] || []}
                     onLongPress={() => handleLongPress(habit)}
                   />
                 );

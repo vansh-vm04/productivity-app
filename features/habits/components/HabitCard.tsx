@@ -60,7 +60,7 @@ const TimeInputModal = ({ isVisible, currentMinutes, onConfirm, onClose }: TimeI
           activeOpacity={1}
           onPress={(e) => e.stopPropagation()}
         >
-          <Text style={styles.modalTitle}>Set Duration</Text>
+          <Text style={styles.modalTitle}>Completed Duration</Text>
 
           <View style={styles.timeInputRow}>
             <View style={styles.timeInputColumn}>
@@ -246,7 +246,7 @@ export const HabitCard = React.memo(
             {isTimeHabit && (
               <View style={styles.controlPanel}>
                 <View style={styles.controlHeader}>
-                  <Text style={styles.controlLabel}>Time Completed</Text>
+                  <Text style={styles.controlLabel}>Duration</Text>
                   <Text style={styles.controlSubLabel} numberOfLines={1}>
                     {habit.targetDuration
                       ? `Target: ${formatDuration(habit.targetDuration)}`
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: moderateScale(12),
-    minHeight: moderateScale(56),
+    minHeight: moderateScale(48),
     borderRadius: moderateScale(12),
     backgroundColor: "rgba(0, 104, 217, 0.08)",
     borderWidth: 1,
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(16),
   },
   timeDisplayValue: {
-    fontSize: responsiveFontSize(28),
+    fontSize: responsiveFontSize(22),
     fontFamily: fonts.bold,
     color: PRIMARY.main,
     lineHeight: moderateScale(36),
