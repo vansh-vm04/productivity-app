@@ -20,7 +20,7 @@ const formatDuration = (minutes: number): string => {
   const hours = Math.floor(safeMinutes / 60);
   const remainingMinutes = safeMinutes % 60;
 
-  return `${String(hours).padStart(2, "0")}:${String(remainingMinutes).padStart(2, "0")}`;
+  return `${hours} hours ${remainingMinutes} mins`;
 };
 
 interface TimeInputModalProps {
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(16),
   },
   timeDisplayValue: {
-    fontSize: responsiveFontSize(22),
+    fontSize: responsiveFontSize(16),
     fontFamily: fonts.bold,
     color: PRIMARY.main,
     lineHeight: moderateScale(36),
