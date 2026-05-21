@@ -4,7 +4,7 @@ import { Habit } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 interface HabitCardProps {
   completionValue: number;
@@ -23,15 +23,105 @@ const formatDuration = (minutes: number): string => {
   return `${String(hours).padStart(2, "0")}:${String(remainingMinutes).padStart(2, "0")}`;
 };
 
+interface TimeInputModalProps {
+  isVisible: boolean;
+  currentMinutes: number;
+  onConfirm: (minutes: number) => void;
+  onClose: () => void;
+}
+
+const TimeInputModal = ({ isVisible, currentMinutes, onConfirm, onClose }: TimeInputModalProps) => {
+  const initialHours = Math.floor(currentMinutes / 60);
+  const initialMins = currentMinutes % 60;
+  const [hours, setHours] = React.useState(String(initialHours).padStart(2, "0"));
+  const [minutes, setMinutes] = React.useState(String(initialMins).padStart(2, "0"));
+
+  React.useEffect(() => {
+    setHours(String(initialHours));
+    setMinutes(String(initialMins));
+  }, [isVisible, initialHours, initialMins]);
+
+  const handleConfirm = () => {
+    const h = Math.max(0, parseInt(hours || "0", 10));
+    const m = Math.max(0, Math.min(59, parseInt(minutes || "0", 10)));
+    onConfirm(h * 60 + m);
+    onClose();
+  };
+
+  return (
+    <Modal visible={isVisible} transparent={true} animationType="fade">
+      <TouchableOpacity
+        style={styles.modalOverlay}
+        activeOpacity={1}
+        onPress={onClose}
+      >
+        <TouchableOpacity
+          style={styles.modalContent}
+          activeOpacity={1}
+          onPress={(e) => e.stopPropagation()}
+        >
+          <Text style={styles.modalTitle}>Set Duration</Text>
+
+          <View style={styles.timeInputRow}>
+            <View style={styles.timeInputColumn}>
+              <Text style={styles.timeInputLabel}>Hours</Text>
+              <TextInput
+                style={styles.timeInput}
+                value={hours}
+                onChangeText={(text) => {
+                  const filtered = text.replace(/[^0-9]/g, '');
+                  setHours(filtered);
+                }}
+                keyboardType="number-pad"
+                maxLength={2}
+                placeholder="00"
+                placeholderTextColor={TEXT.tertiary}
+                autoFocus
+              />
+            </View>
+
+            <Text style={styles.timeInputSeparator}>:</Text>
+
+            <View style={styles.timeInputColumn}>
+              <Text style={styles.timeInputLabel}>Minutes</Text>
+              <TextInput
+                style={styles.timeInput}
+                value={minutes}
+                onChangeText={(text) => {
+                  const filtered = text.replace(/[^0-9]/g, '');
+                  setMinutes(filtered);
+                }}
+                keyboardType="number-pad"
+                maxLength={2}
+                placeholder="00"
+                placeholderTextColor={TEXT.tertiary}
+              />
+            </View>
+          </View>
+
+          <View style={styles.modalButtonRow}>
+            <TouchableOpacity style={[styles.modalButton, styles.modalButtonCancel]} onPress={onClose}>
+              <Text style={styles.modalButtonCancelText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.modalButton, styles.modalButtonConfirm]} onPress={handleConfirm}>
+              <Text style={styles.modalButtonConfirmText}>Confirm</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </Modal>
+  );
+};
+
+
 export const HabitCard = React.memo(
   ({ habit, onPress, onLongPress, onCountChange, onDurationChange, completionValue }: HabitCardProps) => {
     const isBinaryHabit = habit.type === "binary";
     const isCountHabit = habit.type === "count";
     const isTimeHabit = habit.type === "time";
+    const [timeModalVisible, setTimeModalVisible] = React.useState(false);
     const countValue = isCountHabit ?  completionValue : 0;
     const durationValue = isTimeHabit ? completionValue : 0;
-    const durationHours = Math.floor(durationValue / 60);
-    const durationMinutes = durationValue % 60;
     const isCompleted = isBinaryHabit ? habit.completed : isCountHabit ?  completionValue >= (habit.targetCount || 0) : completionValue >= (habit.targetDuration || 0);
 
     const handleCountChange = (delta: number) => {
@@ -41,15 +131,6 @@ export const HabitCard = React.memo(
 
       const nextValue = Math.max(0, countValue + delta);
       onCountChange?.(nextValue);
-    };
-
-    const handleDurationChange = (delta: number) => {
-      if (!isTimeHabit) {
-        return;
-      }
-
-      const nextValue = Math.max(0, durationValue + delta);
-      onDurationChange?.(nextValue);
     };
 
     return (
@@ -165,83 +246,33 @@ export const HabitCard = React.memo(
             {isTimeHabit && (
               <View style={styles.controlPanel}>
                 <View style={styles.controlHeader}>
-                  <Text style={styles.controlLabel}>Duration</Text>
+                  <Text style={styles.controlLabel}>Time Completed</Text>
                   <Text style={styles.controlSubLabel} numberOfLines={1}>
                     {habit.targetDuration
-                      ? `Goal ${formatDuration(habit.targetDuration)}`
-                      : "Set goal"}
+                      ? `Target: ${formatDuration(habit.targetDuration)}`
+                      : "Set target"}
                   </Text>
                 </View>
 
-                <View style={styles.timeRow}>
-                  <View style={styles.timeColumn}>
-                    <Text style={styles.timeUnitLabel}>Hours</Text>
-                    <View style={styles.timeValueBox}>
-                      <Text style={styles.timeValueText}>
-                        {String(durationHours).padStart(2, "0")}
-                      </Text>
-                    </View>
-                    <View style={styles.stepperRow}>
-                      <TouchableOpacity
-                        style={styles.stepButton}
-                        onPress={() => handleDurationChange(-60)}
-                        activeOpacity={0.8}
-                        disabled={durationValue === 0}
-                      >
-                        <MaterialCommunityIcons
-                          name="minus"
-                          size={moderateScale(16)}
-                          color={durationValue === 0 ? TEXT.tertiary : TEXT.primary}
-                        />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.stepButton}
-                        onPress={() => handleDurationChange(60)}
-                        activeOpacity={0.8}
-                      >
-                        <MaterialCommunityIcons
-                          name="plus"
-                          size={moderateScale(16)}
-                          color={PRIMARY.main}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                <TouchableOpacity
+                  style={styles.timeDisplayBox}
+                  onPress={() => setTimeModalVisible(true)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.timeDisplayValue}>{formatDuration(durationValue)}</Text>
+                  <MaterialCommunityIcons
+                    name="pencil"
+                    size={moderateScale(16)}
+                    color={PRIMARY.main}
+                  />
+                </TouchableOpacity>
 
-                  <View style={styles.timeColumn}>
-                    <Text style={styles.timeUnitLabel}>Minutes</Text>
-                    <View style={styles.timeValueBox}>
-                      <Text style={styles.timeValueText}>
-                        {String(durationMinutes).padStart(2, "0")}
-                      </Text>
-                    </View>
-                    <View style={styles.stepperRow}>
-                      <TouchableOpacity
-                        style={styles.stepButton}
-                        onPress={() => handleDurationChange(-1)}
-                        activeOpacity={0.8}
-                        disabled={durationValue === 0}
-                      >
-                        <MaterialCommunityIcons
-                          name="minus"
-                          size={moderateScale(16)}
-                          color={durationValue === 0 ? TEXT.tertiary : TEXT.primary}
-                        />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.stepButton}
-                        onPress={() => handleDurationChange(1)}
-                        activeOpacity={0.8}
-                      >
-                        <MaterialCommunityIcons
-                          name="plus"
-                          size={moderateScale(16)}
-                          color={PRIMARY.main}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
+                <TimeInputModal
+                  isVisible={timeModalVisible}
+                  currentMinutes={durationValue}
+                  onConfirm={(minutes) => onDurationChange?.(minutes)}
+                  onClose={() => setTimeModalVisible(false)}
+                />
               </View>
             )}
           </View>
@@ -356,41 +387,9 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: TEXT.tertiary,
   },
-  timeRow: {
-    flexDirection: "row",
-    gap: moderateScale(8),
-  },
-  timeColumn: {
-    flex: 1,
-    gap: moderateScale(6),
-    alignItems: "stretch",
-  },
-  timeUnitLabel: {
-    fontSize: responsiveFontSize(11),
-    fontFamily: fonts.semibold,
-    color: TEXT.secondary,
-    textAlign: "center",
-  },
-  timeValueBox: {
-    minHeight: moderateScale(44),
-    borderRadius: moderateScale(12),
-    backgroundColor: "rgba(0, 0, 0, 0.04)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  timeValueText: {
-    fontSize: responsiveFontSize(18),
-    fontFamily: fonts.bold,
-    color: TEXT.primary,
-    lineHeight: moderateScale(22),
-  },
-  stepperRow: {
-    flexDirection: "row",
-    gap: moderateScale(6),
-  },
   stepButton: {
-    flex: 1,
-    minHeight: moderateScale(32),
+    minHeight: moderateScale(44),
+    minWidth: moderateScale(44),
     borderRadius: moderateScale(10),
     borderWidth: 1,
     borderColor: "rgba(0, 0, 0, 0.08)",
@@ -399,7 +398,104 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.02)",
   },
   stepButtonDisabled: {
-    opacity: 0.45,
+    opacity: 0.5,
+  },
+  timeDisplayBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: moderateScale(12),
+    minHeight: moderateScale(56),
+    borderRadius: moderateScale(12),
+    backgroundColor: "rgba(0, 104, 217, 0.08)",
+    borderWidth: 1,
+    borderColor: PRIMARY.main,
+    paddingHorizontal: moderateScale(16),
+  },
+  timeDisplayValue: {
+    fontSize: responsiveFontSize(28),
+    fontFamily: fonts.bold,
+    color: PRIMARY.main,
+    lineHeight: moderateScale(36),
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#ffffff",
+    borderRadius: moderateScale(20),
+    padding: moderateScale(24),
+    width: "85%",
+    gap: moderateScale(20),
+  },
+  modalTitle: {
+    fontSize: responsiveFontSize(18),
+    fontFamily: fonts.semibold,
+    color: TEXT.primary,
+    textAlign: "center",
+  },
+  timeInputRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    gap: moderateScale(12),
+  },
+  timeInputColumn: {
+    alignItems: "center",
+    gap: moderateScale(8),
+  },
+  timeInputLabel: {
+    fontSize: responsiveFontSize(12),
+    fontFamily: fonts.medium,
+    color: TEXT.secondary,
+  },
+  timeInput: {
+    fontSize: responsiveFontSize(24),
+    fontFamily: fonts.bold,
+    color: TEXT.primary,
+    borderWidth: 1,
+    borderColor: PRIMARY.main,
+    borderRadius: moderateScale(12),
+    paddingHorizontal: moderateScale(12),
+    paddingVertical: moderateScale(8),
+    width: moderateScale(60),
+    textAlign: "center",
+  },
+  timeInputSeparator: {
+    fontSize: responsiveFontSize(24),
+    fontFamily: fonts.bold,
+    color: TEXT.primary,
+    marginBottom: moderateScale(8),
+  },
+  modalButtonRow: {
+    flexDirection: "row",
+    gap: moderateScale(12),
+  },
+  modalButton: {
+    flex: 1,
+    minHeight: moderateScale(44),
+    borderRadius: moderateScale(10),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalButtonCancel: {
+    backgroundColor: "rgba(0, 0, 0, 0.06)",
+  },
+  modalButtonCancelText: {
+    fontSize: responsiveFontSize(14),
+    fontFamily: fonts.semibold,
+    color: TEXT.primary,
+  },
+  modalButtonConfirm: {
+    backgroundColor: PRIMARY.main,
+  },
+  modalButtonConfirmText: {
+    fontSize: responsiveFontSize(14),
+    fontFamily: fonts.semibold,
+    color: "#ffffff",
   },
   iconContainer: {
     width: moderateScale(48),
