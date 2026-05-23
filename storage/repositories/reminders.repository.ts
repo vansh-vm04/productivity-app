@@ -21,6 +21,14 @@ interface ReminderRowDB {
   updatedAt: number;
 }
 
+interface ReminderWithEntityNameRowDB extends ReminderRowDB {
+  entityName: string | null;
+}
+
+export interface ReminderWithEntityName extends ReminderRecord {
+  entityName: string;
+}
+
 const convertDBRowToReminder = (row: ReminderRowDB): ReminderRecord => ({
   id: row.id,
   entityType: row.entityType as ReminderEntityType,
@@ -82,6 +90,27 @@ class RemindersRepository {
       [entityType, entityId],
     );
     return rows.map(convertDBRowToReminder);
+  }
+
+  /**
+   * Get all reminders with linked habit/task name, active reminders first
+   */
+  async getAllRemindersWithEntityName(): Promise<ReminderWithEntityName[]> {
+    const rows = await getAllAsync<ReminderWithEntityNameRowDB>(
+      `SELECT r.*, 
+          COALESCE(t.name, h.name) AS entityName
+       FROM reminders r
+       LEFT JOIN tasks t
+         ON r.entityType = 'task' AND r.entityId = t.id
+       LEFT JOIN habits h
+         ON r.entityType = 'habit' AND r.entityId = h.id
+       ORDER BY r.enabled DESC, r.time ASC, r.updatedAt DESC`,
+    );
+
+    return rows.map((row) => ({
+      ...convertDBRowToReminder(row),
+      entityName: row.entityName || "Unknown",
+    }));
   }
 
   /**

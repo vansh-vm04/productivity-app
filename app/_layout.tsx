@@ -72,6 +72,15 @@ export default function RootLayout() {
           presentation: "card",
         }}
       />
+      <Stack.Screen
+        name="reminders"
+        options={{
+          headerShown: false,
+          statusBarHidden: false,
+          animation: "simple_push",
+          presentation: "card",
+        }}
+      />
     </Stack>
   );
 }

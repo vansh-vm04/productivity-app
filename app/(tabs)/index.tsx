@@ -6,6 +6,7 @@ import { TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ScrollView,
@@ -16,6 +17,7 @@ import {
 } from "react-native";
 
 export default function Home() {
+  const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
@@ -32,7 +34,10 @@ export default function Home() {
             </Text>
           </View>
           <View style={{ flexDirection: "row", gap: moderateScale(8) }}>
-            <TouchableOpacity style={styles.bellButton}>
+            <TouchableOpacity
+              style={styles.bellButton}
+              onPress={() => router.push("/reminders")}
+            >
               <MaterialCommunityIcons
                 name="bell-ring-outline"
                 size={24}
