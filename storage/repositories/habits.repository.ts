@@ -3,8 +3,10 @@ import {
     Habit,
     HabitData,
     HabitFrequency,
+  Reminder,
 } from "@/shared/types/habit";
 import { executeAsync, getAllAsync, getFirstAsync } from "../db/database";
+import { remindersRepository } from "./reminders.repository";
 
 type HabitUpdateInput = Partial<HabitData> & {
   streak?: number;
@@ -78,6 +80,7 @@ const mapFrequencyDetailsToHabitFrequency = (
 const convertDBRowToHabit = (
   row: HabitRowDB,
   completion: HabitCompletionRowDB | null = null,
+  reminders: Reminder[] = [],
 ): Habit => {
   const frequencyDetails = parseJson<FrequencyDetails>(row.frequencyDetails, {
     type: "daily",
@@ -108,7 +111,7 @@ const convertDBRowToHabit = (
     targetCount: row.targetCount ?? undefined,
     countUnit: row.countUnit ?? undefined,
     targetDuration: row.targetDuration ?? undefined,
-    reminders: [],
+    reminders,
   };
 };
 
@@ -135,6 +138,55 @@ const getCompletionValueForHabit = (habit: Habit): number => {
 };
 
 class HabitsRepository {
+  private generateReminderId(): string {
+    return `reminder_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  }
+
+  private async getHabitReminders(habitId: string): Promise<Reminder[]> {
+    const reminders = await remindersRepository.getRemindersByEntity("habit", habitId);
+    return reminders.map(({ id, time, label, enabled }) => ({
+      id,
+      time,
+      label,
+      enabled,
+    }));
+  }
+
+  private async syncHabitReminders(habitId: string, reminders: Reminder[]): Promise<void> {
+    await remindersRepository.deleteRemindersByEntity("habit", habitId);
+
+    if (reminders.length === 0) {
+      return;
+    }
+
+    await Promise.all(
+      reminders.map((reminder) =>
+        remindersRepository
+          .createReminder({
+            id: this.generateReminderId(),
+            entityType: "habit",
+            entityId: habitId,
+            time: reminder.time,
+            label: reminder.label,
+            enabled: reminder.enabled,
+          })
+          .then(() => undefined),
+      ),
+    );
+  }
+
+  private async attachRemindersToHabits(
+    rows: HabitRowDB[],
+    completionMap: Map<string, HabitCompletionRowDB>,
+  ): Promise<Habit[]> {
+    return Promise.all(
+      rows.map(async (row) => {
+        const reminders = await this.getHabitReminders(row.id);
+        return convertDBRowToHabit(row, completionMap.get(row.id) ?? null, reminders);
+      }),
+    );
+  }
+
   private async getCompletedHabitIdsByDate(
     date: Date = new Date(),
   ): Promise<Set<string>> {
@@ -270,6 +322,21 @@ class HabitsRepository {
       ],
     );
 
+    if (habit.reminders && habit.reminders.length > 0) {
+      await Promise.all(
+        habit.reminders.map((reminder) =>
+          remindersRepository.createReminder({
+            id: reminder.id,
+            entityType: "habit",
+            entityId: habit.id,
+            time: reminder.time,
+            label: reminder.label,
+            enabled: reminder.enabled,
+          }),
+        ),
+      );
+    }
+
     return this.getHabitById(habit.id) as Promise<Habit>;
   }
 
@@ -281,9 +348,7 @@ class HabitsRepository {
     const rows = await getAllAsync<HabitRowDB>(
       "SELECT * FROM habits ORDER BY createdAt DESC",
     );
-    return rows.map((row) =>
-      convertDBRowToHabit(row, completionMap.get(row.id) ?? null),
-    );
+    return this.attachRemindersToHabits(rows, completionMap);
   }
 
   /**
@@ -295,9 +360,12 @@ class HabitsRepository {
       "SELECT * FROM habits WHERE id = ?",
       [id],
     );
-    return row
-      ? convertDBRowToHabit(row, completionMap.get(row.id) ?? null)
-      : null;
+    if (!row) {
+      return null;
+    }
+
+    const reminders = await this.getHabitReminders(row.id);
+    return convertDBRowToHabit(row, completionMap.get(row.id) ?? null, reminders);
   }
 
   /**
@@ -309,9 +377,7 @@ class HabitsRepository {
       "SELECT * FROM habits WHERE category = ? ORDER BY createdAt DESC",
       [category],
     );
-    return rows.map((row) =>
-      convertDBRowToHabit(row, completionMap.get(row.id) ?? null),
-    );
+    return this.attachRemindersToHabits(rows, completionMap);
   }
 
   /**
@@ -582,18 +648,24 @@ class HabitsRepository {
       values.push(updates.streak);
     }
 
-    if (updateFields.length === 0) {
+    if (updateFields.length === 0 && updates.reminders === undefined) {
       return habit;
     }
 
-    updateFields.push("updatedAt = ?");
-    values.push(now);
-    values.push(id);
+    if (updateFields.length > 0) {
+      updateFields.push("updatedAt = ?");
+      values.push(now);
+      values.push(id);
 
-    await executeAsync(
-      `UPDATE habits SET ${updateFields.join(", ")} WHERE id = ?`,
-      values,
-    );
+      await executeAsync(
+        `UPDATE habits SET ${updateFields.join(", ")} WHERE id = ?`,
+        values,
+      );
+    }
+
+    if (updates.reminders !== undefined) {
+      await this.syncHabitReminders(id, updates.reminders);
+    }
 
     return this.getHabitById(id);
   }
@@ -603,6 +675,10 @@ class HabitsRepository {
    */
   async deleteHabit(id: string): Promise<boolean> {
     const result = await executeAsync("DELETE FROM habits WHERE id = ?", [id]);
+
+    if ((result.changes ?? 0) > 0) {
+      await remindersRepository.deleteRemindersByEntity("habit", id);
+    }
 
     return (result.changes ?? 0) > 0;
   }
@@ -619,6 +695,12 @@ class HabitsRepository {
       ids,
     );
 
+    if ((result.changes ?? 0) > 0) {
+      await Promise.all(
+        ids.map((id) => remindersRepository.deleteRemindersByEntity("habit", id)),
+      );
+    }
+
     return result.changes ?? 0;
   }
 
@@ -626,7 +708,17 @@ class HabitsRepository {
    * Clear all habits (use with caution)
    */
   async clearAllHabits(): Promise<number> {
+    const rows = await getAllAsync<{ id: string }>("SELECT id FROM habits");
     const result = await executeAsync("DELETE FROM habits");
+
+    if ((result.changes ?? 0) > 0) {
+      await Promise.all(
+        rows.map((row) =>
+          remindersRepository.deleteRemindersByEntity("habit", row.id),
+        ),
+      );
+    }
+
     return result.changes ?? 0;
   }
 }

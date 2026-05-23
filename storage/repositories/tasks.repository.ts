@@ -1,5 +1,7 @@
 import { Task, TaskData } from "@/shared/types/task";
+import { Reminder } from "@/shared/types/habit";
 import { executeAsync, getAllAsync, getFirstAsync } from "../db/database";
+import { remindersRepository } from "./reminders.repository";
 
 interface TaskRowDB {
   id: string;
@@ -13,7 +15,7 @@ interface TaskRowDB {
   updatedAt: number;
 }
 
-const convertDBRowToTask = (row: TaskRowDB): Task => ({
+const convertDBRowToTask = (row: TaskRowDB, reminders: Reminder[] = []): Task => ({
   id: row.id,
   name: row.name,
   category: row.category as any,
@@ -21,11 +23,64 @@ const convertDBRowToTask = (row: TaskRowDB): Task => ({
   completed: row.completed === 1,
   dueDate: row.dueDate ? new Date(row.dueDate) : null,
   customCategory: row.customCategory || undefined,
+  reminders,
   createdAt: row.createdAt,
   updatedAt: row.updatedAt,
 });
 
 class TasksRepository {
+  private async getTaskReminders(taskId: string): Promise<Reminder[]> {
+    const reminders = await remindersRepository.getRemindersByEntity("task", taskId);
+    return reminders.map(({ id, time, label, enabled }) => ({
+      id,
+      time,
+      label,
+      enabled,
+    }));
+  }
+
+  private async syncTaskReminders(taskId: string, reminders: Reminder[]): Promise<void> {
+    const existing = await remindersRepository.getRemindersByEntity("task", taskId);
+    const existingById = new Map(existing.map((item) => [item.id, item]));
+    const incomingById = new Map(reminders.map((item) => [item.id, item]));
+
+    await Promise.all(
+      existing
+        .filter((item) => !incomingById.has(item.id))
+        .map((item) => remindersRepository.deleteReminder(item.id)),
+    );
+
+    await Promise.all(
+      reminders.map((reminder) => {
+        if (existingById.has(reminder.id)) {
+          return remindersRepository.updateReminder(reminder.id, {
+            time: reminder.time,
+            label: reminder.label,
+            enabled: reminder.enabled,
+          }).then(() => undefined);
+        }
+
+        return remindersRepository.createReminder({
+          id: reminder.id,
+          entityType: "task",
+          entityId: taskId,
+          time: reminder.time,
+          label: reminder.label,
+          enabled: reminder.enabled,
+        }).then(() => undefined);
+      }),
+    );
+  }
+
+  private async attachRemindersToTasks(rows: TaskRowDB[]): Promise<Task[]> {
+    return Promise.all(
+      rows.map(async (row) => {
+        const reminders = await this.getTaskReminders(row.id);
+        return convertDBRowToTask(row, reminders);
+      }),
+    );
+  }
+
   /**
    * Create a new task
    */
@@ -48,6 +103,21 @@ class TasksRepository {
       ],
     );
 
+    if (task.reminders && task.reminders.length > 0) {
+      await Promise.all(
+        task.reminders.map((reminder) =>
+          remindersRepository.createReminder({
+            id: reminder.id,
+            entityType: "task",
+            entityId: task.id,
+            time: reminder.time,
+            label: reminder.label,
+            enabled: reminder.enabled,
+          }),
+        ),
+      );
+    }
+
     return this.getTaskById(task.id) as Promise<Task>;
   }
 
@@ -58,7 +128,7 @@ class TasksRepository {
     const rows = await getAllAsync<TaskRowDB>(
       "SELECT * FROM tasks ORDER BY createdAt DESC",
     );
-    return rows.map(convertDBRowToTask);
+    return this.attachRemindersToTasks(rows);
   }
 
   /**
@@ -69,7 +139,12 @@ class TasksRepository {
       "SELECT * FROM tasks WHERE id = ?",
       [id],
     );
-    return row ? convertDBRowToTask(row) : null;
+    if (!row) {
+      return null;
+    }
+
+    const reminders = await this.getTaskReminders(row.id);
+    return convertDBRowToTask(row, reminders);
   }
 
   /**
@@ -80,7 +155,7 @@ class TasksRepository {
       "SELECT * FROM tasks WHERE category = ? ORDER BY updatedAt DESC",
       [category],
     );
-    return rows.map(convertDBRowToTask);
+    return this.attachRemindersToTasks(rows);
   }
 
   /**
@@ -90,7 +165,7 @@ class TasksRepository {
     const rows = await getAllAsync<TaskRowDB>(
       "SELECT * FROM tasks WHERE completed = 0 ORDER BY dueDate ASC, updatedAt DESC",
     );
-    return rows.map(convertDBRowToTask);
+    return this.attachRemindersToTasks(rows);
   }
 
   /**
@@ -100,7 +175,7 @@ class TasksRepository {
     const rows = await getAllAsync<TaskRowDB>(
       "SELECT * FROM tasks WHERE completed = 1 ORDER BY updatedAt DESC",
     );
-    return rows.map(convertDBRowToTask);
+    return this.attachRemindersToTasks(rows);
   }
 
   /**
@@ -111,7 +186,7 @@ class TasksRepository {
       "SELECT * FROM tasks WHERE priority = ? ORDER BY dueDate ASC, updatedAt DESC",
       [priority],
     );
-    return rows.map(convertDBRowToTask);
+    return this.attachRemindersToTasks(rows);
   }
 
   /**
@@ -127,7 +202,7 @@ class TasksRepository {
       "SELECT * FROM tasks WHERE dueDate >= ? AND dueDate < ? ORDER BY dueDate ASC",
       [today.getTime(), tomorrow.getTime()],
     );
-    return rows.map(convertDBRowToTask);
+    return this.attachRemindersToTasks(rows);
   }
 
   /**
@@ -143,7 +218,7 @@ class TasksRepository {
       "SELECT * FROM tasks WHERE dueDate >= ? AND dueDate < ? ORDER BY dueDate ASC",
       [today.getTime(), nextWeek.getTime()],
     );
-    return rows.map(convertDBRowToTask);
+    return this.attachRemindersToTasks(rows);
   }
 
   /**
@@ -184,18 +259,24 @@ class TasksRepository {
       values.push(updates.customCategory || null);
     }
 
-    if (updateFields.length === 0) {
+    if (updateFields.length === 0 && updates.reminders === undefined) {
       return task;
     }
 
-    updateFields.push("updatedAt = ?");
-    values.push(now);
-    values.push(id);
+    if (updateFields.length > 0) {
+      updateFields.push("updatedAt = ?");
+      values.push(now);
+      values.push(id);
 
-    await executeAsync(
-      `UPDATE tasks SET ${updateFields.join(", ")} WHERE id = ?`,
-      values,
-    );
+      await executeAsync(
+        `UPDATE tasks SET ${updateFields.join(", ")} WHERE id = ?`,
+        values,
+      );
+    }
+
+    if (updates.reminders !== undefined) {
+      await this.syncTaskReminders(id, updates.reminders);
+    }
 
     return this.getTaskById(id);
   }
@@ -224,6 +305,10 @@ class TasksRepository {
   async deleteTask(id: string): Promise<boolean> {
     const result = await executeAsync("DELETE FROM tasks WHERE id = ?", [id]);
 
+    if ((result.changes ?? 0) > 0) {
+      await remindersRepository.deleteRemindersByEntity("task", id);
+    }
+
     return (result.changes ?? 0) > 0;
   }
 
@@ -239,6 +324,12 @@ class TasksRepository {
       ids,
     );
 
+    if ((result.changes ?? 0) > 0) {
+      await Promise.all(
+        ids.map((id) => remindersRepository.deleteRemindersByEntity("task", id)),
+      );
+    }
+
     return result.changes ?? 0;
   }
 
@@ -246,7 +337,17 @@ class TasksRepository {
    * Clear all tasks (use with caution)
    */
   async clearAllTasks(): Promise<number> {
+    const rows = await getAllAsync<{ id: string }>("SELECT id FROM tasks");
     const result = await executeAsync("DELETE FROM tasks");
+
+    if ((result.changes ?? 0) > 0) {
+      await Promise.all(
+        rows.map((row) =>
+          remindersRepository.deleteRemindersByEntity("task", row.id),
+        ),
+      );
+    }
+
     return result.changes ?? 0;
   }
 }

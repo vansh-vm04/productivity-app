@@ -36,11 +36,14 @@ export const RemindersList = React.memo(
     const maxReminders = 5;
     const canAddReminder = reminders.length < maxReminders;
 
+    const createReminderId = () =>
+      `reminder_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+
     const handleAddReminder = () => {
       if (!canAddReminder) return;
 
       const newReminder: Reminder = {
-        id: `${reminders.length + 1}`,
+        id: createReminderId(),
         time: "09:00",
         label: "reminder",
         enabled: true,
@@ -49,6 +52,7 @@ export const RemindersList = React.memo(
     };
 
     const handleRemoveReminder = (index: number) => {
+      onHideTimePicker();
       onRemindersChange(reminders.filter((_, i) => i !== index));
     };
 
@@ -97,7 +101,7 @@ export const RemindersList = React.memo(
         </View>
 
         {reminders.map((reminder, index) => (
-          <View key={index} style={styles.reminderItem}>
+          <View key={reminder.id} style={styles.reminderItem}>
             <TouchableOpacity
               style={styles.reminderTimeButton}
               onPress={() => onShowTimePicker(index)}
@@ -134,18 +138,16 @@ export const RemindersList = React.memo(
               />
             </TouchableOpacity>
 
-            {reminders.length > 1 && (
-              <TouchableOpacity
-                style={styles.removeReminderButton}
-                onPress={() => handleRemoveReminder(index)}
-              >
-                <MaterialCommunityIcons
-                  name="close"
-                  size={18}
-                  color={TEXT.tertiary}
-                />
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={styles.removeReminderButton}
+              onPress={() => handleRemoveReminder(index)}
+            >
+              <MaterialCommunityIcons
+                name="close"
+                size={18}
+                color={TEXT.tertiary}
+              />
+            </TouchableOpacity>
           </View>
         ))}
 

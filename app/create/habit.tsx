@@ -34,14 +34,15 @@ import {
   View,
 } from "react-native";
 
-const defaultReminders: HabitData["reminders"] = [
-  {
-    id: "1",
-    time: "09:00",
-    label: "morning",
-    enabled: true,
-  },
-];
+const createReminderId = () =>
+  `reminder_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+
+const createDefaultReminder = (): HabitData["reminders"][number] => ({
+  id: createReminderId(),
+  time: "09:00",
+  label: "morning",
+  enabled: true,
+});
 
 export default function CreateHabit() {
   const router = useRouter();
@@ -71,7 +72,7 @@ export default function CreateHabit() {
     frequency: {
       type: "daily",
     },
-    reminders: defaultReminders,
+    reminders: [createDefaultReminder()],
   });
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -105,7 +106,7 @@ export default function CreateHabit() {
           countUnit: existingHabit.countUnit ?? "",
           targetDuration: existingHabit.targetDuration ?? 30,
           frequency: frequencyDetails,
-          reminders: defaultReminders,
+          reminders: existingHabit.reminders,
         });
 
         if (existingHabit.category === "custom") {
@@ -121,7 +122,7 @@ export default function CreateHabit() {
     if (Platform.OS === "android") {
       setShowReminderTimePicker(false);
     }
-    if (selectedTime) {
+    if (selectedTime && habitData.reminders[selectedReminderIndex]) {
       const hours = String(selectedTime.getHours()).padStart(2, "0");
       const minutes = String(selectedTime.getMinutes()).padStart(2, "0");
       const timeString = `${hours}:${minutes}`;

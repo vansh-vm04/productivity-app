@@ -19,6 +19,7 @@ export interface Task {
   completed: boolean;
   dueDate: Date | null;
   customCategory?: string;
+  reminders: Reminder[];
   createdAt: number;
   updatedAt: number;
 }
