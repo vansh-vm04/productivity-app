@@ -14,7 +14,7 @@ import { fonts } from "@/shared/theme/fonts";
 import { Habit } from "@/shared/types/habit";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -42,9 +42,6 @@ export default function Habits() {
     Record<string, number>
   >({});
   const [weeklyCompletions, setWeeklyCompletions] = useState<
-    Record<string, string[]>
-  >({});
-  const [monthlyCompletions, setMonthlyCompletions] = useState<
     Record<string, string[]>
   >({});
 
@@ -95,27 +92,50 @@ export default function Habits() {
   }, []);
 
   useEffect(() => {
-    const loadCompletionData = async () => {
+    const loadTodayCompletionValues = async () => {
       const values = await getHabitCompletionValuesByDate(new Date());
       setTodayCompletionValues(values);
-
-      const weekly: Record<string, string[]> = {};
-      for (const habit of habits) {
-        weekly[habit.id] = await getWeeklyCompletedDays(habit);
-      }
-      setWeeklyCompletions(weekly);
-
-      const monthly: Record<string, string[]> = {};
-      for (const habit of habits) {
-        monthly[habit.id] = getMonthlyCompletionDates(habit);
-      }
-      setMonthlyCompletions(monthly);
     };
 
-    if (habits.length > 0) {
-      loadCompletionData();
+    if (habits.length === 0) {
+      setTodayCompletionValues({});
+      return;
     }
-  }, [habits, getHabitCompletionValuesByDate, getWeeklyCompletedDays, getMonthlyCompletionDates]);
+
+    loadTodayCompletionValues();
+  }, [habits, getHabitCompletionValuesByDate]);
+
+  const monthlyCompletions = useMemo(() => {
+    const monthly: Record<string, string[]> = {};
+    for (const habit of habits) {
+      monthly[habit.id] = getMonthlyCompletionDates(habit);
+    }
+    return monthly;
+  }, [habits, getMonthlyCompletionDates]);
+
+  useEffect(() => {
+    const loadWeeklyCompletions = async () => {
+      if (activePeriod !== "weekly") {
+        return;
+      }
+
+      const entries = await Promise.all(
+        habits.map(async (habit) => {
+          const days = await getWeeklyCompletedDays(habit);
+          return [habit.id, days] as const;
+        }),
+      );
+
+      setWeeklyCompletions(Object.fromEntries(entries));
+    };
+
+    if (habits.length === 0) {
+      setWeeklyCompletions({});
+      return;
+    }
+
+    loadWeeklyCompletions();
+  }, [activePeriod, habits, getWeeklyCompletedDays]);
 
   const toggleHabit = async (id: string) => {
     const habit = habits.find((item) => item.id === id);

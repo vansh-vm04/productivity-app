@@ -30,6 +30,10 @@ export const HabitCardMonthly = React.memo(
     const currentDate = new Date();
     const displayMonth = month !== undefined ? month : currentDate.getMonth();
     const displayYear = year !== undefined ? year : currentDate.getFullYear();
+    const completionSet = useMemo(
+      () => new Set(completionDates),
+      [completionDates],
+    );
 
     const calendarDays = useMemo(() => {
       const firstDay = new Date(displayYear, displayMonth, 1).getDay();
@@ -52,19 +56,12 @@ export const HabitCardMonthly = React.memo(
         days.push({
           day,
           isCurrentMonth: true,
-          isCompleted: completionDates.includes(dateStr),
+          isCompleted: completionSet.has(dateStr),
         });
       }
 
       return days;
-    }, [displayMonth, displayYear, completionDates]);
-
-    const getHeatmapColor = (isCompleted: boolean): string => {
-      if (isCompleted) {
-        return habit.accentColor;
-      }
-      return "rgba(0, 0, 0, 0.05)";
-    };
+    }, [completionSet, displayMonth, displayYear]);
 
     const monthName = new Date(displayYear, displayMonth).toLocaleString(
       "default",
