@@ -73,6 +73,9 @@ class TasksRepository {
   }
 
   private async attachRemindersToTasks(rows: TaskRowDB[]): Promise<Task[]> {
+    if (rows.length === 0) {
+      return [];
+    }
     return Promise.all(
       rows.map(async (row) => {
         const reminders = await this.getTaskReminders(row.id);
