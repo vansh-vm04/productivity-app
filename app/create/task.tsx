@@ -111,14 +111,9 @@ export default function CreateTask() {
           setIsLoading(true);
           const existingTask = await getTaskById(params.taskId as string);
           if (existingTask) {
-            const existingReminders =
-              await remindersRepository.getRemindersByEntity(
-                "task",
-                existingTask.id,
-              );
             const reminders =
-              existingReminders.length > 0
-                ? existingReminders.map((reminder) => ({
+              existingTask.reminders.length > 0
+                ? existingTask.reminders.map((reminder) => ({
                     id: reminder.id,
                     time: reminder.time,
                     label: reminder.label,
@@ -233,6 +228,10 @@ export default function CreateTask() {
       };
 
       if (isEditMode) {
+        await remindersRepository.deleteRemindersByEntity(
+          "task",
+          taskPayload.id,
+        );
         await updateTask(taskPayload.id, {
           name: taskPayload.name,
           priority: taskPayload.priority,
@@ -240,31 +239,26 @@ export default function CreateTask() {
           customCategory: taskPayload.customCategory || "",
           dueDate: taskPayload.dueDate,
         });
+        if (taskPayload.reminders && taskPayload.reminders.length > 0) {
+          const baseId = `reminder_${Date.now()}_${Math.random()
+            .toString(36)
+            .slice(2, 10)}`;
 
-        await remindersRepository.deleteRemindersByEntity(
-          "task",
-          taskPayload.id,
-        );
+          await Promise.all(
+            taskPayload.reminders.map((reminder, index) =>
+              remindersRepository.createReminder({
+                id: `${baseId}_${index}`,
+                entityType: "task",
+                entityId: taskPayload.id,
+                time: reminder.time,
+                label: reminder.label,
+                enabled: reminder.enabled,
+              }),
+            ),
+          );
+        }
       } else {
         await createTask(taskPayload);
-      }
-      if (taskPayload.reminders && taskPayload.reminders.length > 0) {
-        const baseId = `reminder_${Date.now()}_${Math.random()
-          .toString(36)
-          .slice(2, 10)}`;
-
-        await Promise.all(
-          taskPayload.reminders.map((reminder, index) =>
-            remindersRepository.createReminder({
-              id: `${baseId}_${index}`,
-              entityType: "task",
-              entityId: taskPayload.id,
-              time: reminder.time,
-              label: reminder.label,
-              enabled: reminder.enabled,
-            }),
-          ),
-        );
       }
 
       router.back();

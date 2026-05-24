@@ -1,4 +1,8 @@
 import { Reminder } from "@/shared/types/habit";
+import {
+  cancelReminderNotificationAsync,
+  scheduleReminderNotificationAsync,
+} from "@/features/notifications/reminderNotifications.service";
 import { executeAsync, getAllAsync, getFirstAsync } from "../db/database";
 
 type ReminderEntityType = "habit" | "task";
@@ -6,6 +10,7 @@ type ReminderEntityType = "habit" | "task";
 export interface ReminderRecord extends Reminder {
   entityType: ReminderEntityType;
   entityId: string;
+  notificationId?: string | null;
   createdAt: number;
   updatedAt: number;
 }
@@ -17,6 +22,7 @@ interface ReminderRowDB {
   time: string;
   label: string;
   enabled: number;
+  notificationId?: string | null;
   createdAt: number;
   updatedAt: number;
 }
@@ -36,9 +42,20 @@ const convertDBRowToReminder = (row: ReminderRowDB): ReminderRecord => ({
   time: row.time,
   label: row.label,
   enabled: row.enabled === 1,
+  notificationId: row.notificationId ?? null,
   createdAt: row.createdAt,
   updatedAt: row.updatedAt,
 });
+
+const updateReminderNotificationIdInDb = async (
+  id: string,
+  notificationId: string | null,
+): Promise<void> => {
+  await executeAsync("UPDATE reminders SET notificationId = ? WHERE id = ?", [
+    notificationId,
+    id,
+  ]);
+};
 
 class RemindersRepository {
   /**
@@ -50,8 +67,8 @@ class RemindersRepository {
     const now = Date.now();
 
     await executeAsync(
-      `INSERT INTO reminders (id, entityType, entityId, time, label, enabled, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO reminders (id, entityType, entityId, time, label, enabled, notificationId, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         reminder.id,
         reminder.entityType,
@@ -59,11 +76,23 @@ class RemindersRepository {
         reminder.time,
         reminder.label,
         reminder.enabled ? 1 : 0,
+        null,
         now,
         now,
       ],
     );
-    console.log(`Created reminder with id ${reminder.id} for ${reminder.entityType} ${reminder.entityId}`);
+
+    if (reminder.enabled) {
+      const notificationId = await scheduleReminderNotificationAsync({
+        id: reminder.id,
+        entityType: reminder.entityType,
+        time: reminder.time,
+        label: reminder.label,
+      });
+
+      await updateReminderNotificationIdInDb(reminder.id, notificationId);
+    }
+
     return this.getReminderById(reminder.id) as Promise<ReminderRecord>;
   }
 
@@ -76,6 +105,17 @@ class RemindersRepository {
       [id],
     );
     return row ? convertDBRowToReminder(row) : null;
+  }
+
+  /**
+   * Get all reminders
+   */
+  async getAllReminders(): Promise<ReminderRecord[]> {
+    const rows = await getAllAsync<ReminderRowDB>(
+      "SELECT * FROM reminders ORDER BY enabled DESC, time ASC, updatedAt DESC",
+    );
+
+    return rows.map(convertDBRowToReminder);
   }
 
   /**
@@ -114,6 +154,16 @@ class RemindersRepository {
   }
 
   /**
+   * Update reminder notification identifier without changing reminder data
+   */
+  async updateReminderNotificationId(
+    id: string,
+    notificationId: string | null,
+  ): Promise<void> {
+    await updateReminderNotificationIdInDb(id, notificationId);
+  }
+
+  /**
    * Update reminder
    */
   async updateReminder(
@@ -129,6 +179,9 @@ class RemindersRepository {
     const now = Date.now();
     const updateFields: string[] = [];
     const values: (string | number | null)[] = [];
+    const nextTime = updates.time ?? reminder.time;
+    const nextLabel = updates.label ?? reminder.label;
+    const nextEnabled = updates.enabled ?? reminder.enabled;
 
     if (updates.time !== undefined) {
       updateFields.push("time = ?");
@@ -143,7 +196,14 @@ class RemindersRepository {
       values.push(updates.enabled ? 1 : 0);
     }
 
-    if (updateFields.length === 0) {
+    const shouldRescheduleNotification =
+      nextEnabled &&
+      (updates.time !== undefined ||
+        updates.label !== undefined ||
+        updates.enabled !== undefined ||
+        !reminder.notificationId);
+
+    if (updateFields.length === 0 && !shouldRescheduleNotification) {
       return reminder;
     }
 
@@ -156,6 +216,23 @@ class RemindersRepository {
       values,
     );
 
+    if (reminder.notificationId) {
+      await cancelReminderNotificationAsync(reminder.notificationId);
+    }
+
+    if (nextEnabled) {
+      const notificationId = await scheduleReminderNotificationAsync({
+        id,
+        entityType: reminder.entityType,
+        time: nextTime,
+        label: nextLabel,
+      });
+
+      await updateReminderNotificationIdInDb(id, notificationId);
+    } else {
+      await updateReminderNotificationIdInDb(id, null);
+    }
+
     return this.getReminderById(id);
   }
 
@@ -163,6 +240,12 @@ class RemindersRepository {
    * Delete reminder
    */
   async deleteReminder(id: string): Promise<boolean> {
+    const reminder = await this.getReminderById(id);
+
+    if (reminder?.notificationId) {
+      await cancelReminderNotificationAsync(reminder.notificationId);
+    }
+
     const result = await executeAsync("DELETE FROM reminders WHERE id = ?", [
       id,
     ]);
@@ -176,6 +259,16 @@ class RemindersRepository {
     entityType: ReminderEntityType,
     entityId: string,
   ): Promise<number> {
+    const reminders = await this.getRemindersByEntity(entityType, entityId);
+
+    await Promise.all(
+      reminders
+        .filter((reminder) => reminder.notificationId)
+        .map((reminder) =>
+          cancelReminderNotificationAsync(reminder.notificationId),
+        ),
+    );
+
     const result = await executeAsync(
       "DELETE FROM reminders WHERE entityType = ? AND entityId = ?",
       [entityType, entityId],
@@ -188,6 +281,16 @@ class RemindersRepository {
    * Clear all reminders (use with caution)
    */
   async clearAllReminders(): Promise<number> {
+    const reminders = await this.getAllReminders();
+
+    await Promise.all(
+      reminders
+        .filter((reminder) => reminder.notificationId)
+        .map((reminder) =>
+          cancelReminderNotificationAsync(reminder.notificationId),
+        ),
+    );
+
     const result = await executeAsync("DELETE FROM reminders");
     return result.changes ?? 0;
   }

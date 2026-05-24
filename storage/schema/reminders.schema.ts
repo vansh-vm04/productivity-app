@@ -1,4 +1,17 @@
-import { executeAsync } from "../db/database";
+import { executeAsync, getAllAsync } from "../db/database";
+
+const ensureReminderNotificationColumn = async (): Promise<void> => {
+  const columns = await getReminderTableColumns();
+
+  if (!columns.has("notificationId")) {
+    await executeAsync("ALTER TABLE reminders ADD COLUMN notificationId TEXT");
+  }
+};
+
+const getReminderTableColumns = async (): Promise<Set<string>> => {
+  const rows = await getAllAsync<{ name: string }>("PRAGMA table_info(reminders)");
+  return new Set(rows.map((row) => row.name));
+};
 
 export const initializeRemindersSchema = async (): Promise<void> => {
   try {
@@ -11,10 +24,13 @@ export const initializeRemindersSchema = async (): Promise<void> => {
         time TEXT NOT NULL,
         label TEXT NOT NULL,
         enabled INTEGER NOT NULL DEFAULT 1,
+        notificationId TEXT,
         createdAt INTEGER NOT NULL,
         updatedAt INTEGER NOT NULL
       );
     `);
+
+    await ensureReminderNotificationColumn();
 
     await executeAsync(`
       CREATE INDEX IF NOT EXISTS idx_reminders_entity ON reminders(entityType, entityId);
@@ -24,7 +40,6 @@ export const initializeRemindersSchema = async (): Promise<void> => {
       CREATE INDEX IF NOT EXISTS idx_reminders_time ON reminders(time);
     `);
 
-    console.log("✓ Reminders schema initialized successfully");
   } catch (error) {
     console.error("Failed to initialize reminders schema:", error);
     throw error;

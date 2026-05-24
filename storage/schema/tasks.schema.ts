@@ -30,7 +30,6 @@ export const initializeTaskSchema = async (): Promise<void> => {
       CREATE INDEX IF NOT EXISTS idx_tasks_category ON tasks(category);
     `);
 
-    console.log('✓ Tasks schema initialized successfully');
   } catch (error) {
     console.error('Failed to initialize tasks schema:', error);
     throw error;

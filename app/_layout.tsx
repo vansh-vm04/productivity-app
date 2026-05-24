@@ -2,6 +2,7 @@ import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { enableScreens } from 'react-native-screens';
+import { syncReminderNotificationsAsync } from "@/features/notifications/reminderNotifications.bootstrap";
 import { initializeAllSchemas } from "@/storage";
 
 SplashScreen.preventAutoHideAsync();
@@ -21,6 +22,7 @@ export default function RootLayout() {
     const initializeApp = async () => {
       try {
         await initializeAllSchemas();
+        await syncReminderNotificationsAsync();
       } catch (error) {
         console.error('Failed to initialize app storage:', error);
       }

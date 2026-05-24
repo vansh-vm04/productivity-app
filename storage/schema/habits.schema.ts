@@ -51,7 +51,6 @@ export const initializeHabitsSchema = async (): Promise<void> => {
       CREATE INDEX IF NOT EXISTS idx_habit_completion_completedDate ON habit_completion(completedDate);
     `);
 
-    console.log("✓ Habits schema initialized successfully");
   } catch (error) {
     console.error("Failed to initialize habits schema:", error);
     throw error;

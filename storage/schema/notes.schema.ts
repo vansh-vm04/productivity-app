@@ -24,7 +24,6 @@ export const initializeNotesSchema = async (): Promise<void> => {
       CREATE INDEX IF NOT EXISTS idx_notes_updatedAt ON notes(updatedAt);
     `);
 
-    console.log("✓ Notes schema initialized successfully");
   } catch (error) {
     console.error("Failed to initialize notes schema:", error);
     throw error;

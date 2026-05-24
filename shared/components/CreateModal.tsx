@@ -37,12 +37,10 @@ export default function CreateModal({ visible, onClose }: Props) {
         break;
       case "note":
         router.push("/create/note");
-        console.log("Navigate to create note");
         break;
       case "habit":
         // TODO: Navigate to create habit screen
         router.push("/create/habit");
-        console.log("Navigate to create habit");
         break;
     }
   };

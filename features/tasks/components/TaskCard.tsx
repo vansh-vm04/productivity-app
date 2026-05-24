@@ -46,7 +46,6 @@ export const TaskCard = React.memo(
     const colors = task.completed
       ? { base: "#E9FBF3", glow: "#059669", accent: "#059669" }
       : { base: "#EAF3FF", glow: PRIMARY.main, accent: PRIMARY.main };
-      console.log("Rendering TaskCard:", task.customCategory, "Completed:", task.completed);
 
     return (
       <TouchableOpacity
