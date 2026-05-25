@@ -64,7 +64,9 @@ export const ensureReminderNotificationsAsync = async (): Promise<void> => {
         await Notifications.setNotificationChannelAsync(ANDROID_CHANNEL_ID, {
           name: "Reminders",
           importance: Notifications.AndroidImportance.MAX,
-          vibrationPattern: [0, 250, 250, 250],
+          lockscreenVisibility:
+            Notifications.AndroidNotificationVisibility.PUBLIC,
+          enableVibrate: false,
           lightColor: "#2563EB",
           sound: "reminder.mp3",
         });
@@ -119,6 +121,7 @@ export const scheduleReminderNotificationAsync = async (
         minute: minute,
         repeats: true,
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        ANDROID_CHANNEL_ID
       } as any,
     });
   } catch (error) {

@@ -12,10 +12,7 @@
       "supportsTablet": true
     },
     "android": {
-      "permissions": [
-        "RECORD_AUDIO",
-        "POST_NOTIFICATIONS"
-      ],
+      "permissions": ["RECORD_AUDIO", "POST_NOTIFICATIONS"],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -57,7 +54,13 @@
       ],
       "expo-sqlite",
       "@react-native-community/datetimepicker",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "sounds": ["assets/sounds/reminder.mp3"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
