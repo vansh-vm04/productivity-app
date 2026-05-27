@@ -58,7 +58,7 @@
       [
         "expo-notifications",
         {
-          "sounds": ["assets/sounds/reminder.mp3"]
+          "sounds": ["./assets/sounds/reminder.mp3"]
         }
       ]
     ],

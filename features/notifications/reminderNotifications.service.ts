@@ -68,7 +68,7 @@ export const ensureReminderNotificationsAsync = async (): Promise<void> => {
             Notifications.AndroidNotificationVisibility.PUBLIC,
           enableVibrate: false,
           lightColor: "#2563EB",
-          sound: "reminder.mp3",
+          sound: "reminder",
         });
       }
 
@@ -121,7 +121,7 @@ export const scheduleReminderNotificationAsync = async (
         minute: minute,
         repeats: true,
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        ANDROID_CHANNEL_ID
+        channelId: ANDROID_CHANNEL_ID,
       } as any,
     });
   } catch (error) {
