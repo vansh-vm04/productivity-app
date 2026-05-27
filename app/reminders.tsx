@@ -10,6 +10,7 @@ import React, { useCallback, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -32,6 +33,21 @@ export default function RemindersScreen() {
       setLoading(false);
     }
   }, []);
+
+  const toggleReminder = async (reminder: ReminderWithEntityName) => {
+    try {
+      await remindersRepository.updateReminder(reminder.id, {
+        enabled: !reminder.enabled,
+      });
+      setReminders(
+        reminders.map((r) =>
+          r.id === reminder.id ? { ...r, enabled: !r.enabled } : r,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to toggle reminder:", error);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -90,25 +106,12 @@ export default function RemindersScreen() {
                     </Text>
                   </View>
 
-                  <View
-                    style={[
-                      styles.statusChip,
-                      reminder.enabled
-                        ? styles.activeChip
-                        : styles.inactiveChip,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.statusChipText,
-                        reminder.enabled
-                          ? styles.activeChipText
-                          : styles.inactiveChipText,
-                      ]}
-                    >
-                      {reminder.enabled ? "Active" : "Inactive"}
-                    </Text>
-                  </View>
+                  <Switch
+                    value={reminder.enabled}
+                    onValueChange={() => toggleReminder(reminder)}
+                    trackColor={{ false: "#E5E7EB", true: PRIMARY.main }}
+                    thumbColor={reminder.enabled ? "#FFFFFF" : "#D1D5DB"}
+                  />
                 </View>
 
                 <View style={styles.detailRow}>
