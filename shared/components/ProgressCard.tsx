@@ -1,34 +1,120 @@
 import { BORDER, PRIMARY, SURFACE, TEXT, PROGRESS } from "@/shared/theme/colors";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
-import React, { useEffect, useRef } from "react";
-import { Animated, Easing, StyleSheet, Text, View } from "react-native";
+import { useTasks } from "@/features/tasks/hooks/useTasks";
+import { useHabits } from "@/features/habits/hooks/useHabits";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Easing, StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
+import EmptyStateCard from "./EmptyStateCard";
 
-type Props = {
+type ProgressType = "tasks" | "habits" | "empty";
+
+interface ProgressData {
   completed: number;
   total: number;
-};
+  type: ProgressType;
+  label: string;
+}
 
-export default function TodayProgress({ completed, total }: Props) {
+export default function TodayProgress() {
+  const { getTasksDueToday } = useTasks(true);
+  const { habits } = useHabits(true);
+  const [progressData, setProgressData] = useState<ProgressData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const animatedValue = useRef(new Animated.Value(0)).current;
-  const progress = Math.round((completed / total) * 100);
 
   useEffect(() => {
-    Animated.timing(animatedValue, {
-      toValue: progress,
-      duration: 900,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: false,
-    }).start();
-  }, [progress]);
+    const fetchProgressData = async () => {
+      try {
+        setIsLoading(true);
 
-  const getMessage = () => {
-    if (progress === 0) return "Let’s start your day 🚀";
+        // Get tasks due today
+        const tasksDueToday = await getTasksDueToday();
+        const completedTasks = tasksDueToday.filter((task) => task.completed).length;
+
+        // If we have tasks, show task progress
+        if (tasksDueToday.length > 0) {
+          setProgressData({
+            completed: completedTasks,
+            total: tasksDueToday.length,
+            type: "tasks",
+            label: "tasks",
+          });
+        } else if (habits.length > 0) {
+          // If no tasks, check habits for today
+          // Habits are already filtered for today by their frequency
+          // We count habits that have completed: true (which means they have completion for today)
+          const completedHabits = habits.filter((habit) => habit.completed).length;
+          setProgressData({
+            completed: completedHabits,
+            total: habits.length,
+            type: "habits",
+            label: "habits",
+          });
+        } else {
+          // No tasks and no habits
+          setProgressData({
+            completed: 0,
+            total: 0,
+            type: "empty",
+            label: "empty",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching progress data:", error);
+        setProgressData({
+          completed: 0,
+          total: 0,
+          type: "empty",
+          label: "empty",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProgressData();
+  }, [getTasksDueToday, habits]);
+
+  useEffect(() => {
+    if (progressData && progressData.total > 0) {
+      const progress = Math.round((progressData.completed / progressData.total) * 100);
+      Animated.timing(animatedValue, {
+        toValue: progress,
+        duration: 900,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [progressData, animatedValue]);
+
+  const getProgressMessage = () => {
+    if (!progressData) return "Loading...";
+
+    const progress = Math.round((progressData.completed / progressData.total) * 100);
+
+    if (progress === 0) return "Let's start your day 🚀";
     if (progress < 50) return "Nice start. Keep going 🔥";
-    if (progress < 100)
-      return `🔥 You’re ${progress}% there. Keep the momentum!`;
+    if (progress < 100) return `🔥 You're ${progress}% there. Keep the momentum!`;
     return "You crushed today 👏";
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>{"Today's Progress"}</Text>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={PRIMARY.main} />
+        </View>
+      </View>
+    );
+  }
+
+  if (!progressData || progressData.type === "empty") {
+    return <EmptyStateCard />;
+  }
+
+  const progress = Math.round((progressData.completed / progressData.total) * 100);
 
   return (
     <View style={styles.card}>
@@ -48,13 +134,13 @@ export default function TodayProgress({ completed, total }: Props) {
             <View style={styles.centerContent}>
               <Text style={styles.percentText}>{progress}%</Text>
               <Text style={styles.subText}>
-                {completed} of {total} tasks
+                {progressData.completed} of {progressData.total} {progressData.label}
               </Text>
             </View>
           )}
         </AnimatedCircularProgress>
 
-        <Text style={styles.message}>{getMessage()}</Text>
+        <Text style={styles.message}>{getProgressMessage()}</Text>
       </View>
     </View>
   );
@@ -76,6 +162,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    minHeight: moderateScale(220),
   },
   cardTitle: {
     fontSize: responsiveFontSize(16),
@@ -116,5 +203,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: moderateScale(14),
     paddingBottom: moderateScale(8),
+  },
+  loadingContainer: {
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: moderateScale(20),
+    paddingBottom: moderateScale(20),
   },
 });

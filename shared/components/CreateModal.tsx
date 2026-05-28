@@ -1,7 +1,5 @@
 import {
-  BACKGROUND,
   MODAL,
-  PRIMARY,
   SURFACE,
   TEXT,
 } from "@/shared/theme/colors";
@@ -19,6 +17,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import OptionCard, { OptionType } from "./OptionCard";
 
 type Props = {
   visible: boolean;
@@ -28,7 +27,7 @@ type Props = {
 export default function CreateModal({ visible, onClose }: Props) {
   const router = useRouter();
 
-  const handleOptionPress = (option: "task" | "note" | "habit") => {
+  const handleOptionPress = (option: OptionType) => {
     onClose();
 
     switch (option) {
@@ -39,14 +38,13 @@ export default function CreateModal({ visible, onClose }: Props) {
         router.push("/create/note");
         break;
       case "habit":
-        // TODO: Navigate to create habit screen
         router.push("/create/habit");
         break;
     }
   };
 
   const options: {
-    label: "task" | "note" | "habit";
+    label: OptionType;
     icon: keyof typeof MaterialIcons.glyphMap;
     description: string;
   }[] = [
@@ -92,34 +90,13 @@ export default function CreateModal({ visible, onClose }: Props) {
               {/* Options */}
               <View style={styles.optionsContainer}>
                 {options.map((option) => (
-                  <TouchableOpacity
+                  <OptionCard
                     key={option.label}
-                    style={styles.option}
-                    onPress={() => handleOptionPress(option.label)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.optionIconContainer}>
-                      <MaterialIcons
-                        name={option.icon}
-                        size={28}
-                        color={PRIMARY.main}
-                      />
-                    </View>
-                    <View style={styles.optionTextContainer}>
-                      <Text style={styles.optionLabel}>
-                        {option.label.charAt(0).toUpperCase() +
-                          option.label.slice(1)}
-                      </Text>
-                      <Text style={styles.optionDescription}>
-                        {option.description}
-                      </Text>
-                    </View>
-                    <MaterialCommunityIcons
-                      name="chevron-right"
-                      size={24}
-                      color={TEXT.tertiary}
-                    />
-                  </TouchableOpacity>
+                    label={option.label}
+                    icon={option.icon}
+                    description={option.description}
+                    onPress={handleOptionPress}
+                  />
                 ))}
               </View>
             </View>
@@ -159,38 +136,5 @@ const styles = StyleSheet.create({
   },
   optionsContainer: {
     gap: moderateScale(8),
-  },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: moderateScale(12),
-    paddingHorizontal: moderateScale(12),
-    borderRadius: moderateScale(12),
-    backgroundColor: BACKGROUND.secondary,
-  },
-  optionIconContainer: {
-    width: moderateScale(44),
-    height: moderateScale(44),
-    borderRadius: moderateScale(12),
-    backgroundColor: `${PRIMARY.main}20`,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: moderateScale(12),
-  },
-  optionTextContainer: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    width: "70%",
-  },
-  optionLabel: {
-    fontSize: responsiveFontSize(16),
-    fontFamily: fonts.medium,
-    color: TEXT.primary,
-  },
-  optionDescription: {
-    fontSize: responsiveFontSize(12),
-    fontFamily: fonts.regular,
-    color: TEXT.tertiary,
   },
 });

@@ -54,7 +54,7 @@ export default function Home() {
         </View>
 
         {/* Today's Progress Card */}
-        <TodayProgress completed={12} total={20} />
+        <TodayProgress />
 
         {/* All Tasks Scrollable */}
         <TasksScrollable />
