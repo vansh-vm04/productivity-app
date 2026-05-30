@@ -5,7 +5,7 @@ import { useHabits } from "@/features/habits/hooks/useHabits";
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import EmptyStateCard from "./EmptyStateCard";
+import GetStartedCard from "./GetStartedCard";
 
 type ProgressType = "tasks" | "habits" | "empty";
 
@@ -111,7 +111,7 @@ export default function TodayProgress() {
   }
 
   if (!progressData || progressData.type === "empty") {
-    return <EmptyStateCard />;
+    return <GetStartedCard />;
   }
 
   const progress = Math.round((progressData.completed / progressData.total) * 100);

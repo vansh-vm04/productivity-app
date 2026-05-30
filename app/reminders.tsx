@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { EmptyState } from "@/shared/components/EmptyState";
 
 export default function RemindersScreen() {
   const router = useRouter();
@@ -86,7 +87,7 @@ export default function RemindersScreen() {
           {loading ? (
             <Text style={styles.statusText}>Loading reminders...</Text>
           ) : reminders.length === 0 ? (
-            <Text style={styles.statusText}>No reminders found</Text>
+            <EmptyState title="No reminders found" subtitle="Create a task or habit reminder to get started" compact={true} />
           ) : (
             reminders.map((reminder) => (
               <View key={reminder.id} style={styles.card}>

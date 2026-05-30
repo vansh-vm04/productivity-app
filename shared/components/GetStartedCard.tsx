@@ -10,7 +10,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import OptionCard, { OptionType } from "./OptionCard";
 
-export default function EmptyStateCard() {
+export default function GetStartedCard() {
   const router = useRouter();
 
   const handleOptionPress = (option: OptionType) => {
@@ -38,11 +38,6 @@ export default function EmptyStateCard() {
       description: "Create a task",
     },
     {
-      label: "note",
-      icon: "notes",
-      description: "Create a note",
-    },
-    {
       label: "habit",
       icon: "event-repeat",
       description: "Create a habit",
@@ -53,7 +48,7 @@ export default function EmptyStateCard() {
     <View style={styles.card}>
       <View style={styles.headerContainer}>
         <Text style={styles.title}>Get Started</Text>
-        <Text style={styles.subtitle}>Create your first task or habit to see progress</Text>
+        <Text style={styles.subtitle}>Create tasks or habits for today</Text>
       </View>
 
       <View style={styles.optionsContainer}>
@@ -75,7 +70,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: moderateScale(24),
     paddingHorizontal: moderateScale(16),
-    paddingVertical: moderateScale(20),
+    paddingVertical: moderateScale(16),
     width: "100%",
     marginVertical: moderateScale(16),
     backgroundColor: SURFACE.primary,
