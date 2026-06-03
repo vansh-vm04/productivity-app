@@ -6,6 +6,7 @@ type ReminderNotificationInput = {
   entityType: "habit" | "task";
   time: string;
   label: string;
+  repeatInterval?: number; // hours between repeats (undefined = single daily)
 };
 
 const ANDROID_CHANNEL_ID = "reminders";
@@ -86,17 +87,13 @@ export const ensureReminderNotificationsAsync = async (): Promise<void> => {
   await initializationPromise;
 };
 
-export const scheduleReminderNotificationAsync = async (
+const scheduleDailyNotification = async (
   reminder: ReminderNotificationInput,
+  hour: number,
+  minute: number,
+  suffix?: string,
 ): Promise<string | null> => {
-  if (Platform.OS === "web") {
-    return null;
-  }
-
-  await ensureReminderNotificationsAsync();
-
   try {
-    const { hour, minute } = parseReminderTime(reminder.time);
     return await Notifications.scheduleNotificationAsync({
       content: {
         title:
@@ -133,6 +130,57 @@ export const scheduleReminderNotificationAsync = async (
   }
 };
 
+export const scheduleReminderNotificationAsync = async (
+  reminder: ReminderNotificationInput,
+): Promise<string | null> => {
+  if (Platform.OS === "web") {
+    return null;
+  }
+
+  await ensureReminderNotificationsAsync();
+
+  const { hour, minute } = parseReminderTime(reminder.time);
+
+  if (reminder.repeatInterval && reminder.repeatInterval > 0) {
+    // Generate all fire times within the day
+    const ids: string[] = [];
+    let currentMinute = hour * 60 + minute;
+    const dayEnd = 24 * 60; // 1440 minutes
+    const intervalMin = reminder.repeatInterval * 60;
+
+    while (currentMinute < dayEnd) {
+      const h = Math.floor(currentMinute / 60);
+      const m = currentMinute % 60;
+      const notificationId = await scheduleDailyNotification(
+        reminder,
+        h,
+        m,
+      );
+      if (notificationId) {
+        ids.push(notificationId);
+      }
+      currentMinute += intervalMin;
+    }
+
+    return ids.length > 0 ? JSON.stringify(ids) : null;
+  }
+
+  return scheduleDailyNotification(reminder, hour, minute);
+};
+
+const getNotificationIds = (
+  notificationId: string | null | undefined,
+): string[] => {
+  if (!notificationId) return [];
+  try {
+    const parsed = JSON.parse(notificationId);
+    if (Array.isArray(parsed)) return parsed;
+    return [notificationId];
+  } catch {
+    return [notificationId];
+  }
+};
+
 export const cancelReminderNotificationAsync = async (
   notificationId: string | null | undefined,
 ): Promise<void> => {
@@ -142,9 +190,12 @@ export const cancelReminderNotificationAsync = async (
 
   await ensureReminderNotificationsAsync();
 
-  try {
-    await Notifications.cancelScheduledNotificationAsync(notificationId);
-  } catch (error) {
-    console.error(`Failed to cancel notification ${notificationId}:`, error);
-  }
+  const ids = getNotificationIds(notificationId);
+  await Promise.all(
+    ids.map((id) =>
+      Notifications.cancelScheduledNotificationAsync(id).catch((err) =>
+        console.error(`Failed to cancel notification ${id}:`, err),
+      ),
+    ),
+  );
 };

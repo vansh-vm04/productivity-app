@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View, ActivityIndicator } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import GetStartedCard from "./GetStartedCard";
+import { usePathname } from "expo-router";
 
 type ProgressType = "tasks" | "habits" | "empty";
 
@@ -22,6 +23,7 @@ export default function TodayProgress() {
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const animatedValue = useRef(new Animated.Value(0)).current;
+  const pathname = usePathname() === "/" ? true : false;
 
   useEffect(() => {
     const fetchProgressData = async () => {
@@ -73,8 +75,10 @@ export default function TodayProgress() {
       }
     };
 
-    fetchProgressData();
-  }, [getTasksDueToday, habits]);
+    if(pathname) {
+      fetchProgressData();
+    }
+  }, [getTasksDueToday, habits, pathname]);
 
   useEffect(() => {
     if (progressData && progressData.total > 0) {

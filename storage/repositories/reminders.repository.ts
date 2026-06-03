@@ -23,6 +23,7 @@ interface ReminderRowDB {
   label: string;
   enabled: number;
   notificationId?: string | null;
+  repeatInterval: number | null;
   createdAt: number;
   updatedAt: number;
 }
@@ -43,6 +44,7 @@ const convertDBRowToReminder = (row: ReminderRowDB): ReminderRecord => ({
   label: row.label,
   enabled: row.enabled === 1,
   notificationId: row.notificationId ?? null,
+  repeatInterval: row.repeatInterval ?? null,
   createdAt: row.createdAt,
   updatedAt: row.updatedAt,
 });
@@ -66,9 +68,11 @@ class RemindersRepository {
   ): Promise<ReminderRecord> {
     const now = Date.now();
 
+    const repeatInterval = (reminder as any).repeatInterval ?? null;
+
     await executeAsync(
-      `INSERT INTO reminders (id, entityType, entityId, time, label, enabled, notificationId, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO reminders (id, entityType, entityId, time, label, enabled, notificationId, repeatInterval, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         reminder.id,
         reminder.entityType,
@@ -77,6 +81,7 @@ class RemindersRepository {
         reminder.label,
         reminder.enabled ? 1 : 0,
         null,
+        repeatInterval,
         now,
         now,
       ],
@@ -88,6 +93,7 @@ class RemindersRepository {
         entityType: reminder.entityType,
         time: reminder.time,
         label: reminder.label,
+        repeatInterval: repeatInterval ?? undefined,
       });
 
       await updateReminderNotificationIdInDb(reminder.id, notificationId);
@@ -168,7 +174,7 @@ class RemindersRepository {
    */
   async updateReminder(
     id: string,
-    updates: Partial<Pick<ReminderRecord, "time" | "label" | "enabled">>,
+    updates: Partial<Pick<ReminderRecord, "time" | "label" | "enabled" | "repeatInterval">>,
   ): Promise<ReminderRecord | null> {
     const reminder = await this.getReminderById(id);
 
@@ -182,6 +188,7 @@ class RemindersRepository {
     const nextTime = updates.time ?? reminder.time;
     const nextLabel = updates.label ?? reminder.label;
     const nextEnabled = updates.enabled ?? reminder.enabled;
+    const nextRepeatInterval = updates.repeatInterval !== undefined ? updates.repeatInterval : reminder.repeatInterval;
 
     if (updates.time !== undefined) {
       updateFields.push("time = ?");
@@ -195,12 +202,17 @@ class RemindersRepository {
       updateFields.push("enabled = ?");
       values.push(updates.enabled ? 1 : 0);
     }
+    if (updates.repeatInterval !== undefined) {
+      updateFields.push("repeatInterval = ?");
+      values.push(updates.repeatInterval);
+    }
 
     const shouldRescheduleNotification =
       nextEnabled &&
       (updates.time !== undefined ||
         updates.label !== undefined ||
         updates.enabled !== undefined ||
+        updates.repeatInterval !== undefined ||
         !reminder.notificationId);
 
     if (updateFields.length === 0 && !shouldRescheduleNotification) {
@@ -226,6 +238,7 @@ class RemindersRepository {
         entityType: reminder.entityType,
         time: nextTime,
         label: nextLabel,
+        repeatInterval: nextRepeatInterval ?? undefined,
       });
 
       await updateReminderNotificationIdInDb(id, notificationId);

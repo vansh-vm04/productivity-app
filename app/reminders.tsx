@@ -124,6 +124,19 @@ export default function RemindersScreen() {
                   <Text style={styles.detailText}>{reminder.time}</Text>
                 </View>
 
+                {reminder.repeatInterval ? (
+                  <View style={styles.detailRow}>
+                    <MaterialCommunityIcons
+                      name="repeat"
+                      size={16}
+                      color={PRIMARY.main}
+                    />
+                    <Text style={styles.repeatDetailText}>
+                      Every {reminder.repeatInterval}h
+                    </Text>
+                  </View>
+                ) : null}
+
                 <View style={styles.detailRow}>
                   <MaterialCommunityIcons
                     name="label-outline"
@@ -244,5 +257,11 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(12),
     fontFamily: fonts.medium,
     color: TEXT.secondary,
+  },
+  repeatDetailText: {
+    flex: 1,
+    fontSize: responsiveFontSize(12),
+    fontFamily: fonts.semibold,
+    color: PRIMARY.main,
   },
 });

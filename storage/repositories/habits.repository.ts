@@ -144,11 +144,12 @@ class HabitsRepository {
 
   private async getHabitReminders(habitId: string): Promise<Reminder[]> {
     const reminders = await remindersRepository.getRemindersByEntity("habit", habitId);
-    return reminders.map(({ id, time, label, enabled }) => ({
+    return reminders.map(({ id, time, label, enabled, repeatInterval }) => ({
       id,
       time,
       label,
       enabled,
+      repeatInterval,
     }));
   }
 
@@ -169,6 +170,7 @@ class HabitsRepository {
             time: reminder.time,
             label: reminder.label,
             enabled: reminder.enabled,
+            repeatInterval: reminder.repeatInterval ?? null,
           })
           .then(() => undefined),
       ),
@@ -332,6 +334,7 @@ class HabitsRepository {
             time: reminder.time,
             label: reminder.label,
             enabled: reminder.enabled,
+            repeatInterval: reminder.repeatInterval ?? null,
           }),
         ),
       );

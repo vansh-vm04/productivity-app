@@ -1,10 +1,13 @@
 import { executeAsync, getAllAsync } from "../db/database";
 
-const ensureReminderNotificationColumn = async (): Promise<void> => {
+const ensureReminderColumns = async (): Promise<void> => {
   const columns = await getReminderTableColumns();
 
   if (!columns.has("notificationId")) {
     await executeAsync("ALTER TABLE reminders ADD COLUMN notificationId TEXT");
+  }
+  if (!columns.has("repeatInterval")) {
+    await executeAsync("ALTER TABLE reminders ADD COLUMN repeatInterval INTEGER");
   }
 };
 
@@ -25,12 +28,13 @@ export const initializeRemindersSchema = async (): Promise<void> => {
         label TEXT NOT NULL,
         enabled INTEGER NOT NULL DEFAULT 1,
         notificationId TEXT,
+        repeatInterval INTEGER,
         createdAt INTEGER NOT NULL,
         updatedAt INTEGER NOT NULL
       );
     `);
 
-    await ensureReminderNotificationColumn();
+    await ensureReminderColumns();
 
     await executeAsync(`
       CREATE INDEX IF NOT EXISTS idx_reminders_entity ON reminders(entityType, entityId);

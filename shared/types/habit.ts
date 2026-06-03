@@ -13,6 +13,7 @@ export interface Reminder {
   time: string; // HH:MM format
   label: string; // "morning", "evening", etc.
   enabled: boolean;
+  repeatInterval?: number | null; // hours between repeats (null = daily only)
 }
 
 export interface FrequencyDetails {

@@ -118,6 +118,7 @@ export default function CreateTask() {
                     time: reminder.time,
                     label: reminder.label,
                     enabled: reminder.enabled,
+                    repeatInterval: reminder.repeatInterval,
                   }))
                 : defaultReminders;
 
@@ -253,6 +254,7 @@ export default function CreateTask() {
                 time: reminder.time,
                 label: reminder.label,
                 enabled: reminder.enabled,
+                repeatInterval: reminder.repeatInterval ?? null,
               }),
             ),
           );

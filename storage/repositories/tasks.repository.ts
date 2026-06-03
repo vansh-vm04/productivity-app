@@ -31,11 +31,12 @@ const convertDBRowToTask = (row: TaskRowDB, reminders: Reminder[] = []): Task =>
 class TasksRepository {
   private async getTaskReminders(taskId: string): Promise<Reminder[]> {
     const reminders = await remindersRepository.getRemindersByEntity("task", taskId);
-    return reminders.map(({ id, time, label, enabled }) => ({
+    return reminders.map(({ id, time, label, enabled, repeatInterval }) => ({
       id,
       time,
       label,
       enabled,
+      repeatInterval,
     }));
   }
 
@@ -53,21 +54,23 @@ class TasksRepository {
     await Promise.all(
       reminders.map((reminder) => {
         if (existingById.has(reminder.id)) {
-          return remindersRepository.updateReminder(reminder.id, {
-            time: reminder.time,
-            label: reminder.label,
-            enabled: reminder.enabled,
-          }).then(() => undefined);
-        }
-
-        return remindersRepository.createReminder({
-          id: reminder.id,
-          entityType: "task",
-          entityId: taskId,
+        return remindersRepository.updateReminder(reminder.id, {
           time: reminder.time,
           label: reminder.label,
           enabled: reminder.enabled,
+          repeatInterval: reminder.repeatInterval ?? null,
         }).then(() => undefined);
+      }
+
+      return remindersRepository.createReminder({
+        id: reminder.id,
+        entityType: "task",
+        entityId: taskId,
+        time: reminder.time,
+        label: reminder.label,
+        enabled: reminder.enabled,
+        repeatInterval: reminder.repeatInterval ?? null,
+      }).then(() => undefined);
       }),
     );
   }
@@ -116,6 +119,7 @@ class TasksRepository {
             time: reminder.time,
             label: reminder.label,
             enabled: reminder.enabled,
+            repeatInterval: reminder.repeatInterval ?? null,
           }),
         ),
       );
