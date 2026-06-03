@@ -10,6 +10,7 @@ export {
   notesRepository,
   remindersRepository,
   tasksRepository,
+  userRepository,
 } from "./repositories";
 export { initializeAllSchemas } from "./schema";
 export { initializeHabitsSchema } from "./schema/habits.schema";

@@ -2,12 +2,14 @@ import TasksScrollable from "@/features/tasks/components/TasksScrollable";
 import CreateModal from "@/shared/components/CreateModal";
 import TodayProgress from "@/shared/components/ProgressCard";
 import ScreenWrapper from "@/shared/components/ScreenWrapper";
+import UserSetupModal from "@/shared/components/UserSetupModal";
 import { TEXT } from "@/shared/theme/colors";
 import { fonts } from "@/shared/theme/fonts";
 import { moderateScale, responsiveFontSize } from "@/shared/utils/responsive";
+import { userRepository } from "@/storage";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -19,6 +21,30 @@ import {
 export default function Home() {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [setupVisible, setSetupVisible] = useState(false);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const user = await userRepository.getUser();
+      if (user) {
+        setUserName(user.name);
+      } else {
+        setSetupVisible(true);
+      }
+    };
+    loadUser();
+  }, []);
+
+  const handleSetupSubmit = useCallback(async (name: string, email: string) => {
+    await userRepository.createUser({
+      id: Math.random().toString(36).substring(2, 15),
+      name,
+      email,
+    });
+    setUserName(name);
+    setSetupVisible(false);
+  }, []);
 
   return (
     <ScreenWrapper>
@@ -27,7 +53,7 @@ export default function Home() {
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Text style={styles.headerGreeting}>
-              Hey <Text style={styles.headerName}>Vansh!</Text>
+              Hey <Text style={styles.headerName}>{userName.split(" ")[0].slice(0, 6)}{userName.split(" ")[0].length > 6 ? "..." : ""}</Text>!
             </Text>
             <Text style={styles.headerTextSmall}>
               Let’s make today productive.
@@ -64,6 +90,12 @@ export default function Home() {
       <CreateModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
+      />
+
+      {/* First-time User Setup Modal */}
+      <UserSetupModal
+        visible={setupVisible}
+        onSubmit={handleSetupSubmit}
       />
     </ScreenWrapper>
   );
