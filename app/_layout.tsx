@@ -1,6 +1,6 @@
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { enableScreens } from 'react-native-screens';
 import { syncReminderNotificationsAsync } from "@/features/notifications/reminderNotifications.bootstrap";
 import { initializeAllSchemas } from "@/storage";
@@ -9,6 +9,7 @@ SplashScreen.preventAutoHideAsync();
 enableScreens(true);
 
 export default function RootLayout() {
+  const [dbReady, setDbReady] = useState(false);
   const [loaded, error] = useFonts({
     "Poppins-Light": require("../assets/fonts/Poppins-Light.ttf"),
     "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
@@ -23,8 +24,10 @@ export default function RootLayout() {
       try {
         await initializeAllSchemas();
         await syncReminderNotificationsAsync();
+        setDbReady(true);
       } catch (error) {
         console.error('Failed to initialize app storage:', error);
+        setDbReady(true);
       }
     };
 
@@ -32,12 +35,12 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (loaded || error) {
+    if ((loaded || error) && dbReady) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error]);
+  }, [loaded, error, dbReady]);
 
-  if (!loaded && !error) {
+  if (!loaded && !error || !dbReady) {
     return null;
   }
 

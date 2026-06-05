@@ -253,15 +253,13 @@ const styles = StyleSheet.create({
   daysGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
   },
   dayCell: {
-    width: `${100 / 7 - 2}%`,
+    width: "14.28%",
     height: moderateScale(28),
     borderRadius: moderateScale(6),
     alignItems: "center",
     justifyContent: "center",
-    margin: moderateScale(3),
     borderWidth: 1,
     borderStyle: "dotted",
   },
