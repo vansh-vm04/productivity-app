@@ -39,7 +39,7 @@ export default function UserSetupModal({ visible, onSubmit }: Props) {
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
             <KeyboardAvoidingView
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              behavior={Platform.OS === "ios" ? "padding" : "padding"}
             >
               <View style={styles.modalContent}>
                 <Text style={styles.title}>Welcome!</Text>
