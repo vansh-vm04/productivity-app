@@ -1,4 +1,4 @@
-<img src="https://res.cloudinary.com/dd2jupzdn/image/upload/v1780887435/dayone-banner-2_dizkj6.png" width="100%" />
+<img src="https://res.cloudinary.com/dd2jupzdn/image/upload/v1780887435/dayone-banner-2_dizkj6.png" width="760" />
 
 ## ✨ Features
 
