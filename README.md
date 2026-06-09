@@ -1,50 +1,38 @@
-# Welcome to your Expo app 👋
+<img src="https://res.cloudinary.com/dd2jupzdn/image/upload/v1780887435/dayone-banner-2_dizkj6.png" width="100%" />
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## ✨ Features
 
-## Get started
+- ✅ Task Management
+- 🎯 Habit Tracking with Streaks
+- 📝 Notes with Speech-to-Text
+- 🔔 Local Notifications & Reminders
+- 📅 Monthly Habit Calendar
+- 🏷 Priority Tags & Categories
+- 📶 Offline-First using SQLite
 
-1. Install dependencies
+## 🛠 Tech Stack
 
-   ```bash
-   npm install
-   ```
+- React Native
+- Expo
+- TypeScript
+- SQLite
+- Expo Notifications
 
-2. Start the app
+## 📸 Screenshots
 
-   ```bash
-   npx expo start
-   ```
+<p align="center">
+  <img src="https://res.cloudinary.com/dd2jupzdn/image/upload/v1780887433/dayone-banner-4_rnznl7.png" width="100%" />
+  <img src="https://res.cloudinary.com/dd2jupzdn/image/upload/v1780887434/dayone-banner-3_cahfvv.png" width="100%" />
+</p>
 
-In the output, you'll find options to open the app in a
+## 📦 Download APK
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+👉 https://github.com/vansh-vm04/productivity-app/releases/download/v1.0.0/DayONE-v1.0.0.apk
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## 🚀 Run Locally
 
 ```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+git clone https://github.com/vansh-vm04/productivity-app.git
+cd productivity-app
+npm install
+npx expo start
